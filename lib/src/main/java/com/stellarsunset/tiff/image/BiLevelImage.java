@@ -38,9 +38,8 @@ public record BiLevelImage(Interpretation type, ImageDimensions dimensions, Stri
     }
 
     @Override
-    public PixelValue valueAt(int row, int col) {
-        byte value = data[col][row];
-        return new PixelValue.Empty();
+    public PixelValue.BlackOrWhite valueAt(int row, int col) {
+        return new PixelValue.BlackOrWhite(data[row][col]);
     }
 
     public enum Interpretation {

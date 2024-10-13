@@ -1,13 +1,18 @@
-package com.stellarsunset.tiff;
+package com.stellarsunset.tiff.image;
 
-import com.stellarsunset.tiff.image.BiLevelImage;
-import com.stellarsunset.tiff.image.Image;
+import com.stellarsunset.tiff.Ifd;
+import com.stellarsunset.tiff.TiffFile;
+import com.stellarsunset.tiff.TiffFileReader;
+import com.stellarsunset.tiff.TiffHeader;
 import com.stellarsunset.tiff.tag.BitsPerSample;
 import com.stellarsunset.tiff.tag.Compression;
 import com.stellarsunset.tiff.tag.PhotometricInterpretation;
+import mil.nga.tiff.Rasters;
+import mil.nga.tiff.TiffReader;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 
@@ -16,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Integration-level test for reading an entire Little-Endian TIFF file.
  */
-class LittleEndianTiffFileReaderTest {
+class BiLevelImageRegressionTest {
 
     private static final File FILE = tiffFile("bilevel.tif");
 
@@ -48,13 +53,24 @@ class LittleEndianTiffFileReaderTest {
             );
 
             Image image = file.image(0);
+            Rasters rasters = readRasters();
 
             if (unwrap(image) instanceof BiLevelImage b) {
                 assertAll(
                         "Check Image(0) contents.",
-                        () -> assertEquals(280, b.dimensions().imageLength(), "Image Length"),
-                        () -> assertEquals(272, b.dimensions().imageWidth(), "Image Width"),
+                        () -> assertEquals(rasters.getHeight(), b.dimensions().imageLength(), "Image Length Matches"),
+                        () -> assertEquals(280, b.dimensions().imageLength(), "Image Length (280)"),
+                        () -> assertEquals(rasters.getWidth(), b.dimensions().imageWidth(), "Image Width Matches"),
+                        () -> assertEquals(272, b.dimensions().imageWidth(), "Image Width (272)"),
                         () -> assertEquals(30, b.stripInfo().rowsPerStrip(), "Rows Per Strip")
+                );
+
+                assertAll(
+                        "Check Image(0) pixels.",
+                        () -> comparePixelValues(b, rasters, 0, 0),
+                        () -> comparePixelValues(b, rasters, 200, 200),
+                        () -> comparePixelValues(b, rasters, 125, 225),
+                        () -> comparePixelValues(b, rasters, 279, 271)
                 );
             } else {
                 fail("Image not of the correct type, image type was: " + unwrap(image).getClass().getSimpleName());
@@ -64,11 +80,21 @@ class LittleEndianTiffFileReaderTest {
         }
     }
 
+    private void comparePixelValues(BiLevelImage image, Rasters rasters, int row, int column) {
+
+        Number[] rPixel = rasters.getPixel(column, row);
+        assertEquals(1, rPixel.length, "Should return a single number for the BiLevel image pixel value.");
+
+        PixelValue.BlackOrWhite iPixel = image.valueAt(row, column);
+        assertEquals(Short.toUnsignedInt((Short) rPixel[0]), Byte.toUnsignedInt(iPixel.value()), String.format("Should contain identical values at the respective pixel (%d, %d).", row, column));
+    }
+
+    private Rasters readRasters() throws IOException {
+        return TiffReader.readTiff(FILE).getFileDirectory().readRasters();
+    }
+
     private Image unwrap(Image image) {
-        return switch (image) {
-            case Image.Lazy l -> l.delegate();
-            default -> image;
-        };
+        return image instanceof Image.Lazy l ? l.delegate() : image;
     }
 
     private static File tiffFile(String name) {

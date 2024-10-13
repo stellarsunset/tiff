@@ -22,16 +22,16 @@ public sealed interface PixelValue {
     sealed interface Baseline extends PixelValue {
     }
 
-    record BlackOrWhite() implements PixelValue.Baseline {
+    record BlackOrWhite(byte value) implements PixelValue.Baseline {
     }
 
-    record Grayscale() implements PixelValue.Baseline {
+    record Grayscale(byte value) implements PixelValue.Baseline {
     }
 
     record PaletteColor() implements PixelValue.Baseline {
     }
 
-    record Rgb() implements PixelValue.Baseline {
+    record Rgb(byte r, byte g, byte b) implements PixelValue.Baseline {
     }
 
     /**

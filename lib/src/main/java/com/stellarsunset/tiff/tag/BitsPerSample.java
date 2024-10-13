@@ -32,8 +32,9 @@ public final class BitsPerSample {
         return switch (ifd.findTag(ID)) {
             case Entry.Short s -> Optional.of(Arrays.toUnsignedIntArray(s.values()));
             case Entry.NotFound _ -> Optional.of(new int[]{1});
-            case Entry.Byte _, Entry.Ascii _, Entry.Long _, Entry.Rational _, Entry.SByte _, Entry.Undefined _, Entry.SShort _, Entry.SLong _, Entry.SRational _,
-                    Entry.Float _, Entry.Double _ -> throw new UnsupportedTypeForTagException(NAME, ID);
+            case Entry.Byte _, Entry.Ascii _, Entry.Long _, Entry.Rational _, Entry.SByte _, Entry.Undefined _,
+                 Entry.SShort _, Entry.SLong _, Entry.SRational _,
+                 Entry.Float _, Entry.Double _ -> throw new UnsupportedTypeForTagException(NAME, ID);
         };
     }
 }

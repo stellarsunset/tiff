@@ -1,6 +1,7 @@
 package com.stellarsunset.tiff;
 
 import com.stellarsunset.tiff.image.Image;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 

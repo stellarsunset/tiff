@@ -8,6 +8,8 @@ import com.stellarsunset.tiff.tag.ImageWidth;
 /**
  * Container class for the {@link ImageLength} and {@link ImageWidth} tags.
  *
+ * <p>The width of the image is the number of columns in the image, the length is the number of rows.
+ *
  * <p>Parameter types are Java longs to contain the unsigned short/int values.
  */
 public record ImageDimensions(long imageLength, long imageWidth) {

@@ -42,12 +42,12 @@ public record RgbImage(ImageDimensions dimensions, StripInfo stripInfo, Resoluti
     }
 
     @Override
-    public PixelValue valueAt(int row, int col) {
+    public PixelValue.Rgb valueAt(int row, int col) {
         int offset = col * SAMPLES_PER_PIXEL;
         byte r = data[row][offset];
         byte g = data[row][offset + 1];
         byte b = data[row][offset + 2];
-        return new PixelValue.Empty();
+        return new PixelValue.Rgb(r, g, b);
     }
 
     record Maker(BytesAdapter adapter) implements ImageMaker {
