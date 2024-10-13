@@ -39,9 +39,8 @@ public record GrayscaleImage(Interpretation type, ImageDimensions dimensions, St
     }
 
     @Override
-    public PixelValue valueAt(int row, int col) {
-        byte value = data[row][col];
-        return new PixelValue.Empty();
+    public PixelValue.Grayscale valueAt(int row, int col) {
+        return new PixelValue.Grayscale(data[row][col]);
     }
 
     /**

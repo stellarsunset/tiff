@@ -1,33 +1,27 @@
 package com.stellarsunset.tiff.compress;
 
 import com.stellarsunset.tiff.BytesAdapter;
-import mil.nga.tiff.compression.LZWCompression;
-import org.junit.jupiter.api.Disabled;
+import mil.nga.tiff.compression.RawCompression;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteOrder;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-class LzwTest {
+class UncompressedTest {
 
-    private static final LZWCompression REFERENCE = new LZWCompression();
+    private static final RawCompression REFERENCE = new RawCompression();
 
-    private static final Lzw DECODER = new Lzw();
+    private static final Uncompressed DECODER = new Uncompressed();
 
     @Test
-    @Disabled("Not implemented")
     void test() {
-        byte[] bytes = new byte[]{-128, -3, 4, 3, 0, 1, 2, 3};
-
-        byte[] expected = new byte[]{4, 4, 4, 4, 0, 1, 2, 3};
+        byte[] bytes = new byte[]{4, 4, 4, 4, 0, 1, 2, 3};
         byte[] actual = DECODER.decompress(bytes, BytesAdapter.of(ByteOrder.BIG_ENDIAN));
-
-        assertArrayEquals(expected, actual);
+        assertArrayEquals(bytes, actual);
     }
 
     @Test
-    @Disabled("Not implemented")
     void regressionTest() {
 
         byte[] bytes = new byte[]{-128, -3, 4, 3, 0, 1, 2, 3};

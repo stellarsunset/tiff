@@ -18,9 +18,6 @@ import java.nio.channels.FileChannel;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Integration-level test for reading an entire Big-Endian TIFF file.
- */
 class RgbImageRegressionTest {
 
     private static final File FILE = tiffFile("rgb.tif");

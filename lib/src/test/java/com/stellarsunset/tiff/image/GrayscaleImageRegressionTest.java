@@ -18,9 +18,9 @@ import java.nio.channels.FileChannel;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BiLevelImageRegressionTest {
+class GrayscaleImageRegressionTest {
 
-    private static final File FILE = tiffFile("bilevel.tif");
+    private static final File FILE = tiffFile("grayscale.tif");
 
     @Test
     void test() {
@@ -30,7 +30,7 @@ class BiLevelImageRegressionTest {
 
             assertAll(
                     "Check the top-level file contents.",
-                    () -> assertEquals(ByteOrder.LITTLE_ENDIAN, header.order(), "ByteOrder"),
+                    () -> assertEquals(ByteOrder.BIG_ENDIAN, header.order(), "ByteOrder"),
                     () -> assertEquals(1, file.numberOfImages(), "Number of Images")
             );
 
@@ -56,18 +56,10 @@ class BiLevelImageRegressionTest {
                 assertAll(
                         "Check Image(0) contents.",
                         () -> assertEquals(rasters.getHeight(), b.dimensions().imageLength(), "Image Length Matches"),
-                        () -> assertEquals(280, b.dimensions().imageLength(), "Image Length (280)"),
+                        () -> assertEquals(256, b.dimensions().imageLength(), "Image Length (256)"),
                         () -> assertEquals(rasters.getWidth(), b.dimensions().imageWidth(), "Image Width Matches"),
-                        () -> assertEquals(272, b.dimensions().imageWidth(), "Image Width (272)"),
-                        () -> assertEquals(30, b.stripInfo().rowsPerStrip(), "Rows Per Strip")
-                );
-
-                assertAll(
-                        "Check Image(0) pixels.",
-                        () -> comparePixelValues(b, rasters, 0, 0),
-                        () -> comparePixelValues(b, rasters, 200, 200),
-                        () -> comparePixelValues(b, rasters, 125, 225),
-                        () -> comparePixelValues(b, rasters, 279, 271)
+                        () -> assertEquals(256, b.dimensions().imageWidth(), "Image Width (256)"),
+                        () -> assertEquals(32, b.stripInfo().rowsPerStrip(), "Rows Per Strip")
                 );
             } else {
                 fail("Image not of the correct type, image type was: " + unwrap(image).getClass().getSimpleName());

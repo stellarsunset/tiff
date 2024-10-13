@@ -6,14 +6,10 @@ import com.stellarsunset.tiff.BytesAdapter;
 public interface Compressor {
 
     /**
-     * Assume no modification of the underlying binary data was made.
-     */
-    static Compressor noop() {
-        return (bytes, order) -> bytes;
-    }
-
-    /**
      * No compression, but pack data into bytes as tightly as possible, leaving no unused bits (except at the end of a row).
+     *
+     * <p>This decompressor also applies the requisite {@link BytesAdapter} transform to the underlying bytes so they can
+     * be interpreted as values correctly in JVM primitive types.
      *
      * <p>The component values are stored as an array of type BYTE. Each scan line (row) is padded to the next BYTE boundary.
      */

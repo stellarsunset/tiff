@@ -30,7 +30,7 @@ public record StripInfo(long rowsPerStrip, long[] stripOffsets, long[] stripByte
 
             long stripByteCount = stripByteCounts[i];
 
-            Preconditions.checkArgument(stripByteCounts.length < java.lang.Integer.MAX_VALUE,
+            Preconditions.checkArgument(stripByteCount < java.lang.Integer.MAX_VALUE,
                     "StripByteCount should be less than Integer.MAX_VALUE, value was %s for strip %s", stripByteCount, i);
 
             intByteCounts[i] = (int) stripByteCount;

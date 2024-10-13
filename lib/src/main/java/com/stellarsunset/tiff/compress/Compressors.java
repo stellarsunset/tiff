@@ -54,7 +54,7 @@ public final class Compressors {
     private static ConcurrentHashMap<Integer, Compressor> createRegistry() {
 
         Map<Integer, Compressor> baseline = Map.of(
-                1, Compressor.noop(),
+                1, Compressor.uncompressed(),
                 2, Compressor.modifiedHuffman(),
                 32773, Compressor.packBits()
         );

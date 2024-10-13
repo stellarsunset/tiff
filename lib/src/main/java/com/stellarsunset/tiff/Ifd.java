@@ -22,6 +22,13 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public record Ifd(short entryCount, Entry[] entries, int nextIfdOffset) {
 
+    public Ifd {
+        checkArgument(Short.toUnsignedInt(entryCount) == entries.length,
+                "Entry count (%s) should match entries array length (%s)", Short.toUnsignedInt(entryCount), entries.length);
+        
+        Arrays.sort(entries); // Ensure entries are sorted
+    }
+
     public long unsignedNextIfdOffset() {
         return Integer.toUnsignedLong(nextIfdOffset);
     }
@@ -39,7 +46,6 @@ public record Ifd(short entryCount, Entry[] entries, int nextIfdOffset) {
         return index < 0 ? searchEntry : entries[index];
     }
 
-    // TODO - maybe add a TiffValue type, have the entries decorate it, reuse for the pixel value returns...?
     public sealed interface Entry extends Comparable<Entry> {
 
         static NotFound notFound(short tag) {
