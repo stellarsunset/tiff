@@ -52,14 +52,14 @@ class GrayscaleImageRegressionTest {
             Image image = file.image(0);
             Rasters rasters = readRasters();
 
-            if (unwrap(image) instanceof BiLevelImage b) {
+            if (unwrap(image) instanceof GrayscaleImage g) {
                 assertAll(
                         "Check Image(0) contents.",
-                        () -> assertEquals(rasters.getHeight(), b.dimensions().imageLength(), "Image Length Matches"),
-                        () -> assertEquals(256, b.dimensions().imageLength(), "Image Length (256)"),
-                        () -> assertEquals(rasters.getWidth(), b.dimensions().imageWidth(), "Image Width Matches"),
-                        () -> assertEquals(256, b.dimensions().imageWidth(), "Image Width (256)"),
-                        () -> assertEquals(32, b.stripInfo().rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(rasters.getHeight(), g.dimensions().imageLength(), "Image Length Matches"),
+                        () -> assertEquals(256, g.dimensions().imageLength(), "Image Length (256)"),
+                        () -> assertEquals(rasters.getWidth(), g.dimensions().imageWidth(), "Image Width Matches"),
+                        () -> assertEquals(256, g.dimensions().imageWidth(), "Image Width (256)"),
+                        () -> assertEquals(32, g.stripInfo().rowsPerStrip(), "Rows Per Strip")
                 );
             } else {
                 fail("Image not of the correct type, image type was: " + unwrap(image).getClass().getSimpleName());

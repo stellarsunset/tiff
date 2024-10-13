@@ -2,6 +2,7 @@ package com.stellarsunset.tiff.image;
 
 import com.stellarsunset.tiff.BytesAdapter;
 import com.stellarsunset.tiff.Ifd;
+import com.stellarsunset.tiff.tag.BitsPerSample;
 import com.stellarsunset.tiff.tag.PhotometricInterpretation;
 
 import java.nio.channels.SeekableByteChannel;
@@ -56,7 +57,9 @@ public interface ImageMaker {
         }
 
         private Image grayscaleOrBiLevel(SeekableByteChannel channel, Ifd ifd) {
-            return biLevel.makeImage(channel, ifd);
+            return BitsPerSample.getOptionalValue(ifd)
+                    .map(_ -> grayscale.makeImage(channel, ifd))
+                    .orElseGet(() -> biLevel.makeImage(channel, ifd));
         }
     }
 }
