@@ -74,9 +74,21 @@ public sealed interface Image {
         }
     }
 
+    /**
+     * Seals the baseline image types defined in the TIFF 6.0 specification.
+     *
+     * <p>This repository ships with working implementations of extraction for all baseline images.
+     */
     sealed interface Baseline extends Image permits BiLevelImage, GrayscaleImage, PaletteColorImage, RgbImage {
     }
 
+    /**
+     * Extensions types are alluded to by this non-sealed interface, they are expected to be an external extension point
+     * for the library.
+     *
+     * <p>I.e. other applications that want to provide their own {@link Image} implementations can branch off from here
+     * in the API.
+     */
     non-sealed interface Extension extends Image {
     }
 }

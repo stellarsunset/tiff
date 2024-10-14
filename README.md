@@ -50,5 +50,5 @@ int b = rgb0_0.unsignedB();
 Example `.tiff` images were taken from [here](https://people.math.sc.edu/Burkardt/data/tif/tif.html)
 and [here](https://github.com/tlnagy/exampletiffs/tree/master).
 
-This implementation relied mostly on the TIFF6
+This implementation relied primarily on TIFF6
 documentation [here](https://www.itu.int/itudoc/itu-t/com16/tiff-fx/docs/tiff6.pdf).

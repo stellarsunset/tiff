@@ -21,7 +21,7 @@ class YResolutionTest {
     }
 
     @Test
-    void testWrongId() {
+    void testMissingId() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
                 new Ifd.Entry.Rational(XResolution.ID, new int[]{0}, new int[]{1})
