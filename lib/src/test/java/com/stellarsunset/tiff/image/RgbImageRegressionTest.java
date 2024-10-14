@@ -77,8 +77,8 @@ class RgbImageRegressionTest {
         PixelValue.Rgb iPixel = image.valueAt(row, column);
         assertAll(
                 () -> assertEquals(Short.toUnsignedInt((Short) rPixel[0]), Byte.toUnsignedInt(iPixel.r()), String.format("Should contain identical Red values at the respective pixel (%d, %d).", row, column)),
-                () -> assertEquals(Short.toUnsignedInt((Short) rPixel[0]), Byte.toUnsignedInt(iPixel.r()), String.format("Should contain identical Green values at the respective pixel (%d, %d).", row, column)),
-                () -> assertEquals(Short.toUnsignedInt((Short) rPixel[0]), Byte.toUnsignedInt(iPixel.r()), String.format("Should contain identical Blue values at the respective pixel (%d, %d).", row, column))
+                () -> assertEquals(Short.toUnsignedInt((Short) rPixel[1]), Byte.toUnsignedInt(iPixel.g()), String.format("Should contain identical Green values at the respective pixel (%d, %d).", row, column)),
+                () -> assertEquals(Short.toUnsignedInt((Short) rPixel[2]), Byte.toUnsignedInt(iPixel.b()), String.format("Should contain identical Blue values at the respective pixel (%d, %d).", row, column))
         );
     }
 

@@ -30,12 +30,20 @@ public sealed interface PixelValue {
      *
      */
     record BlackOrWhite(byte value) implements PixelValue.Baseline {
+
+        int unsignedValue() {
+            return Byte.toUnsignedInt(value);
+        }
     }
 
     /**
      *
      */
     record Grayscale(byte value) implements PixelValue.Baseline {
+
+        int unsignedValue() {
+            return Byte.toUnsignedInt(value);
+        }
     }
 
     /**
@@ -43,7 +51,7 @@ public sealed interface PixelValue {
      * contains the {@link Rgb} value of the pixel.
      *
      * <p>I.e. it's a way to encode a limited set of RGB values compactly. These colors can also have more gradation to
-     * them as each component is 16 bits instead of 8 as in a standard {@link RgbImage}.
+     * them as each component (R, G, or B) is 16 bits instead of 8 as in a standard {@link RgbImage}.
      *
      * <p>Remember these values are unsigned, so to compare actual values apply the correct unsigned Java conversion.
      *
@@ -82,6 +90,18 @@ public sealed interface PixelValue {
      * @param b the blue component
      */
     record Rgb(byte r, byte g, byte b) implements PixelValue.Baseline {
+
+        public int unsignedR() {
+            return Short.toUnsignedInt(r);
+        }
+
+        public int unsignedG() {
+            return Short.toUnsignedInt(g);
+        }
+
+        public int unsignedB() {
+            return Short.toUnsignedInt(b);
+        }
     }
 
     /**

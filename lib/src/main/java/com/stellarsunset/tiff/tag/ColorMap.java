@@ -34,17 +34,29 @@ public final class ColorMap {
         };
     }
 
-    private static ColorMap create(short[] shorts) {
+    /**
+     * Create a new {@link ColorMap} from an array of provided shorts.
+     *
+     * <p>This is mostly used for testing, applications should expect to go through {@link #getRequired(Ifd)} etc. in
+     * most normal cases to retrieve the map from an IFD.
+     */
+    public static ColorMap create(short[] shorts) {
         int n = shorts.length / 3;
         Rgb[] rgbValues = new Rgb[n];
 
-        for (int i = 0; i < n; i++) {
-            int offset = i * 3;
-            rgbValues[i] = new Rgb(
-                    shorts[offset],
-                    shorts[offset + 1],
-                    shorts[offset + 2]
+        int r = 0;
+        int g = n;
+        int b = n + n;
+
+        while (r < n) {
+            rgbValues[r] = new Rgb(
+                    shorts[r],
+                    shorts[g],
+                    shorts[b]
             );
+            r++;
+            g++;
+            b++;
         }
 
         return new ColorMap(rgbValues);
@@ -57,6 +69,32 @@ public final class ColorMap {
      */
     public Rgb rgb(int index) {
         return rgbValues[index];
+    }
+
+    /**
+     * Inverse operation to {@link #create(short[])}, generate the {@code short[]} from the ColorMap that when passed to
+     * create would re-create this exact ColorMap.
+     */
+    public short[] flatten() {
+        int n = rgbValues.length;
+
+        int r = 0;
+        int g = n;
+        int b = n + n;
+
+        short[] shorts = new short[n * 3];
+
+        while (r < n) {
+            ColorMap.Rgb rgb = rgb(r);
+            shorts[r] = rgb.r();
+            shorts[g] = rgb.g();
+            shorts[b] = rgb.b();
+            r++;
+            g++;
+            b++;
+        }
+
+        return shorts;
     }
 
     /**

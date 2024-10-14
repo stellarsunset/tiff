@@ -58,6 +58,7 @@ public interface ImageMaker {
 
         private Image grayscaleOrBiLevel(SeekableByteChannel channel, Ifd ifd) {
             return BitsPerSample.getOptionalValue(ifd)
+                    .filter(bps -> bps.length == 1 && (bps[0] == 4 || bps[0] == 8))
                     .map(_ -> grayscale.makeImage(channel, ifd))
                     .orElseGet(() -> biLevel.makeImage(channel, ifd));
         }

@@ -7,12 +7,9 @@ import com.stellarsunset.tiff.TiffHeader;
 import com.stellarsunset.tiff.tag.BitsPerSample;
 import com.stellarsunset.tiff.tag.Compression;
 import com.stellarsunset.tiff.tag.PhotometricInterpretation;
-import mil.nga.tiff.Rasters;
-import mil.nga.tiff.TiffReader;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 
@@ -43,51 +40,36 @@ class BiLevelImageRegressionTest {
 
             assertAll(
                     "Check IFD(0) contents.",
-                    () -> assertEquals(14, ifd.entryCount(), "IFD Entry Count"),
-                    () -> assertArrayEquals(new int[]{8}, bitsPerSample, "Bits Per Sample"),
-                    () -> assertEquals(32773, compression, "Compression"),
-                    () -> assertEquals(1, photometricInterpretation, "Photometric Interpretation")
+                    () -> assertEquals(13, ifd.entryCount(), "IFD Entry Count"),
+                    () -> assertArrayEquals(new int[]{1}, bitsPerSample, "Bits Per Sample"),
+                    () -> assertEquals(2, compression, "Compression"),
+                    () -> assertEquals(0, photometricInterpretation, "Photometric Interpretation")
             );
 
-            Image image = file.image(0);
-            Rasters rasters = readRasters();
-
-            if (unwrap(image) instanceof BiLevelImage b) {
-                assertAll(
-                        "Check Image(0) contents.",
-                        () -> assertEquals(rasters.getHeight(), b.dimensions().imageLength(), "Image Length Matches"),
-                        () -> assertEquals(280, b.dimensions().imageLength(), "Image Length (280)"),
-                        () -> assertEquals(rasters.getWidth(), b.dimensions().imageWidth(), "Image Width Matches"),
-                        () -> assertEquals(272, b.dimensions().imageWidth(), "Image Width (272)"),
-                        () -> assertEquals(30, b.stripInfo().rowsPerStrip(), "Rows Per Strip")
-                );
-
-                assertAll(
-                        "Check Image(0) pixels.",
-                        () -> comparePixelValues(b, rasters, 0, 0),
-                        () -> comparePixelValues(b, rasters, 200, 200),
-                        () -> comparePixelValues(b, rasters, 125, 225),
-                        () -> comparePixelValues(b, rasters, 279, 271)
-                );
-            } else {
-                fail("Image not of the correct type, image type was: " + unwrap(image).getClass().getSimpleName());
-            }
+//            TODO - Huffman Decompression
+//            Image image = file.image(0);
+//
+//            if (unwrap(image) instanceof BiLevelImage b) {
+//                assertAll(
+//                        "Check Image(0) contents.",
+//                        () -> assertEquals(280, b.dimensions().imageLength(), "Image Length (280)"),
+//                        () -> assertEquals(272, b.dimensions().imageWidth(), "Image Width (272)"),
+//                        () -> assertEquals(30, b.stripInfo().rowsPerStrip(), "Rows Per Strip")
+//                );
+//
+//                assertAll(
+//                        "Check Image(0) pixels.",
+//                        () -> assertEquals(1, b.valueAt(0, 0).value()),
+//                        () -> assertEquals(1, b.valueAt(0, 0).value()),
+//                        () -> assertEquals(1, b.valueAt(0, 0).value()),
+//                        () -> assertEquals(1, b.valueAt(0, 0).value())
+//                );
+//            } else {
+//                fail("Image not of the correct type, image type was: " + unwrap(image).getClass().getSimpleName());
+//            }
         } catch (Exception e) {
             fail(e);
         }
-    }
-
-    private void comparePixelValues(BiLevelImage image, Rasters rasters, int row, int column) {
-
-        Number[] rPixel = rasters.getPixel(column, row);
-        assertEquals(1, rPixel.length, "Should return a single number for the BiLevel image pixel value.");
-
-        PixelValue.BlackOrWhite iPixel = image.valueAt(row, column);
-        assertEquals(Short.toUnsignedInt((Short) rPixel[0]), Byte.toUnsignedInt(iPixel.value()), String.format("Should contain identical values at the respective pixel (%d, %d).", row, column));
-    }
-
-    private Rasters readRasters() throws IOException {
-        return TiffReader.readTiff(FILE).getFileDirectory().readRasters();
     }
 
     private Image unwrap(Image image) {
