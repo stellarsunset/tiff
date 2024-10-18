@@ -19,35 +19,54 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Grayscale images are a generalization of bi-level images. Bi-level images can store only black and white image data,
  * but grayscale images can also store shades of gray.
  *
+ * <p>Grayscale images allow for 4 or 8-bit shades of gray, i.e. 16 shades of gray or 256 shades of gray, each pixel is
+ * only one byte.
+ *
  * <p>Grayscale images are almost always uncompressed or PackBits compressed, usually PackBits performs poorly on them,
  * and so they are left uncompressed.
  */
-public record GrayscaleImage(Interpretation type, ImageDimensions dimensions, StripInfo stripInfo,
-                             Resolution resolution, ShadesOfGray shadesOfGray,
-                             byte[][] data) implements Image.Baseline {
+public sealed interface GrayscaleImage extends Image.Baseline {
 
     static Maker maker(BytesAdapter adapter) {
         return new Maker(adapter);
     }
 
-    public GrayscaleImage {
-        checkArgument(data.length == dimensions.imageLength(),
-                "Expected %s rows, found %s", dimensions.imageLength(), data.length);
+    /**
+     * A grayscale image with 4-bit grayscale tones.
+     */
+    record Grayscale4Image(Interpretation type, ImageDimensions dimensions, StripInfo stripInfo,
+                           Resolution resolution, byte[][] data) implements GrayscaleImage {
 
-        checkArgument(data[0].length == dimensions.imageWidth(),
-                "Expected %s columns, found %s", dimensions.imageWidth(), data[0].length);
-    }
+        public Grayscale4Image {
+            dimensions.checkBounds(data, 1);
+        }
 
-    @Override
-    public PixelValue.Grayscale valueAt(int row, int col) {
-        return new PixelValue.Grayscale(data[row][col]);
+        @Override
+        public PixelValue.Grayscale4 valueAt(int row, int col) {
+            return new PixelValue.Grayscale4(data[row][col], type.whiteIsZero());
+        }
     }
 
     /**
-     * Allowable values for Baseline TIFF grayscale images are 4 and 8, allowing either
-     * 16 or 256 distinct shades of gray.
+     * A grayscale image with 8-bit grayscale tones.
      */
-    public enum ShadesOfGray {
+    record Grayscale8Image(Interpretation type, ImageDimensions dimensions, StripInfo stripInfo,
+                           Resolution resolution, byte[][] data) implements GrayscaleImage {
+
+        public Grayscale8Image {
+            dimensions.checkBounds(data, 1);
+        }
+
+        @Override
+        public PixelValue.Grayscale8 valueAt(int row, int col) {
+            return new PixelValue.Grayscale8(data[row][col], type.whiteIsZero());
+        }
+    }
+
+    /**
+     * Allowable values for Baseline TIFF grayscale images are 4 and 8, allowing either 16 or 256 distinct shades of gray.
+     */
+    enum ShadesOfGray {
         N16,
         N256;
 
@@ -62,7 +81,7 @@ public record GrayscaleImage(Interpretation type, ImageDimensions dimensions, St
         }
     }
 
-    public enum Interpretation {
+    enum Interpretation {
         /**
          * BlackIsZero. For bi-level and grayscale images: 0 is imaged as black. The maximum value is imaged as white.
          *
@@ -75,6 +94,10 @@ public record GrayscaleImage(Interpretation type, ImageDimensions dimensions, St
          * <p>This is the normal value for Compression=2.
          */
         WHITE_IS_ZERO;
+
+        public boolean whiteIsZero() {
+            return this.equals(WHITE_IS_ZERO);
+        }
 
         private static Interpretation from(Ifd ifd) {
             int photometricCode = PhotometricInterpretation.getRequired(ifd);
@@ -132,14 +155,22 @@ public record GrayscaleImage(Interpretation type, ImageDimensions dimensions, St
                 }
             }
 
-            return new GrayscaleImage(
-                    Interpretation.from(ifd),
-                    imageDimensions,
-                    stripInfo,
-                    Resolution.from(ifd),
-                    ShadesOfGray.from(ifd),
-                    bytes
-            );
+            return switch (ShadesOfGray.from(ifd)) {
+                case N16 -> new Grayscale4Image(
+                        Interpretation.from(ifd),
+                        imageDimensions,
+                        stripInfo,
+                        Resolution.from(ifd),
+                        bytes
+                );
+                case N256 -> new Grayscale8Image(
+                        Interpretation.from(ifd),
+                        imageDimensions,
+                        stripInfo,
+                        Resolution.from(ifd),
+                        bytes
+                );
+            };
         }
     }
 }

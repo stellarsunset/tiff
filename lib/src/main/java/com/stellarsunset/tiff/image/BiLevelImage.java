@@ -39,7 +39,7 @@ public record BiLevelImage(Interpretation type, ImageDimensions dimensions, Stri
 
     @Override
     public PixelValue.BlackOrWhite valueAt(int row, int col) {
-        return new PixelValue.BlackOrWhite(data[row][col]);
+        return new PixelValue.BlackOrWhite(data[row][col], type.whiteIsZero());
     }
 
     public enum Interpretation {
@@ -55,6 +55,10 @@ public record BiLevelImage(Interpretation type, ImageDimensions dimensions, Stri
          * <p>This is the normal value for Compression=2.
          */
         WHITE_IS_ZERO;
+
+        public boolean whiteIsZero() {
+            return this.equals(WHITE_IS_ZERO);
+        }
 
         private static Interpretation from(Ifd ifd) {
             int photometricCode = PhotometricInterpretation.getRequired(ifd);

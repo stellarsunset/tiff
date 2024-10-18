@@ -23,7 +23,7 @@ int xResolution = XResolution.getRequired(ifd0);
 // the first image in the file, images can either be Baseline or Extension types
 Image image0 = file.image(0);
 
-/** Handle the class sealed interface hierarchy to return a concrete image types. */
+/** Handle the sealed interface hierarchy to work with concrete image types. */
 public RgbImage asRgb(Image image) {
     return switch (image) {
         case Image.Lazy l -> asRgb(l.delegate());
@@ -40,6 +40,7 @@ RgbImage rgb0 = asRgb(image0);
 
 // work with their concrete PixelValue types
 PixelValue.Rgb rgb0_0 = rgb0.valueAt(0, 0);
+
 int r = rgb0_0.unsignedR();
 int g = rgb0_0.unsignedG();
 int b = rgb0_0.unsignedB();

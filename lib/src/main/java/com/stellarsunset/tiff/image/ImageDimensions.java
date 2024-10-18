@@ -1,9 +1,10 @@
 package com.stellarsunset.tiff.image;
 
-import com.google.common.base.Preconditions;
 import com.stellarsunset.tiff.Ifd;
 import com.stellarsunset.tiff.tag.ImageLength;
 import com.stellarsunset.tiff.tag.ImageWidth;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Container class for the {@link ImageLength} and {@link ImageWidth} tags.
@@ -20,13 +21,27 @@ public record ImageDimensions(long imageLength, long imageWidth) {
 
     public Int asIntInfo() {
 
-        Preconditions.checkArgument(imageLength < java.lang.Integer.MAX_VALUE,
+        checkArgument(imageLength < java.lang.Integer.MAX_VALUE,
                 "ImageLength should be less than Integer.MAX_VALUE, value was %s", imageLength);
 
-        Preconditions.checkArgument(imageWidth < java.lang.Integer.MAX_VALUE,
+        checkArgument(imageWidth < java.lang.Integer.MAX_VALUE,
                 "ImageWidth should be less than Integer.MAX_VALUE, value was %s", imageWidth);
 
         return new Int((int) imageLength, (int) imageWidth);
+    }
+
+    /**
+     * Shorthand to check the bounds materialized image data against the expected image dimensions.
+     *
+     * @param data          the materialized image bytes
+     * @param bytesPerPixel the number of bytes per pixel of the image, e.g. 1 for BiLevel, 3 for RGB
+     */
+    public void checkBounds(byte[][] data, int bytesPerPixel) {
+        checkArgument(data.length == imageLength(),
+                "Expected %s rows, found %s", imageLength(), data.length);
+
+        checkArgument(data[0].length == imageWidth() * bytesPerPixel,
+                "Expected %s * %s columns, found %s", imageWidth(), bytesPerPixel, data[0].length);
     }
 
     /**

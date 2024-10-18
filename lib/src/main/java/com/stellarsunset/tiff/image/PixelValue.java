@@ -2,11 +2,19 @@ package com.stellarsunset.tiff.image;
 
 import com.stellarsunset.tiff.tag.ColorMap;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 /**
- * Represents the value of an X/Y pixel in an image.
+ * Represents the value of a row/col (y/x) pixel in an image.
  *
  * <p>Different {@link Image} implementations are expected to return different {@link PixelValue} subtypes specific to
  * their implementation.
+ *
+ * <p>These implementations are provided to:
+ * <ol>
+ *     <li>Provide distinct types to help communicate differences in how pixels are encoded</li>
+ *     <li>Provide places for further documentation on their interpretation for rendering</li>
+ * </ol>
  */
 public sealed interface PixelValue {
 
@@ -27,24 +35,81 @@ public sealed interface PixelValue {
     }
 
     /**
+     * Bi-level image pixels are either black or white and can be stored as:
+     * <ol>
+     *     <li>{@link BiLevelImage.Interpretation#BLACK_IS_ZERO}</li>
+     *     <li>{@link BiLevelImage.Interpretation#WHITE_IS_ZERO}</li>
+     * </ol>
      *
+     * <p>formats. This record encodes the raw pixel value and a boolean indicator for whether white is zero, it then
+     * provides simple methods to determine whether the pixel should be colored white or black.
+     *
+     * <p>This could be broken into {@code WhiteIsZero} and {@code BlackIsZero} types, but that seems excessive.
      */
-    record BlackOrWhite(byte value) implements PixelValue.Baseline {
+    record BlackOrWhite(byte value, boolean whiteIsZero) implements PixelValue.Baseline {
 
-        int unsignedValue() {
+        public BlackOrWhite {
+            checkArgument(value == 0 || value == 1,
+                    "Pixel value should be either 0 or 1, found %s.", value);
+        }
+
+        public boolean isWhite() {
+            return whiteIsZero && value == 0 || !whiteIsZero && value == 1;
+        }
+
+        public boolean isBlack() {
+            return whiteIsZero && value == 1 || !whiteIsZero && value == 0;
+        }
+
+        public int unsignedValue() {
             return Byte.toUnsignedInt(value);
         }
     }
 
     /**
+     * Grayscale images can represent a finite number of "shades of gray" between white and black based on the number of
+     * bits used in their encoding, in this case 4 (also see {@link Grayscale8}).
      *
+     * <p>Grayscale images like Bi-level ones, can be encoded in:
+     * <ol>
+     *     <li>{@link GrayscaleImage.Interpretation#BLACK_IS_ZERO}</li>
+     *     <li>{@link GrayscaleImage.Interpretation#WHITE_IS_ZERO}</li>
+     * </ol>
+     *
+     * <p>formats. This record encodes only the raw pixel value and whether white should be interpreted as zero, the max
+     * number of bits in the byte value used for tones is 15 (4 bits).
      */
-    record Grayscale(byte value) implements PixelValue.Baseline {
+    record Grayscale4(byte value, boolean whiteIsZero) implements PixelValue.Baseline {
 
-        int unsignedValue() {
+        public Grayscale4 {
+            checkArgument(value >= 0 && value < 16, "4-bit grayscale range is [0, 16).");
+        }
+
+        public int unsignedValue() {
             return Byte.toUnsignedInt(value);
         }
     }
+
+    /**
+     * Grayscale images can represent a finite number of "shades of gray" between white and black based on the number of
+     * bits used in their encoding, in this case 8 (also see {@link Grayscale4}).
+     *
+     * <p>Grayscale images like Bi-level ones, can be encoded in:
+     * <ol>
+     *     <li>{@link GrayscaleImage.Interpretation#BLACK_IS_ZERO}</li>
+     *     <li>{@link GrayscaleImage.Interpretation#WHITE_IS_ZERO}</li>
+     * </ol>
+     *
+     * <p>formats. This record encodes only the raw pixel value and whether white should be interpreted as zero. the max
+     * number of bits in the byte value used for tones is 255 (8 bits).
+     */
+    record Grayscale8(byte value, boolean whiteIsZero) implements PixelValue.Baseline {
+
+        public int unsignedValue() {
+            return Byte.toUnsignedInt(value);
+        }
+    }
+
 
     /**
      * Palette color image pixels are a byte value that can be used to index into a {@link ColorMap}, the color map then
