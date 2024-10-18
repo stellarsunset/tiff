@@ -1,7 +1,5 @@
 package com.stellarsunset.tiff;
 
-import com.stellarsunset.tiff.image.Image;
-
 import java.nio.channels.SeekableByteChannel;
 
 import static com.google.common.base.Preconditions.checkArgument;

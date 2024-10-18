@@ -1,8 +1,5 @@
 package com.stellarsunset.tiff;
 
-import com.stellarsunset.tiff.image.Image;
-import com.stellarsunset.tiff.image.ImageMaker;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -47,7 +44,7 @@ public final class TiffFileReader {
             List<Ifd> ifds = new ArrayList<>();
             List<Image> images = new ArrayList<>();
 
-            ImageMaker maker = ImageMaker.baseline(adapter);
+            Image.Maker maker = Image.Maker.baseline(adapter);
 
             Ifd ifd = first;
             while (ifd.unsignedNextIfdOffset() != 0) {
