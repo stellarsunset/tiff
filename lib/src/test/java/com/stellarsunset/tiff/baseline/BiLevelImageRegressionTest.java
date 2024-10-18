@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BiLevelImageRegressionTest {
 
-    private static final File FILE = tiffFile("bilevel.tif");
+    private static final File FILE = tiffFile("baseline/bilevel.tif");
 
     @Test
     void test() {

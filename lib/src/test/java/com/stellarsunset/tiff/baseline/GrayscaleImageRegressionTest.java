@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GrayscaleImageRegressionTest {
 
-    private static final File FILE = tiffFile("grayscale.tif");
+    private static final File FILE = tiffFile("baseline/grayscale.tif");
 
     @Test
     void test() {

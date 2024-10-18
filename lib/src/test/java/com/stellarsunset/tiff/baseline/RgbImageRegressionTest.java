@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class RgbImageRegressionTest {
 
-    private static final File FILE = tiffFile("rgb.tif");
+    private static final File FILE = tiffFile("baseline/rgb.tif");
 
     @Test
     void test() {

@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PaletteColorImageRegressionTest {
 
-    private static final File FILE = tiffFile("palette.tif");
+    private static final File FILE = tiffFile("baseline/palette.tif");
 
     @Test
     void test() {

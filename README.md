@@ -37,7 +37,6 @@ public Optional<RgbImage> asRgb(Image image) {
     };
 }
 
-// work directly on concrete subtypes
 RgbImage rgb0 = asRgb(image0).orElseThrow();
 
 // and their concrete Pixel types
@@ -48,10 +47,11 @@ int g = rgb0_0.unsignedG();
 int b = rgb0_0.unsignedB();
 ```
 
-## Useful links
+## Notes
 
-This implementation relied primarily on TIFF6 documentation
-[here](https://www.itu.int/itudoc/itu-t/com16/tiff-fx/docs/tiff6.pdf).
-
-Example `.tiff` images were taken from [here](https://people.math.sc.edu/Burkardt/data/tif/tif.html)
-and [here](https://github.com/tlnagy/exampletiffs/tree/master).
+1. This repo is published to maven central as `io.github.stellarsunset:tiff`, see releases for versions
+2. This implementation relied primarily on TIFF6
+   documentation [here](https://www.itu.int/itudoc/itu-t/com16/tiff-fx/docs/tiff6.pdf)
+3. Example `.tiff` images were taken from [here](https://people.math.sc.edu/Burkardt/data/tif/tif.html)
+   and [here](https://github.com/tlnagy/exampletiffs/tree/master)
+4. Implementations are regression tested against the [NGA TIFF](https://github.com/ngageoint/tiff-java) library
