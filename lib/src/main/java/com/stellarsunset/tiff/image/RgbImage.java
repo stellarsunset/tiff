@@ -30,11 +30,7 @@ public record RgbImage(ImageDimensions dimensions, StripInfo stripInfo, Resoluti
     private static final int SAMPLES_PER_PIXEL = 3;
 
     public RgbImage {
-        checkArgument(data.length == dimensions.imageLength(),
-                "Expected %s rows, found %s", dimensions.imageLength(), data.length);
-
-        checkArgument(data[0].length / SAMPLES_PER_PIXEL == dimensions.imageWidth(),
-                "Expected %s columns, found %s", dimensions.imageWidth(), data[0].length / SAMPLES_PER_PIXEL);
+        dimensions.checkBounds(data, 3);
     }
 
     static Maker maker(BytesAdapter adapter) {

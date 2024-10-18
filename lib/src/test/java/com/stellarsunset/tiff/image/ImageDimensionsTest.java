@@ -49,4 +49,15 @@ class ImageDimensionsTest {
                 () -> assertThrows(IllegalArgumentException.class, dimensions::asIntInfo, "Should fail on narrowing to integer values.")
         );
     }
+
+    @Test
+    void testCheckBounds() {
+        ImageDimensions dimensions = new ImageDimensions(10, 10);
+
+        assertAll(
+                () -> assertThrows(IllegalArgumentException.class, () -> dimensions.checkBounds(new byte[5][5], 1), "[5][5], 1"),
+                () -> assertDoesNotThrow(() -> dimensions.checkBounds(new byte[10][10], 1), "[10][10], 1"),
+                () -> assertDoesNotThrow(() -> dimensions.checkBounds(new byte[10][30], 3), "[10][30], 3")
+        );
+    }
 }

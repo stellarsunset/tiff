@@ -26,11 +26,7 @@ public record BiLevelImage(Interpretation type, ImageDimensions dimensions, Stri
                            byte[][] data) implements Image.Baseline {
 
     public BiLevelImage {
-        checkArgument(data.length == dimensions.imageLength(),
-                "Expected %s rows, found %s", dimensions.imageLength(), data.length);
-
-        checkArgument(data[0].length == dimensions.imageWidth(),
-                "Expected %s columns, found %s", dimensions.imageWidth(), data[0].length);
+        dimensions.checkBounds(data, 1);
     }
 
     static Maker maker(BytesAdapter adapter) {

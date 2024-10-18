@@ -7,8 +7,8 @@ A data-driven library for interacting with common tiff image formats.
 
 ## Motivation
 
-We want to take advantage for the newer JDK features in 21/23 to build a data-oriented programming model for interacting
-with TIFF files.
+Take advantage for the newer JDK features in 21/23 to build a data-oriented programming model for interacting with TIFF
+files.
 
 ```java
 TiffFile file = TiffFileReader.read(FileChannel.open(FILE.toPath()));

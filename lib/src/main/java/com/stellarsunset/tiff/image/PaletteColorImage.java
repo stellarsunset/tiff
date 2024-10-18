@@ -27,6 +27,10 @@ public record PaletteColorImage(ImageDimensions dimensions, StripInfo stripInfo,
         return new Maker(adapter);
     }
 
+    public PaletteColorImage {
+        dimensions.checkBounds(data, 1);
+    }
+
     @Override
     public PixelValue.PaletteColor valueAt(int row, int col) {
 
