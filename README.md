@@ -7,7 +7,7 @@ A data-driven library for interacting with common tiff image formats.
 
 ## Motivation
 
-Take advantage for the newer JDK features in 21/23 to build a data-oriented programming model for interacting with TIFF
+Take advantage of the newer JDK features in 21/23 to build a data-oriented programming model for interacting with TIFF
 files.
 
 ```java
@@ -35,10 +35,10 @@ public RgbImage asRgb(Image image) {
     };
 }
 
-// convert to a baseline TIFF spec RGB image
+// convert to a baseline TIFF RGB image
 RgbImage rgb0 = asRgb(image0);
 
-// work with their concrete PixelValue types
+// work with concrete PixelValue types
 PixelValue.Rgb rgb0_0 = rgb0.valueAt(0, 0);
 
 int r = rgb0_0.unsignedR();
