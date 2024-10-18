@@ -23,23 +23,25 @@ int xResolution = XResolution.getRequired(ifd0);
 // the first image in the file, images can either be Baseline or Extension types
 Image image0 = file.image(0);
 
-/** Handle the sealed interface hierarchy to work with concrete image types. */
-public RgbImage asRgb(Image image) {
+// navigate the sealed hierarchy to safely work with concrete subtypes
+public Optional<RgbImage> asRgb(Image image) {
     return switch (image) {
-        case Image.Lazy l -> asRgb(l.delegate());
-        case Baseline b -> switch (b) {
-            case RgbImage r -> r;
-            case BiLevelImage _, GrayscaleImage _, PaletteColorImage _ -> throw IllegalArgumentException();
-        };
-        case Extension e -> throw IllegalArgumentException();
+        case Image.Lazy lazy -> asRgb(lazy.delegate());
+        case BaselineImage baselineImage -> {
+            switch (baselineImage) {
+                case BiLevelImage _, GrayscaleImage _, PaletteColorImage _ -> Optional.empty();
+                case RgbImage rgbImage -> Optional.of(rgbImage);
+            }
+        }
+        case Image.Unknown _, ExtensionImage _ -> Optional.empty();
     };
 }
 
-// convert to a baseline TIFF RGB image
-RgbImage rgb0 = asRgb(image0);
+// work directly on concrete subtypes
+RgbImage rgb0 = asRgb(image0).orElseThrow();
 
-// work with concrete PixelValue types
-PixelValue.Rgb rgb0_0 = rgb0.valueAt(0, 0);
+// and their concrete Pixel types
+Pixel.Rgb rgb0_0 = rgb0.valueAt(0, 0);
 
 int r = rgb0_0.unsignedR();
 int g = rgb0_0.unsignedG();
@@ -48,8 +50,8 @@ int b = rgb0_0.unsignedB();
 
 ## Useful links
 
+This implementation relied primarily on TIFF6 documentation
+[here](https://www.itu.int/itudoc/itu-t/com16/tiff-fx/docs/tiff6.pdf).
+
 Example `.tiff` images were taken from [here](https://people.math.sc.edu/Burkardt/data/tif/tif.html)
 and [here](https://github.com/tlnagy/exampletiffs/tree/master).
-
-This implementation relied primarily on TIFF6
-documentation [here](https://www.itu.int/itudoc/itu-t/com16/tiff-fx/docs/tiff6.pdf).

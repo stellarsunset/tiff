@@ -26,6 +26,10 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public sealed interface Pixel {
 
+    static Pixel empty() {
+        return new Empty();
+    }
+
     /**
      * Represents an empty pixel value.
      *
