@@ -1,5 +1,6 @@
 module tiff.lib.main {
     requires com.google.common;
+    requires org.checkerframework.checker.qual;
 
     exports com.stellarsunset.tiff;
     exports com.stellarsunset.tiff.compress;

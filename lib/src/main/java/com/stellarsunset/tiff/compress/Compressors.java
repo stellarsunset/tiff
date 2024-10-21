@@ -56,6 +56,7 @@ public final class Compressors {
         Map<Integer, Compressor> baseline = Map.of(
                 1, Compressor.uncompressed(),
                 2, Compressor.modifiedHuffman(),
+                5, Compressor.lzw(),
                 32773, Compressor.packBits()
         );
 

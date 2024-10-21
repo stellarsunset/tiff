@@ -34,6 +34,14 @@ public interface Compressor {
     }
 
     /**
+     * LZW compression, a lossless dictionary encoding scheme that sees high compression ratios for images with repeated
+     * subsequences of bytes.
+     */
+    static Compressor lzw() {
+        return new Lzw();
+    }
+
+    /**
      * Decompresses the provided {@code byte[]} from its compressed form to its uncompressed one.
      */
     byte[] decompress(byte[] bytes, BytesAdapter adapter);
