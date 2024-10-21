@@ -52,7 +52,7 @@ mavenPublishing {
 
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
 
-    coordinates("io.github.stellarsunset", "tiff", "0.0.2")
+    coordinates("io.github.stellarsunset", "tiff", "0.0.3")
 
     pom {
         name = "tiff"
