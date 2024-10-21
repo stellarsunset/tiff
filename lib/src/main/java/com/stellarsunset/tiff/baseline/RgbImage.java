@@ -7,6 +7,7 @@ import com.stellarsunset.tiff.compress.Compressor;
 import com.stellarsunset.tiff.compress.Compressors;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 
@@ -32,8 +33,8 @@ public record RgbImage(ImageDimensions dimensions, StripInfo stripInfo, Resoluti
         dimensions.checkBounds(data, 3);
     }
 
-    static Maker maker(BytesAdapter adapter) {
-        return new Maker(adapter);
+    static Maker maker() {
+        return new Maker();
     }
 
     @Override
@@ -45,11 +46,12 @@ public record RgbImage(ImageDimensions dimensions, StripInfo stripInfo, Resoluti
         return new Pixel.Rgb(r, g, b);
     }
 
-    record Maker(BytesAdapter adapter) implements Image.Maker {
+    record Maker() implements Image.Maker {
 
         @Override
-        public RgbImage makeImage(SeekableByteChannel channel, Ifd ifd) {
+        public RgbImage makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
+            BytesAdapter adapter = BytesAdapter.of(order);
             BytesReader reader = new BytesReader(channel);
 
             Compressor compressor = Compressors.getInstance()

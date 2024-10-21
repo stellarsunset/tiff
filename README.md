@@ -11,7 +11,8 @@ Take advantage of the newer JDK features in 21/23 to build a data-oriented progr
 files.
 
 ```java
-TiffFile file = TiffFileReader.read(FileChannel.open(FILE.toPath()));
+TiffFile file = TiffFileReader.baseline()
+        .read(FileChannel.open(FILE.toPath()));
 
 // the IFD for the first image in the TIFF file
 Ifd ifd0 = file.ifd(0);

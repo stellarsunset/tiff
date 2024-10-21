@@ -3,6 +3,7 @@ package com.stellarsunset.tiff;
 import com.stellarsunset.tiff.baseline.BaselineImage;
 import com.stellarsunset.tiff.extension.ExtensionImage;
 
+import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
 import java.util.function.Supplier;
 
@@ -88,8 +89,8 @@ public sealed interface Image permits Image.Unknown, Image.Lazy, BaselineImage, 
          * <p>By default to decrease memory pressure when loading a large number of TIFF files and images the baseline
          * maker returns lazy handles to the extracted image data.
          */
-        static Maker baseline(BytesAdapter adapter) {
-            return new BaselineImage.Maker(adapter);
+        static Maker baseline() {
+            return new BaselineImage.Maker();
         }
 
         /**
@@ -97,8 +98,9 @@ public sealed interface Image permits Image.Unknown, Image.Lazy, BaselineImage, 
          * to the underlying TIFF file.
          *
          * @param channel the open channel to the bytes of the file
-         * @param ifd     the image file directory with tags describing the contents of the image
+         * @param order   the byte order to use when interpreting data in the underlying image
+         * @param ifd     the image file directory ({@link Ifd}) with tags describing the contents of the image
          */
-        Image makeImage(SeekableByteChannel channel, Ifd ifd);
+        Image makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd);
     }
 }

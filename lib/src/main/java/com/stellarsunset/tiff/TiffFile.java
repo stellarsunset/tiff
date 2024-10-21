@@ -6,6 +6,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Handle for a TIFF file, created via the {@link TiffFileReader}.
+ *
+ * <p>{@link TiffFile}s are {@link AutoCloseable} because they may hold onto an open file pointer to lazily read bytes
+ * from the underlying file.
  */
 public record TiffFile(SeekableByteChannel channel, TiffHeader header, Ifd[] ifds,
                        Image[] images) implements AutoCloseable {

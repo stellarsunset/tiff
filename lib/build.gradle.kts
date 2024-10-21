@@ -20,7 +20,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // Reference implementation for regression testing, assume of all places NGA can write
-    // a correct TIFF file decoder lol
+    // a correct TIFF file decoder
     testImplementation("mil.nga:tiff:3.0.0")
 }
 

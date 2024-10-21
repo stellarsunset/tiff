@@ -21,7 +21,7 @@ class GrayscaleImageRegressionTest {
 
     @Test
     void test() {
-        try (TiffFile file = TiffFileReader.read(FileChannel.open(FILE.toPath()))) {
+        try (TiffFile file = TiffFileReader.baseline().read(FileChannel.open(FILE.toPath()))) {
 
             TiffHeader header = file.header();
 

@@ -10,13 +10,26 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 public final class TiffFileReader {
 
     private static final short LE = 0x4949;
 
     private static final short BE = 0x4D4D;
 
-    private TiffFileReader() {
+    private final Image.Maker imageMaker;
+
+    private TiffFileReader(Image.Maker imageMaker) {
+        this.imageMaker = requireNonNull(imageMaker);
+    }
+
+    public static TiffFileReader baseline() {
+        return new TiffFileReader(Image.Maker.baseline());
+    }
+
+    public static TiffFileReader withMaker(Image.Maker maker) {
+        return new TiffFileReader(maker);
     }
 
     /**
@@ -29,7 +42,7 @@ public final class TiffFileReader {
      *
      * @param channel the {@link SeekableByteChannel} pointing to the contents of the TIFF file
      */
-    public static TiffFile read(SeekableByteChannel channel) {
+    public TiffFile read(SeekableByteChannel channel) {
         try {
 
             TiffHeader header = readHeader(channel);
@@ -44,18 +57,16 @@ public final class TiffFileReader {
             List<Ifd> ifds = new ArrayList<>();
             List<Image> images = new ArrayList<>();
 
-            Image.Maker maker = Image.Maker.baseline(adapter);
-
             Ifd ifd = first;
             while (ifd.unsignedNextIfdOffset() != 0) {
                 ifds.add(ifd);
-                images.add(maker.makeImage(channel, ifd));
+                images.add(imageMaker.makeImage(channel, header.order(), ifd));
 
                 ifd = ifdReader.read(channel, ifd.unsignedNextIfdOffset());
             }
 
             ifds.add(ifd);
-            images.add(maker.makeImage(channel, ifd));
+            images.add(imageMaker.makeImage(channel, header.order(), ifd));
 
             return new TiffFile(
                     channel,

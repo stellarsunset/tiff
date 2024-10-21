@@ -7,6 +7,7 @@ import com.stellarsunset.tiff.compress.Compressor;
 import com.stellarsunset.tiff.compress.Compressors;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 
@@ -27,8 +28,8 @@ public record BiLevelImage(Interpretation type, ImageDimensions dimensions, Stri
         dimensions.checkBounds(data, 1);
     }
 
-    static Maker maker(BytesAdapter adapter) {
-        return new Maker(adapter);
+    static Maker maker() {
+        return new Maker();
     }
 
     @Override
@@ -65,11 +66,12 @@ public record BiLevelImage(Interpretation type, ImageDimensions dimensions, Stri
         }
     }
 
-    record Maker(BytesAdapter adapter) implements Image.Maker {
+    record Maker() implements Image.Maker {
 
         @Override
-        public BiLevelImage makeImage(SeekableByteChannel channel, Ifd ifd) {
+        public BiLevelImage makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
+            BytesAdapter adapter = BytesAdapter.of(order);
             BytesReader reader = new BytesReader(channel);
 
             Compressor compressor = Compressors.getInstance()
