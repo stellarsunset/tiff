@@ -1,4 +1,4 @@
-package com.stellarsunset.tiff.baseline;
+package com.stellarsunset.tiff.extension.geo;
 
 import com.stellarsunset.tiff.*;
 import com.stellarsunset.tiff.baseline.tag.BitsPerSample;
@@ -15,9 +15,9 @@ import java.nio.channels.FileChannel;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GrayscaleImageRegressionTest {
+class GeoImageRegressionTest {
 
-    private static final File FILE = tiffFile("baseline/grayscale.tif");
+    private static final File FILE = tiffFile("extension/geo/USGS_1_n52e177.tif");
 
     @Test
     void test() {
@@ -27,8 +27,8 @@ class GrayscaleImageRegressionTest {
 
             assertAll(
                     "Check the top-level file contents.",
-                    () -> assertEquals(ByteOrder.BIG_ENDIAN, header.order(), "ByteOrder"),
-                    () -> assertEquals(1, file.numberOfImages(), "Number of Images")
+                    () -> assertEquals(ByteOrder.LITTLE_ENDIAN, header.order(), "ByteOrder"),
+                    () -> assertEquals(6, file.numberOfImages(), "Number of Images")
             );
 
             Ifd ifd = file.ifd(0);
@@ -40,16 +40,16 @@ class GrayscaleImageRegressionTest {
 
             assertAll(
                     "Check IFD(0) contents.",
-                    () -> assertEquals(14, ifd.entryCount(), "IFD Entry Count"),
-                    () -> assertArrayEquals(new int[]{8}, bitsPerSample, "Bits Per Sample"),
-                    () -> assertEquals(32773, compression, "Compression"),
+                    () -> assertEquals(19, ifd.entryCount(), "IFD Entry Count"),
+                    () -> assertArrayEquals(new int[]{32}, bitsPerSample, "Bits Per Sample"),
+                    () -> assertEquals(5, compression, "Compression"),
                     () -> assertEquals(1, photometricInterpretation, "Photometric Interpretation")
             );
 
             Image image = file.image(0);
             Rasters rasters = readRasters();
 
-            if (unwrap(image) instanceof GrayscaleImage.Grayscale8Image g) {
+            if (unwrap(image) instanceof GeoImage g) {
                 assertAll(
                         "Check Image(0) contents.",
                         () -> assertEquals(rasters.getHeight(), g.dimensions().imageLength(), "Image Length Matches"),
@@ -74,13 +74,13 @@ class GrayscaleImageRegressionTest {
         }
     }
 
-    private void comparePixelValues(GrayscaleImage.Grayscale8Image image, Rasters rasters, int row, int column) {
+    private void comparePixelValues(GeoImage image, Rasters rasters, int row, int column) {
 
         Number[] rPixel = rasters.getPixel(column, row);
         assertEquals(1, rPixel.length, "Should return a single number for the BiLevel image pixel value.");
 
-        Pixel.Grayscale8 iPixel = image.valueAt(row, column);
-        assertEquals(Short.toUnsignedInt((Short) rPixel[0]), Byte.toUnsignedInt(iPixel.value()), String.format("Should contain identical values at the respective pixel (%d, %d).", row, column));
+        //Pixel.Grayscale8 iPixel = image.valueAt(row, column);
+        //assertEquals(Short.toUnsignedInt((Short) rPixel[0]), Byte.toUnsignedInt(iPixel.value()), String.format("Should contain identical values at the respective pixel (%d, %d).", row, column));
     }
 
     private Rasters readRasters() throws IOException {

@@ -56,3 +56,10 @@ int b = rgb0_0.unsignedB();
 3. Example `.tiff` images were taken from [here](https://people.math.sc.edu/Burkardt/data/tif/tif.html)
    and [here](https://github.com/tlnagy/exampletiffs/tree/master)
 4. Implementations are regression tested against the [NGA TIFF](https://github.com/ngageoint/tiff-java) library
+
+## TODO
+
+1. Tiled strips extension
+2. Modified Huffman compression for BiLevel images
+3. Writing? :thinking: couldn't be too hard right?
+4. 
