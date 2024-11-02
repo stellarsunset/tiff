@@ -21,7 +21,7 @@ class GeoImageRegressionTest {
 
     @Test
     void test() {
-        try (TiffFile file = TiffFileReader.baseline().read(FileChannel.open(FILE.toPath()))) {
+        try (TiffFile file = TiffFileReader.withMaker(Image.Maker.lazy(Float32Image.maker())).read(FileChannel.open(FILE.toPath()))) {
 
             TiffHeader header = file.header();
 
@@ -46,25 +46,28 @@ class GeoImageRegressionTest {
                     () -> assertEquals(1, photometricInterpretation, "Photometric Interpretation")
             );
 
+            GeoKeyDirectory gkd = GeoKeyDirectory.getRequired(ifd);
+
             Image image = file.image(0);
             Rasters rasters = readRasters();
 
-            if (unwrap(image) instanceof GeoImage g) {
+            if (unwrap(image) instanceof Float32Image f) {
+
                 assertAll(
                         "Check Image(0) contents.",
-                        () -> assertEquals(rasters.getHeight(), g.dimensions().imageLength(), "Image Length Matches"),
-                        () -> assertEquals(256, g.dimensions().imageLength(), "Image Length (256)"),
-                        () -> assertEquals(rasters.getWidth(), g.dimensions().imageWidth(), "Image Width Matches"),
-                        () -> assertEquals(256, g.dimensions().imageWidth(), "Image Width (256)"),
-                        () -> assertEquals(32, g.stripInfo().rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(rasters.getHeight(), f.dimensions().imageLength(), "Image Length Matches"),
+                        () -> assertEquals(3612, f.dimensions().imageLength(), "Image Length (256)"),
+                        () -> assertEquals(rasters.getWidth(), f.dimensions().imageWidth(), "Image Width Matches"),
+                        () -> assertEquals(3612, f.dimensions().imageWidth(), "Image Width (256)"),
+                        () -> assertEquals(32, f.stripInfo().rowsPerStrip(), "Rows Per Strip")
                 );
 
                 assertAll(
                         "Check Image(0) pixels.",
-                        () -> comparePixelValues(g, rasters, 0, 0),
-                        () -> comparePixelValues(g, rasters, 20, 100),
-                        () -> comparePixelValues(g, rasters, 150, 200),
-                        () -> comparePixelValues(g, rasters, 255, 255)
+                        () -> comparePixelValues(f, rasters, 0, 0),
+                        () -> comparePixelValues(f, rasters, 20, 100),
+                        () -> comparePixelValues(f, rasters, 150, 200),
+                        () -> comparePixelValues(f, rasters, 255, 255)
                 );
             } else {
                 fail("Image not of the correct type, image type was: " + unwrap(image).getClass().getSimpleName());
@@ -74,7 +77,7 @@ class GeoImageRegressionTest {
         }
     }
 
-    private void comparePixelValues(GeoImage image, Rasters rasters, int row, int column) {
+    private void comparePixelValues(Float32Image image, Rasters rasters, int row, int column) {
 
         Number[] rPixel = rasters.getPixel(column, row);
         assertEquals(1, rPixel.length, "Should return a single number for the BiLevel image pixel value.");

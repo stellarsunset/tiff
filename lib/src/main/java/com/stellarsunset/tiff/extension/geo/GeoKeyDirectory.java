@@ -17,7 +17,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * <p>Clients should think about {@link GeoKeyDirectory}s as:
  * <ol>
  *     <li>Accessed like a tag, e.g. {@code GeoKeyDirectory.getOptional(ifd)}</li>
- *     <li>Used like an {@link Ifd}, e.g. {@code SomeGeoTag.getOptional(gkd)}</li>
+ *     <li>Used like an {@link Ifd}, e.g. {@code SomeGeoKey.getOptional(gkd)}</li>
  * </ol>
  *
  * <p>This design minimizes the number of reserved tags that need to be carved out of the underlying keyspace in the TIFF
@@ -45,8 +45,8 @@ public record GeoKeyDirectory(short keyDirectoryVersion,
                 "Currently only key revision 1 is supported, received %s", keyRevision);
         checkArgument(minorRevision == 0 || minorRevision == 1,
                 "Currently only minor revisions 0 and 1 are supported, received %s", minorRevision);
-        checkArgument(numberOfKeys > 0,
-                "Should be at least 1 key present in the directory, found %s", numberOfKeys);
+        checkArgument(Short.toUnsignedInt(numberOfKeys) == entries.length,
+                "Should be the same number of keys %s as entries %s", numberOfKeys, entries.length);
     }
 
     public static GeoKeyDirectory getRequired(Ifd ifd) {

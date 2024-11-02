@@ -7,9 +7,9 @@ import java.nio.ByteOrder;
  * Implementation of a {@link BytesAdapter} that also provides convenience methods for working with arrays as required
  * in a number of places in this class.
  */
-record ArrayBytesAdapter(BytesAdapter adapter) implements BytesAdapter {
+public record ArrayBytesAdapter(BytesAdapter adapter) implements BytesAdapter {
 
-    static ArrayBytesAdapter of(ByteOrder order) {
+    public static ArrayBytesAdapter of(ByteOrder order) {
         return new ArrayBytesAdapter(BytesAdapter.of(order));
     }
 
@@ -63,7 +63,7 @@ record ArrayBytesAdapter(BytesAdapter adapter) implements BytesAdapter {
     /**
      * Read {@code count} bytes from the buffer starting at the provided {@code offset} in the buffer.
      *
-     * <p>This method handles the endian-ness conversions be delegating to {@link #adaptRawByte(byte)}.
+     * <p>This method handles the endian-ness conversions by delegating to {@link #adaptRawByte(byte)}.
      *
      * @param buffer the buffer to read bytes from
      * @param offset the offset in the buffer to start the read from
@@ -80,7 +80,7 @@ record ArrayBytesAdapter(BytesAdapter adapter) implements BytesAdapter {
     /**
      * Read {@code count} shorts from the buffer starting at the provided {@code offset} in the buffer.
      *
-     * <p>This method handles the endian-ness conversions be delegating to {@link #adaptRawShort(short)}.
+     * <p>This method handles the endian-ness conversions by delegating to {@link #adaptRawShort(short)}.
      *
      * @param buffer the buffer to read shorts from
      * @param offset the offset in the buffer to start the read from
@@ -97,7 +97,7 @@ record ArrayBytesAdapter(BytesAdapter adapter) implements BytesAdapter {
     /**
      * Read {@code count} ints from the buffer starting at the provided {@code offset} in the buffer.
      *
-     * <p>This method handles the endian-ness conversions be delegating to {@link #adaptRawInt(int)}.
+     * <p>This method handles the endian-ness conversions by delegating to {@link #adaptRawInt(int)}.
      *
      * @param buffer the buffer to read ints from
      * @param offset the offset in the buffer to start the read from
@@ -112,9 +112,27 @@ record ArrayBytesAdapter(BytesAdapter adapter) implements BytesAdapter {
     }
 
     /**
+     * Read {@code count} floats from the buffer starting at the provided {@code offset} in the buffer.
+     *
+     * <p>This method handles the endian-ness conversions by delegating to {@link #adaptRawInt(int)} and float conversions
+     * via {@link Float#intBitsToFloat(int)}.
+     *
+     * @param buffer the buffer to read floats from
+     * @param offset the offset in the buffer to start the read from
+     * @param count  the number of int values to read from the buffer after the offset
+     */
+    public float[] readFloats(ByteBuffer buffer, int offset, int count) {
+        float[] array = new float[count];
+        for (int i = offset; i < count; i++) {
+            array[i - offset] = Float.intBitsToFloat(adaptRawInt(buffer.getInt(i * 4)));
+        }
+        return array;
+    }
+
+    /**
      * Read {@code count} longs from the buffer starting at the provided {@code offset} in the buffer.
      *
-     * <p>This method handles the endian-ness conversions be delegating to {@link #adaptRawLong(long)}.
+     * <p>This method handles the endian-ness conversions by delegating to {@link #adaptRawLong(long)}.
      *
      * @param buffer the buffer to read longs from
      * @param offset the offset in the buffer to start the read from
@@ -124,6 +142,24 @@ record ArrayBytesAdapter(BytesAdapter adapter) implements BytesAdapter {
         long[] array = new long[count];
         for (int i = offset; i < count; i++) {
             array[i - offset] = adaptRawLong(buffer.getLong(i * 8));
+        }
+        return array;
+    }
+
+    /**
+     * Read {@code count} doubles from the buffer starting at the provided {@code offset} in the buffer.
+     *
+     * <p>This method handles the endian-ness conversions by delegating to {@link #adaptRawLong(long)} and double conversions
+     * via {@link Double#longBitsToDouble(long)}.
+     *
+     * @param buffer the buffer to read doubles from
+     * @param offset the offset in the buffer to start the read from
+     * @param count  the number of long values to read from the buffer after the offset
+     */
+    public double[] readDoubles(ByteBuffer buffer, int offset, int count) {
+        double[] array = new double[count];
+        for (int i = offset; i < count; i++) {
+            array[i - offset] = Double.longBitsToDouble(adaptRawLong(buffer.getLong(i * 8)));
         }
         return array;
     }

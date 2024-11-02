@@ -34,7 +34,7 @@ public sealed interface Image permits Image.Unknown, Image.Lazy, BaselineImage, 
         return new Image.Lazy(supplier);
     }
 
-    Pixel valueAt(int x, int y);
+    Pixel valueAt(int row, int col);
 
     record Unknown(SeekableByteChannel channel, Ifd ifd) implements Image {
         @Override
@@ -91,6 +91,13 @@ public sealed interface Image permits Image.Unknown, Image.Lazy, BaselineImage, 
          */
         static Maker baseline() {
             return new BaselineImage.Maker();
+        }
+
+        /**
+         * Wraps the provided {@link Image.Maker} as one that produces {@link Image.Lazy} definitions.
+         */
+        static Maker lazy(Image.Maker maker) {
+            return (channel, order, ifd) -> Image.lazy(() -> maker.makeImage(channel, order, ifd));
         }
 
         /**
