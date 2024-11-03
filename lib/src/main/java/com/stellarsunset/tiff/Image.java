@@ -80,9 +80,14 @@ public sealed interface Image permits Image.Unknown, Image.Lazy, BaselineImage, 
      *
      * <p>Most concrete image implementations will provide their own {@link Maker} implementation, these implementations
      * are then rolled up into broader implementations like the {@link BaselineImage.Maker}.
+     *
+     * <p>Many of these maker classes delegate most of the data-reading work directly to {@link Raster.Reader}, as there's
+     * more diversity in the interpretation of the data in the raster (i.e. the {@link Image}) than there is in the data
+     * itself.
      */
     @FunctionalInterface
     interface Maker {
+
         /**
          * Returns a new {@link Image.Maker} for {@link Image}s that supports all the {@link BaselineImage} image types.
          *

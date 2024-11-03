@@ -1,18 +1,14 @@
 package com.stellarsunset.tiff.baseline;
 
-import com.stellarsunset.tiff.*;
+import com.stellarsunset.tiff.Ifd;
+import com.stellarsunset.tiff.Image;
+import com.stellarsunset.tiff.Pixel;
+import com.stellarsunset.tiff.Raster;
 import com.stellarsunset.tiff.baseline.tag.BitsPerSample;
-import com.stellarsunset.tiff.baseline.tag.Compression;
 import com.stellarsunset.tiff.baseline.tag.PhotometricInterpretation;
-import com.stellarsunset.tiff.compress.Compressor;
-import com.stellarsunset.tiff.compress.Compressors;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
-import java.util.Arrays;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Grayscale images are a generalization of bi-level images. Bi-level images can store only black and white image data,
@@ -33,8 +29,8 @@ public sealed interface GrayscaleImage extends BaselineImage {
     /**
      * A grayscale image with 4-bit grayscale tones.
      */
-    record Grayscale4Image(Interpretation type, ImageDimensions dimensions, StripInfo stripInfo,
-                           Resolution resolution, byte[][] data) implements GrayscaleImage {
+    record Grayscale4Image(Interpretation type, ImageDimensions dimensions, Resolution resolution,
+                           byte[][] data) implements GrayscaleImage {
 
         public Grayscale4Image {
             dimensions.checkBounds(data, 1);
@@ -49,8 +45,8 @@ public sealed interface GrayscaleImage extends BaselineImage {
     /**
      * A grayscale image with 8-bit grayscale tones.
      */
-    record Grayscale8Image(Interpretation type, ImageDimensions dimensions, StripInfo stripInfo,
-                           Resolution resolution, byte[][] data) implements GrayscaleImage {
+    record Grayscale8Image(Interpretation type, ImageDimensions dimensions, Resolution resolution,
+                           byte[][] data) implements GrayscaleImage {
 
         public Grayscale8Image {
             dimensions.checkBounds(data, 1);
@@ -114,62 +110,24 @@ public sealed interface GrayscaleImage extends BaselineImage {
         @Override
         public GrayscaleImage makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
-            BytesAdapter adapter = BytesAdapter.of(order);
-            BytesReader reader = new BytesReader(channel);
-
-            Compressor compressor = Compressors.getInstance()
-                    .compressorFor(Compression.getRequired(ifd));
-
-            ImageDimensions imageDimensions = ImageDimensions.from(ifd);
-            StripInfo stripInfo = StripInfo.from(ifd);
-
-            ImageDimensions.Int intImageDimensions = imageDimensions.asIntInfo();
-            StripInfo.Int intStripInfo = stripInfo.asIntInfo();
-
-            byte[][] bytes = new byte[intImageDimensions.imageLength()][intImageDimensions.imageWidth()];
-
-            int nOffsets = stripInfo.stripOffsets().length;
-            int rowsPerStrip = intStripInfo.rowsPerStrip();
-
-            int imageWidth = intImageDimensions.imageWidth();
-
-            for (int i = 0; i < nOffsets; i++) {
-
-                long stripOffset = stripInfo.stripOffsets()[i];
-                int stripBytes = intStripInfo.stripByteCounts()[i];
-
-                ByteBuffer buffer = reader.readBytes(stripOffset, stripBytes);
-                byte[] uncompressedStrip = compressor.decompress(buffer.array(), adapter);
-
-                int rowsInStrip = uncompressedStrip.length / imageWidth;
-                if (i != nOffsets - 1) {
-                    checkArgument(rowsInStrip == rowsPerStrip,
-                            "Incorrect number of rows found (%s) in strip# (%s).", rowsInStrip, i);
-                }
-
-                for (int stripRow = 0; stripRow < rowsInStrip; stripRow++) {
-
-                    int imageRow = i * rowsPerStrip + stripRow;
-                    int stripRowStart = stripRow * imageWidth;
-
-                    bytes[imageRow] = Arrays.copyOfRange(uncompressedStrip, stripRowStart, stripRowStart + imageWidth);
-                }
-            }
+            Raster.Bytes bytes = new Raster.Reader.ByteStrips(1).readRaster(
+                    channel,
+                    order,
+                    ifd
+            );
 
             return switch (ShadesOfGray.from(ifd)) {
                 case N16 -> new Grayscale4Image(
                         Interpretation.from(ifd),
-                        imageDimensions,
-                        stripInfo,
+                        ImageDimensions.from(ifd),
                         Resolution.from(ifd),
-                        bytes
+                        bytes.bytes()
                 );
                 case N256 -> new Grayscale8Image(
                         Interpretation.from(ifd),
-                        imageDimensions,
-                        stripInfo,
+                        ImageDimensions.from(ifd),
                         Resolution.from(ifd),
-                        bytes
+                        bytes.bytes()
                 );
             };
         }

@@ -15,7 +15,7 @@ import java.nio.channels.SeekableByteChannel;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public record Float32Image(ImageDimensions dimensions, StripInfo stripInfo, Resolution resolution,
+public record Float32Image(ImageDimensions dimensions, Resolution resolution,
                            float[][] data) implements ExtensionImage {
 
     public static Image.Maker maker() {
@@ -23,8 +23,8 @@ public record Float32Image(ImageDimensions dimensions, StripInfo stripInfo, Reso
     }
 
     @Override
-    public Pixel.Float32 valueAt(int row, int col) {
-        return new Pixel.Float32(data[row][col]);
+    public Pixel.Float valueAt(int row, int col) {
+        return new Pixel.Float(data[row][col]);
     }
 
     record Maker() implements Image.Maker {
@@ -83,7 +83,6 @@ public record Float32Image(ImageDimensions dimensions, StripInfo stripInfo, Reso
 
             return new Float32Image(
                     imageDimensions,
-                    stripInfo,
                     Resolution.from(ifd),
                     bytes
             );

@@ -63,7 +63,7 @@ class PaletteColorImageRegressionTest {
                         () -> assertEquals(756, p.dimensions().imageLength(), "Image Length (756)"),
                         () -> assertEquals(rasters.getWidth(), p.dimensions().imageWidth(), "Image Width Matches"),
                         () -> assertEquals(1008, p.dimensions().imageWidth(), "Image Width (1008)"),
-                        () -> assertEquals(756, p.stripInfo().rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(756, StripInfo.from(ifd).rowsPerStrip(), "Rows Per Strip")
                 );
 
                 assertEquals(colorMap, flattenColorMap(p.colorMap()), "Color Map");

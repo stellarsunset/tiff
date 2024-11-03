@@ -2,6 +2,7 @@ package com.stellarsunset.tiff.compress;
 
 import com.stellarsunset.tiff.*;
 import com.stellarsunset.tiff.baseline.PaletteColorImage;
+import com.stellarsunset.tiff.baseline.StripInfo;
 import com.stellarsunset.tiff.baseline.tag.BitsPerSample;
 import com.stellarsunset.tiff.baseline.tag.ColorMap;
 import com.stellarsunset.tiff.baseline.tag.Compression;
@@ -150,7 +151,7 @@ class LzwTest {
                         "Check Image(0) contents.",
                         () -> assertEquals(72, p.dimensions().imageLength(), "Image Length (280)"),
                         () -> assertEquals(128, p.dimensions().imageWidth(), "Image Width (272)"),
-                        () -> assertEquals(72, p.stripInfo().rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(72, StripInfo.from(ifd).rowsPerStrip(), "Rows Per Strip")
                 );
 
                 assertEquals(colorMap, flattenColorMap(p.colorMap()), "Color Map");

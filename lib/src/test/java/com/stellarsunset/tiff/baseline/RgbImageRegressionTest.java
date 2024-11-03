@@ -49,7 +49,7 @@ class RgbImageRegressionTest {
                         () -> assertEquals(443, r.dimensions().imageLength(), "Image Length (443)"),
                         () -> assertEquals(rasters.getWidth(), r.dimensions().imageWidth(), "Image Width Matches"),
                         () -> assertEquals(455, r.dimensions().imageWidth(), "Image Width (455)"),
-                        () -> assertEquals(443, r.stripInfo().rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(443, StripInfo.from(ifd).rowsPerStrip(), "Rows Per Strip")
                 );
 
                 assertAll(

@@ -196,6 +196,6 @@ public sealed interface Pixel {
      *
      * <p>These are typically used in extensions for storing measurements (e.g. elevations) taken on grids as images.
      */
-    record Float32(float value) implements Pixel.Extension {
+    record Float(float value) implements Pixel.Extension {
     }
 }

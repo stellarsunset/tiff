@@ -56,7 +56,7 @@ class GrayscaleImageRegressionTest {
                         () -> assertEquals(256, g.dimensions().imageLength(), "Image Length (256)"),
                         () -> assertEquals(rasters.getWidth(), g.dimensions().imageWidth(), "Image Width Matches"),
                         () -> assertEquals(256, g.dimensions().imageWidth(), "Image Width (256)"),
-                        () -> assertEquals(32, g.stripInfo().rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(32, StripInfo.from(ifd).rowsPerStrip(), "Rows Per Strip")
                 );
 
                 assertAll(

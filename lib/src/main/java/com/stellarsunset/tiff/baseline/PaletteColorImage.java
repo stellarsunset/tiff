@@ -1,17 +1,13 @@
 package com.stellarsunset.tiff.baseline;
 
-import com.stellarsunset.tiff.*;
+import com.stellarsunset.tiff.Ifd;
+import com.stellarsunset.tiff.Image;
+import com.stellarsunset.tiff.Pixel;
+import com.stellarsunset.tiff.Raster;
 import com.stellarsunset.tiff.baseline.tag.ColorMap;
-import com.stellarsunset.tiff.baseline.tag.Compression;
-import com.stellarsunset.tiff.compress.Compressor;
-import com.stellarsunset.tiff.compress.Compressors;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
-import java.util.Arrays;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Palette-color images are similar to grayscale images. They still have one component per pixel, but the component value
@@ -19,8 +15,8 @@ import static com.google.common.base.Preconditions.checkArgument;
  *
  * <p>See {@link Pixel.PaletteColor} for more info.
  */
-public record PaletteColorImage(ImageDimensions dimensions, StripInfo stripInfo, Resolution resolution,
-                                ColorMap colorMap, byte[][] data) implements BaselineImage {
+public record PaletteColorImage(ImageDimensions dimensions, Resolution resolution, ColorMap colorMap,
+                                byte[][] data) implements BaselineImage {
 
     public PaletteColorImage {
         dimensions.checkBounds(data, 1);
@@ -50,54 +46,17 @@ public record PaletteColorImage(ImageDimensions dimensions, StripInfo stripInfo,
         @Override
         public PaletteColorImage makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
-            BytesAdapter adapter = BytesAdapter.of(order);
-            BytesReader reader = new BytesReader(channel);
-
-            Compressor compressor = Compressors.getInstance()
-                    .compressorFor(Compression.getRequired(ifd));
-
-            ImageDimensions imageDimensions = ImageDimensions.from(ifd);
-            StripInfo stripInfo = StripInfo.from(ifd);
-
-            ImageDimensions.Int intImageDimensions = imageDimensions.asIntInfo();
-            StripInfo.Int intStripInfo = stripInfo.asIntInfo();
-
-            byte[][] bytes = new byte[intImageDimensions.imageLength()][intImageDimensions.imageWidth()];
-
-            int nOffsets = stripInfo.stripOffsets().length;
-            int rowsPerStrip = intStripInfo.rowsPerStrip();
-
-            int imageWidth = intImageDimensions.imageWidth();
-
-            for (int i = 0; i < nOffsets; i++) {
-
-                long stripOffset = stripInfo.stripOffsets()[i];
-                int stripBytes = intStripInfo.stripByteCounts()[i];
-
-                ByteBuffer buffer = reader.readBytes(stripOffset, stripBytes);
-                byte[] uncompressedStrip = compressor.decompress(buffer.array(), adapter);
-
-                int rowsInStrip = uncompressedStrip.length / imageWidth;
-                if (i != nOffsets - 1) {
-                    checkArgument(rowsInStrip == rowsPerStrip,
-                            "Incorrect number of rows found (%s) in strip# (%s).", rowsInStrip, i);
-                }
-
-                for (int stripRow = 0; stripRow < rowsInStrip; stripRow++) {
-
-                    int imageRow = i * rowsPerStrip + stripRow;
-                    int stripRowStart = stripRow * imageWidth;
-
-                    bytes[imageRow] = Arrays.copyOfRange(uncompressedStrip, stripRowStart, stripRowStart + imageWidth);
-                }
-            }
+            Raster.Bytes bytes = new Raster.Reader.ByteStrips(1).readRaster(
+                    channel,
+                    order,
+                    ifd
+            );
 
             return new PaletteColorImage(
-                    imageDimensions,
-                    stripInfo,
+                    ImageDimensions.from(ifd),
                     Resolution.from(ifd),
                     ColorMap.getRequired(ifd),
-                    bytes
+                    bytes.bytes()
             );
         }
     }
