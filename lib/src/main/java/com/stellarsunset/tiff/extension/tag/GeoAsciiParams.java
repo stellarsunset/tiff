@@ -4,9 +4,13 @@ import com.stellarsunset.tiff.Ifd;
 import com.stellarsunset.tiff.Ifd.Entry;
 import com.stellarsunset.tiff.baseline.tag.MissingRequiredTagException;
 import com.stellarsunset.tiff.baseline.tag.UnsupportedTypeForTagException;
+import com.stellarsunset.tiff.extension.geo.GeoKeyDirectory;
 
 import java.util.Optional;
 
+/**
+ * A top-level TIFF tag used to store ASCII values associated with {@link GeoKeyDirectory} entry values.
+ */
 public final class GeoAsciiParams {
 
     public static final String NAME = "GEO_ASCII_PARAMS";

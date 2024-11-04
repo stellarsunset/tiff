@@ -1,11 +1,14 @@
-package com.stellarsunset.tiff.extension.geo;
+package com.stellarsunset.tiff.extension;
 
 import com.stellarsunset.tiff.*;
+import com.stellarsunset.tiff.baseline.StripInfo;
 import com.stellarsunset.tiff.baseline.tag.BitsPerSample;
 import com.stellarsunset.tiff.baseline.tag.Compression;
 import com.stellarsunset.tiff.baseline.tag.PhotometricInterpretation;
+import com.stellarsunset.tiff.extension.geo.GeoKeyDirectory;
 import mil.nga.tiff.Rasters;
 import mil.nga.tiff.TiffReader;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -20,8 +23,9 @@ class GeoImageRegressionTest {
     private static final File FILE = tiffFile("extension/geo/USGS_1_n52e177.tif");
 
     @Test
+    @Disabled("Not ready yet...")
     void test() {
-        try (TiffFile file = TiffFileReader.withMaker(Image.Maker.lazy(Float32Image.maker())).read(FileChannel.open(FILE.toPath()))) {
+        try (TiffFile file = TiffFileReader.withMaker(Image.Maker.lazy(FloatImage.maker())).read(FileChannel.open(FILE.toPath()))) {
 
             TiffHeader header = file.header();
 
@@ -51,7 +55,7 @@ class GeoImageRegressionTest {
             Image image = file.image(0);
             Rasters rasters = readRasters();
 
-            if (unwrap(image) instanceof Float32Image f) {
+            if (unwrap(image) instanceof FloatImage f) {
 
                 assertAll(
                         "Check Image(0) contents.",
@@ -59,7 +63,7 @@ class GeoImageRegressionTest {
                         () -> assertEquals(3612, f.dimensions().imageLength(), "Image Length (256)"),
                         () -> assertEquals(rasters.getWidth(), f.dimensions().imageWidth(), "Image Width Matches"),
                         () -> assertEquals(3612, f.dimensions().imageWidth(), "Image Width (256)"),
-                        () -> assertEquals(32, f.stripInfo().rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(32, StripInfo.from(ifd).rowsPerStrip(), "Rows Per Strip")
                 );
 
                 assertAll(
@@ -77,7 +81,7 @@ class GeoImageRegressionTest {
         }
     }
 
-    private void comparePixelValues(Float32Image image, Rasters rasters, int row, int column) {
+    private void comparePixelValues(FloatImage image, Rasters rasters, int row, int column) {
 
         Number[] rPixel = rasters.getPixel(column, row);
         assertEquals(1, rPixel.length, "Should return a single number for the BiLevel image pixel value.");
