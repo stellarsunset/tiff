@@ -15,7 +15,7 @@ public final class GeoDoubleParams {
 
     public static final String NAME = "GEO_DOUBLE_PARAMS";
 
-    public static final short ID = (short) 0x34736;
+    public static final short ID = (short) 0x87B0;
 
     public static double[] getRequired(Ifd ifd) {
         return getOptionalValue(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));

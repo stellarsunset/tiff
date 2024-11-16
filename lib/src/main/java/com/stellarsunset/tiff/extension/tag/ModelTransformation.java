@@ -19,7 +19,7 @@ public final class ModelTransformation {
 
     public static final String NAME = "MODEL_TRANSFORMATION";
 
-    public static final short ID = (short) 0x34264;
+    public static final short ID = (short) 0x85D8;
 
     public static double[][] getRequired(Ifd ifd) {
         return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
@@ -36,7 +36,7 @@ public final class ModelTransformation {
     }
 
     static double[][] createTransformationMatrix(double[] doubles) {
-        checkArgument(16 == doubles.length, "Should be exactly 16 elements, got: {}", doubles.length);
+        checkArgument(16 == doubles.length, "Should be exactly 16 elements, got %s", doubles.length);
         double[][] matrix = new double[4][4];
         for (int i = 0; i < 4; i++) {
             int offset = i * 4;

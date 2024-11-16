@@ -52,11 +52,11 @@ class GrayscaleImageRegressionTest {
             if (unwrap(image) instanceof GrayscaleImage.Grayscale8Image g) {
                 assertAll(
                         "Check Image(0) contents.",
-                        () -> assertEquals(rasters.getHeight(), g.dimensions().imageLength(), "Image Length Matches"),
-                        () -> assertEquals(256, g.dimensions().imageLength(), "Image Length (256)"),
-                        () -> assertEquals(rasters.getWidth(), g.dimensions().imageWidth(), "Image Width Matches"),
-                        () -> assertEquals(256, g.dimensions().imageWidth(), "Image Width (256)"),
-                        () -> assertEquals(32, StripInfo.from(ifd).rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(rasters.getHeight(), g.dimensions().length(), "Image Length Matches"),
+                        () -> assertEquals(256, g.dimensions().length(), "Image Length (256)"),
+                        () -> assertEquals(rasters.getWidth(), g.dimensions().width(), "Image Width Matches"),
+                        () -> assertEquals(256, g.dimensions().width(), "Image Width (256)"),
+                        () -> assertEquals(32, StripInfo.getRequired(ifd).rowsPerStrip(), "Rows Per Strip")
                 );
 
                 assertAll(

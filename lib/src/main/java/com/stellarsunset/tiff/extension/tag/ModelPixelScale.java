@@ -26,7 +26,7 @@ public record ModelPixelScale(double x, double y, double z) {
 
     public static final String NAME = "MODEL_PIXEL_SCALE";
 
-    public static final short ID = (short) 0x33550;
+    public static final short ID = (short) 0x830E;
 
     public static ModelPixelScale getRequired(Ifd ifd) {
         return getOptionalValue(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));

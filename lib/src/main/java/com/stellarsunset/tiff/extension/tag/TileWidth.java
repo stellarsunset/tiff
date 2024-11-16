@@ -49,10 +49,10 @@ public final class TileWidth {
     public static final short ID = 0x142;
 
     public static long getRequired(Ifd ifd) {
-        return getOptionalValue(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
     }
 
-    public static OptionalLong getOptionalValue(Ifd ifd) {
+    public static OptionalLong getOptional(Ifd ifd) {
         return switch (ifd.findTag(ID)) {
             case Entry.Short s -> OptionalLong.of(Short.toUnsignedLong(s.values()[0]));
             case Entry.Long l -> OptionalLong.of(Integer.toUnsignedLong(l.values()[0]));

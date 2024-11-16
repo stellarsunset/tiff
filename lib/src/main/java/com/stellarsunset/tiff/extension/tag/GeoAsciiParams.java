@@ -15,7 +15,7 @@ public final class GeoAsciiParams {
 
     public static final String NAME = "GEO_ASCII_PARAMS";
 
-    public static final short ID = (short) 0x34737;
+    public static final short ID = (short) 0x87B1;
 
     public static byte[] getRequired(Ifd ifd) {
         return getOptionalValue(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));

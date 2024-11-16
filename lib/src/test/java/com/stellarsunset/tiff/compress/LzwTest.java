@@ -149,9 +149,9 @@ class LzwTest {
             if (unwrap(image) instanceof PaletteColorImage p) {
                 assertAll(
                         "Check Image(0) contents.",
-                        () -> assertEquals(72, p.dimensions().imageLength(), "Image Length (280)"),
-                        () -> assertEquals(128, p.dimensions().imageWidth(), "Image Width (272)"),
-                        () -> assertEquals(72, StripInfo.from(ifd).rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(72, p.dimensions().length(), "Image Length (280)"),
+                        () -> assertEquals(128, p.dimensions().width(), "Image Width (272)"),
+                        () -> assertEquals(72, StripInfo.getRequired(ifd).rowsPerStrip(), "Rows Per Strip")
                 );
 
                 assertEquals(colorMap, flattenColorMap(p.colorMap()), "Color Map");

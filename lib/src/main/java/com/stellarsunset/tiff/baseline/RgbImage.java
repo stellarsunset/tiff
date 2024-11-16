@@ -46,7 +46,7 @@ public record RgbImage(ImageDimensions dimensions, Resolution resolution, byte[]
         @Override
         public RgbImage makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
-            Raster.Bytes bytes = new Raster.Reader.ByteStrips(SAMPLES_PER_PIXEL).readRaster(
+            Raster.Bytes bytes = Raster.Reader.bytes(SAMPLES_PER_PIXEL).readRaster(
                     channel,
                     order,
                     ifd

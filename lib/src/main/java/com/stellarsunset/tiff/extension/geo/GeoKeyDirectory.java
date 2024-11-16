@@ -36,7 +36,7 @@ public record GeoKeyDirectory(short keyDirectoryVersion,
 
     public static final String NAME = "GEO_KEY_DIRECTORY";
 
-    public static final short ID = (short) 34735;
+    public static final short ID = (short) 0x87AF;
 
     public GeoKeyDirectory {
         checkArgument(keyDirectoryVersion == 1,

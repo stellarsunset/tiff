@@ -6,6 +6,7 @@ import com.stellarsunset.tiff.Pixel;
 import com.stellarsunset.tiff.Raster;
 import com.stellarsunset.tiff.baseline.ImageDimensions;
 import com.stellarsunset.tiff.baseline.Resolution;
+import com.stellarsunset.tiff.baseline.tag.SamplesPerPixel;
 
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
@@ -26,7 +27,9 @@ public record FloatImage(ImageDimensions dimensions, Resolution resolution, floa
         @Override
         public FloatImage makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
-            Raster.Floats floats = new Raster.Reader.FloatStrips(1).readRaster(
+            int componentsPerPixel = SamplesPerPixel.getRequired(ifd);
+
+            Raster.Floats floats = Raster.Reader.floats(componentsPerPixel).readRaster(
                     channel,
                     order,
                     ifd

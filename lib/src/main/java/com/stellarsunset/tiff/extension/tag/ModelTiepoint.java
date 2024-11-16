@@ -18,7 +18,7 @@ public record ModelTiepoint(double i, double j, double k, double x, double y, do
 
     public static final String NAME = "MODEL_TIE_POINT";
 
-    public static final short ID = (short) 0x33922;
+    public static final short ID = (short) 0x8482;
 
     public static ModelTiepoint[] getRequired(Ifd ifd) {
         return getOptionalValue(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));

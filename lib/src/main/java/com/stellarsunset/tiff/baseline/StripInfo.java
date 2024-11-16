@@ -6,6 +6,9 @@ import com.stellarsunset.tiff.baseline.tag.RowsPerStrip;
 import com.stellarsunset.tiff.baseline.tag.StripByteCounts;
 import com.stellarsunset.tiff.baseline.tag.StripOffsets;
 
+import java.util.Optional;
+import java.util.OptionalLong;
+
 /**
  * Container class for the related baseline tags:
  * <ol>
@@ -16,13 +19,32 @@ import com.stellarsunset.tiff.baseline.tag.StripOffsets;
  */
 public record StripInfo(long rowsPerStrip, long[] stripOffsets, long[] stripByteCounts) {
 
-    public static StripInfo from(Ifd ifd) {
+    public static StripInfo getRequired(Ifd ifd) {
         return new StripInfo(RowsPerStrip.getRequired(ifd), StripOffsets.getRequired(ifd), StripByteCounts.getRequired(ifd));
+    }
+
+    public static Optional<StripInfo> getOptional(Ifd ifd) {
+
+        OptionalLong rowsPerStrip = RowsPerStrip.getOptional(ifd);
+        Optional<long[]> offsets = StripOffsets.getOptional(ifd);
+        Optional<long[]> byteCounts = StripByteCounts.getOptional(ifd);
+
+        if (rowsPerStrip.isPresent() && offsets.isPresent() && byteCounts.isPresent()) {
+            return Optional.of(
+                    new StripInfo(
+                            rowsPerStrip.getAsLong(),
+                            offsets.get(),
+                            byteCounts.get()
+                    )
+            );
+        }
+
+        return Optional.empty();
     }
 
     public Int asIntInfo() {
 
-        Preconditions.checkArgument(rowsPerStrip < java.lang.Integer.MAX_VALUE,
+        Preconditions.checkArgument(rowsPerStrip < Integer.MAX_VALUE,
                 "RowsPerStrip should be less than Integer.MAX_VALUE, value was %s", rowsPerStrip);
 
         int[] intByteCounts = new int[stripByteCounts.length];
@@ -30,7 +52,7 @@ public record StripInfo(long rowsPerStrip, long[] stripOffsets, long[] stripByte
 
             long stripByteCount = stripByteCounts[i];
 
-            Preconditions.checkArgument(stripByteCount < java.lang.Integer.MAX_VALUE,
+            Preconditions.checkArgument(stripByteCount < Integer.MAX_VALUE,
                     "StripByteCount should be less than Integer.MAX_VALUE, value was %s for strip %s", stripByteCount, i);
 
             intByteCounts[i] = (int) stripByteCount;
@@ -48,6 +70,5 @@ public record StripInfo(long rowsPerStrip, long[] stripOffsets, long[] stripByte
      * integer ones for ease-of-use but will throw exceptions if our expectations aren't met.
      */
     public record Int(int rowsPerStrip, long[] stripOffsets, int[] stripByteCounts) {
-
     }
 }

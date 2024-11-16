@@ -24,8 +24,8 @@ class ImageDimensionsTest {
 
         ImageDimensions dimensions = ImageDimensions.from(ifd);
         assertAll(
-                () -> assertEquals(10, dimensions.imageWidth(), "Image Width"),
-                () -> assertEquals(20, dimensions.imageLength(), "Image Length"),
+                () -> assertEquals(10, dimensions.width(), "Image Width"),
+                () -> assertEquals(20, dimensions.length(), "Image Length"),
                 () -> assertDoesNotThrow(dimensions::asIntInfo, "Should be able to narrow to integer values.")
         );
     }
@@ -44,8 +44,8 @@ class ImageDimensionsTest {
 
         ImageDimensions dimensions = ImageDimensions.from(ifd);
         assertAll(
-                () -> assertEquals(4294967295L, dimensions.imageWidth(), "Image Width"),
-                () -> assertEquals(4294967295L, dimensions.imageLength(), "Image Length"),
+                () -> assertEquals(4294967295L, dimensions.width(), "Image Width"),
+                () -> assertEquals(4294967295L, dimensions.length(), "Image Length"),
                 () -> assertThrows(IllegalArgumentException.class, dimensions::asIntInfo, "Should fail on narrowing to integer values.")
         );
     }

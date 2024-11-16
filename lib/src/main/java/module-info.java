@@ -9,4 +9,5 @@ module tiff.lib.main {
     exports com.stellarsunset.tiff.baseline.tag;
 
     exports com.stellarsunset.tiff.extension;
+    exports com.stellarsunset.tiff.extension.tag;
 }

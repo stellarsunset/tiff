@@ -62,4 +62,3 @@ int b = rgb0_0.unsignedB();
 1. Tiled strips extension
 2. Modified Huffman compression for BiLevel images
 3. Writing? :thinking: couldn't be too hard right?
-4. 

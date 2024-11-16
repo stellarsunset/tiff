@@ -46,7 +46,7 @@ public record PaletteColorImage(ImageDimensions dimensions, Resolution resolutio
         @Override
         public PaletteColorImage makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
-            Raster.Bytes bytes = new Raster.Reader.ByteStrips(1).readRaster(
+            Raster.Bytes bytes = Raster.Reader.bytes(1).readRaster(
                     channel,
                     order,
                     ifd

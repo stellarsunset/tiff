@@ -110,7 +110,7 @@ public sealed interface GrayscaleImage extends BaselineImage {
         @Override
         public GrayscaleImage makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
-            Raster.Bytes bytes = new Raster.Reader.ByteStrips(1).readRaster(
+            Raster.Bytes bytes = Raster.Reader.bytes(1).readRaster(
                     channel,
                     order,
                     ifd
