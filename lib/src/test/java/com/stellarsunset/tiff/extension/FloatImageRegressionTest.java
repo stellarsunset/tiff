@@ -5,7 +5,7 @@ import com.stellarsunset.tiff.baseline.StripInfo;
 import com.stellarsunset.tiff.baseline.tag.BitsPerSample;
 import com.stellarsunset.tiff.baseline.tag.Compression;
 import com.stellarsunset.tiff.baseline.tag.PhotometricInterpretation;
-import com.stellarsunset.tiff.extension.geo.GeoKeyDirectory;
+import com.stellarsunset.tiff.extension.tag.GeoKeyDirectory;
 import mil.nga.tiff.Rasters;
 import mil.nga.tiff.TiffReader;
 import org.junit.jupiter.api.Disabled;
@@ -23,7 +23,7 @@ class FloatImageRegressionTest {
     private static final File FILE = tiffFile("extension/USGS_1_n52e177.tif");
 
     @Test
-    @Disabled("Not ready yet...")
+    @Disabled("Tiling not ready for float images")
     void test() {
         try (TiffFile file = TiffFileReader.withMaker(Image.Maker.lazy(FloatImage.maker())).read(FileChannel.open(FILE.toPath()))) {
 
@@ -39,7 +39,7 @@ class FloatImageRegressionTest {
 
             int[] bitsPerSample = BitsPerSample.getRequired(ifd);
 
-            int compression = Compression.getRequired(ifd);
+            int compression = Compression.get(ifd);
             int photometricInterpretation = PhotometricInterpretation.getRequired(ifd);
 
             assertAll(

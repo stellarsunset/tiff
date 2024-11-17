@@ -29,10 +29,10 @@ public record ModelPixelScale(double x, double y, double z) {
     public static final short ID = (short) 0x830E;
 
     public static ModelPixelScale getRequired(Ifd ifd) {
-        return getOptionalValue(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
     }
 
-    public static Optional<ModelPixelScale> getOptionalValue(Ifd ifd) {
+    public static Optional<ModelPixelScale> getOptional(Ifd ifd) {
         return switch (ifd.findTag(ID)) {
             case Entry.Double d -> Optional.of(new ModelPixelScale(d.values()[0], d.values()[1], d.values()[2]));
             case Entry.NotFound _ -> Optional.empty();

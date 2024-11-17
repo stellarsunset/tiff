@@ -5,6 +5,7 @@ import com.stellarsunset.tiff.baseline.RgbImage;
 import com.stellarsunset.tiff.baseline.tag.BitsPerSample;
 import com.stellarsunset.tiff.baseline.tag.Compression;
 import com.stellarsunset.tiff.baseline.tag.PhotometricInterpretation;
+import com.stellarsunset.tiff.extension.tag.DifferencingPredictor;
 import com.stellarsunset.tiff.extension.tag.PlanarConfiguration;
 import mil.nga.tiff.Rasters;
 import mil.nga.tiff.TiffReader;
@@ -17,6 +18,9 @@ import java.nio.channels.FileChannel;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Note - this also has a {@link DifferencingPredictor} applied.
+ */
 class TiledImageRegressionTest {
 
     private static final File FILE = tiffFile("extension/tiled-rgb.tif");
@@ -37,7 +41,7 @@ class TiledImageRegressionTest {
 
             int[] bitsPerSample = BitsPerSample.getRequired(ifd);
 
-            int compression = Compression.getRequired(ifd);
+            int compression = Compression.get(ifd);
             int photometricInterpretation = PhotometricInterpretation.getRequired(ifd);
             int planarConfiguration = PlanarConfiguration.getRequired(ifd);
 

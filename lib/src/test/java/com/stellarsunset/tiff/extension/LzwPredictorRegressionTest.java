@@ -40,7 +40,7 @@ class LzwPredictorRegressionTest {
 
             int[] bitsPerSample = BitsPerSample.getRequired(ifd);
 
-            int compression = Compression.getRequired(ifd);
+            int compression = Compression.get(ifd);
             int photometricInterpretation = PhotometricInterpretation.getRequired(ifd);
             int planarConfiguration = PlanarConfiguration.getRequired(ifd);
             int componentsPerPixel = SamplesPerPixel.getRequired(ifd);

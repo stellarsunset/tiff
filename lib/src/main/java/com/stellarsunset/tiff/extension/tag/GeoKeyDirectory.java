@@ -1,4 +1,4 @@
-package com.stellarsunset.tiff.extension.geo;
+package com.stellarsunset.tiff.extension.tag;
 
 import com.stellarsunset.tiff.Ifd;
 import com.stellarsunset.tiff.Ifd.Entry;
@@ -23,7 +23,8 @@ import static com.google.common.base.Preconditions.checkArgument;
  * <p>This design minimizes the number of reserved tags that need to be carved out of the underlying keyspace in the TIFF
  * 6.0 standard to support the GeoTIFF extension (only one mandatory key needs to be reserved for the GKD itself).
  *
- * <p>This directory can be searched just like an {@link Ifd} for tags and returns normal {@link Entry} objects.
+ * <p>This directory can be searched just like an {@link Ifd} for tags and returns normal {@link Entry} objects. For TIFF
+ * tag-like handles for GeoKeys see the {@code ..extension.geokey} package.
  *
  * <p>See the <a href="https://docs.ogc.org/is/19-008r4/19-008r4.html#_underlying_tiff_requirements">GeoTIFF</a> spec for
  * more details.
@@ -47,6 +48,10 @@ public record GeoKeyDirectory(short keyDirectoryVersion,
                 "Currently only minor revisions 0 and 1 are supported, received %s", minorRevision);
         checkArgument(Short.toUnsignedInt(numberOfKeys) == entries.length,
                 "Should be the same number of keys %s as entries %s", numberOfKeys, entries.length);
+    }
+
+    public static GeoKeyDirectory v1(Entry[] entries) {
+        return new GeoKeyDirectory((short) 1, (short) 1, (short) 1, (short) entries.length, entries);
     }
 
     public static GeoKeyDirectory getRequired(Ifd ifd) {

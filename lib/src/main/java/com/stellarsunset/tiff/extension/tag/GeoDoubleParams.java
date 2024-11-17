@@ -4,7 +4,6 @@ import com.stellarsunset.tiff.Ifd;
 import com.stellarsunset.tiff.Ifd.Entry;
 import com.stellarsunset.tiff.baseline.tag.MissingRequiredTagException;
 import com.stellarsunset.tiff.baseline.tag.UnsupportedTypeForTagException;
-import com.stellarsunset.tiff.extension.geo.GeoKeyDirectory;
 
 import java.util.Optional;
 
@@ -18,10 +17,10 @@ public final class GeoDoubleParams {
     public static final short ID = (short) 0x87B0;
 
     public static double[] getRequired(Ifd ifd) {
-        return getOptionalValue(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
     }
 
-    public static Optional<double[]> getOptionalValue(Ifd ifd) {
+    public static Optional<double[]> getOptional(Ifd ifd) {
         return switch (ifd.findTag(ID)) {
             case Entry.Double d -> Optional.of(d.values());
             case Entry.NotFound _ -> Optional.empty();

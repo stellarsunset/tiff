@@ -80,7 +80,7 @@ public sealed interface Raster {
                 BytesReader reader = new BytesReader(channel);
 
                 Compressor compressor = Compressors.getInstance()
-                        .compressorFor(Compression.getRequired(ifd));
+                        .compressorFor(Compression.get(ifd));
 
                 ImageDimensions imageDimensions = ImageDimensions.from(ifd);
                 StripInfo stripInfo = StripInfo.getRequired(ifd);
@@ -140,7 +140,7 @@ public sealed interface Raster {
                 BytesReader reader = new BytesReader(channel);
 
                 Compressor compressor = Compressors.getInstance()
-                        .compressorFor(Compression.getRequired(ifd));
+                        .compressorFor(Compression.get(ifd));
 
                 ImageDimensions imageDimensions = ImageDimensions.from(ifd);
                 TileInfo tileInfo = TileInfo.getRequired(ifd);
@@ -235,7 +235,7 @@ public sealed interface Raster {
                 BytesReader reader = new BytesReader(channel);
 
                 Compressor compressor = Compressors.getInstance()
-                        .compressorFor(Compression.getRequired(ifd));
+                        .compressorFor(Compression.get(ifd));
 
                 ImageDimensions imageDimensions = ImageDimensions.from(ifd);
                 StripInfo stripInfo = StripInfo.getRequired(ifd);
@@ -293,7 +293,7 @@ public sealed interface Raster {
                 BytesReader reader = new BytesReader(channel);
 
                 Compressor compressor = Compressors.getInstance()
-                        .compressorFor(Compression.getRequired(ifd));
+                        .compressorFor(Compression.get(ifd));
 
                 ImageDimensions imageDimensions = ImageDimensions.from(ifd);
                 TileInfo tileInfo = TileInfo.getRequired(ifd);

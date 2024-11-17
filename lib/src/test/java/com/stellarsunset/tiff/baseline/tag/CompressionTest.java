@@ -16,7 +16,7 @@ class CompressionTest {
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertThrows(UnsupportedTypeForTagException.class, () -> Compression.getRequired(ifd));
+        assertThrows(UnsupportedTypeForTagException.class, () -> Compression.get(ifd));
     }
 
     @Test
@@ -27,7 +27,7 @@ class CompressionTest {
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertEquals(1, Compression.getRequired(ifd), "Has a default value...");
+        assertEquals(1, Compression.get(ifd), "Has a default value...");
     }
 
     @Test
@@ -38,6 +38,6 @@ class CompressionTest {
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertEquals(8, Compression.getRequired(ifd));
+        assertEquals(8, Compression.get(ifd));
     }
 }

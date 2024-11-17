@@ -46,7 +46,7 @@ public sealed interface BaselineImage extends Image permits BiLevelImage, Graysc
         }
 
         private Image grayscaleOrBiLevel(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
-            return BitsPerSample.getOptionalValue(ifd)
+            return BitsPerSample.getOptional(ifd)
                     .filter(bps -> bps.length == 1 && (bps[0] == 4 || bps[0] == 8))
                     .map(_ -> grayscale.makeImage(channel, order, ifd))
                     .orElseGet(() -> biLevel.makeImage(channel, order, ifd));

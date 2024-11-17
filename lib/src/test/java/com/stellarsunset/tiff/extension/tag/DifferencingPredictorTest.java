@@ -72,5 +72,21 @@ class DifferencingPredictorTest {
     @Test
     void testUnpackThreeComponents() {
 
+        byte[][] bytes = new byte[][]{
+                new byte[]{1, 2, 1, 4, 2, 4, 2, 4, 2},
+                new byte[]{-1, -2, -3, -3, -3, -3, -3, -3, -3},
+                new byte[]{10, 20, 30, 30, 20, 0, -20, -30, -30}
+        };
+
+        byte[][] expected = new byte[][]{
+                new byte[]{1, 2, 1, 5, 4, 5, 7, 8, 7},
+                new byte[]{-1, -2, -3, -4, -5, -6, -7, -8, -9},
+                new byte[]{10, 20, 30, 40, 40, 30, 20, 10, 0}
+        };
+
+        DifferencingPredictor.planarOneByteComponents(3)
+                .unpackAll(bytes);
+
+        assertArrayEquals(expected, bytes);
     }
 }

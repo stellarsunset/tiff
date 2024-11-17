@@ -24,17 +24,23 @@ public final class BitsPerSample {
     public static final short ID = 0x102;
 
     public static int[] getRequired(Ifd ifd) {
-        return getOptionalValue(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
     }
 
-    // TODO - respect SamplesPerPixel in the default?
-    public static Optional<int[]> getOptionalValue(Ifd ifd) {
+    public static Optional<int[]> getOptional(Ifd ifd) {
         return switch (ifd.findTag(ID)) {
             case Entry.Short s -> Optional.of(Arrays.toUnsignedIntArray(s.values()));
-            case Entry.NotFound _ -> Optional.of(new int[]{1});
+            case Entry.NotFound _ -> Optional.of(createDefault(ifd));
             case Entry.Byte _, Entry.Ascii _, Entry.Long _, Entry.Rational _, Entry.SByte _, Entry.Undefined _,
                  Entry.SShort _, Entry.SLong _, Entry.SRational _,
                  Entry.Float _, Entry.Double _ -> throw new UnsupportedTypeForTagException(NAME, ID);
         };
+    }
+
+    static int[] createDefault(Ifd ifd) {
+        int samplesPerPixel = SamplesPerPixel.getRequired(ifd);
+        int[] array = new int[samplesPerPixel];
+        java.util.Arrays.fill(array, 1);
+        return array;
     }
 }

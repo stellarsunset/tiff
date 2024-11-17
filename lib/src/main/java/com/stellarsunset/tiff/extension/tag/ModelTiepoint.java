@@ -21,10 +21,10 @@ public record ModelTiepoint(double i, double j, double k, double x, double y, do
     public static final short ID = (short) 0x8482;
 
     public static ModelTiepoint[] getRequired(Ifd ifd) {
-        return getOptionalValue(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
     }
 
-    public static Optional<ModelTiepoint[]> getOptionalValue(Ifd ifd) {
+    public static Optional<ModelTiepoint[]> getOptional(Ifd ifd) {
         return switch (ifd.findTag(ID)) {
             case Entry.Double d -> Optional.of(createTiepoints(d.values()));
             case Entry.NotFound _ -> Optional.empty();

@@ -4,7 +4,6 @@ import com.stellarsunset.tiff.Ifd;
 import com.stellarsunset.tiff.Ifd.Entry;
 import com.stellarsunset.tiff.baseline.tag.MissingRequiredTagException;
 import com.stellarsunset.tiff.baseline.tag.UnsupportedTypeForTagException;
-import com.stellarsunset.tiff.extension.geo.GeoKeyDirectory;
 
 import java.util.Optional;
 
@@ -18,10 +17,10 @@ public final class GeoAsciiParams {
     public static final short ID = (short) 0x87B1;
 
     public static byte[] getRequired(Ifd ifd) {
-        return getOptionalValue(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
     }
 
-    public static Optional<byte[]> getOptionalValue(Ifd ifd) {
+    public static Optional<byte[]> getOptional(Ifd ifd) {
         return switch (ifd.findTag(ID)) {
             case Entry.Ascii d -> Optional.of(d.values());
             case Entry.NotFound _ -> Optional.empty();

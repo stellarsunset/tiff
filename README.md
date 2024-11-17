@@ -48,6 +48,27 @@ int g = rgb0_0.unsignedG();
 int b = rgb0_0.unsignedB();
 ```
 
+## Extensions
+
+The strength of the TIFF specification is its extensibility, meaning there is a rich ecosystem of non-baseline
+image types and encoding methods that are widely used.
+
+This library out-of-the-box supports some of the most common extension types outlined in the following sections.
+
+### GeoTIFF
+
+The GeoTIFF extension allows for the encoding of a rich set of geospatial tags used to describe image data
+within a TIFF file. Accessing these tags is done via:
+
+```java
+// GeoTIFF specific tags are stored in a standard TIFF tag called the GeoKeyDirectory
+GeoKeyDirectory gkd = GeoKeyDirectory.getRequired(ifd);
+
+// The GKD can be interacted with like an IFD, and the library ships with a default set 
+// of common GeoKey accessors
+int rasterType = RasterType.getRequired(gkd);
+```
+
 ## Notes
 
 1. This repo is published to maven central as `io.github.stellarsunset:tiff`, see releases for versions
@@ -59,6 +80,6 @@ int b = rgb0_0.unsignedB();
 
 ## TODO
 
-1. Tiled strips extension
+1. Tiled strips extension (floats)
 2. Modified Huffman compression for BiLevel images
-3. Writing? :thinking: couldn't be too hard right?
+3. Write files? 

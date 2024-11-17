@@ -1,4 +1,4 @@
-package com.stellarsunset.tiff.extension.geo;
+package com.stellarsunset.tiff.extension.tag;
 
 import com.stellarsunset.tiff.Ifd;
 import com.stellarsunset.tiff.baseline.tag.MissingRequiredTagException;
