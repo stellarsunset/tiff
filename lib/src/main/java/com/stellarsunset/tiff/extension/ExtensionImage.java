@@ -16,5 +16,5 @@ import com.stellarsunset.tiff.baseline.BaselineImage;
  * <p>In-library we define "extension image" types for images containing data in their pixel values. The interpretation
  * of the data stored in the various pixels depends on the type of image (e.g. might be elevation data).
  */
-public sealed interface ExtensionImage extends Image permits IntImage, FloatImage {
+public non-sealed interface ExtensionImage extends Image {
 }

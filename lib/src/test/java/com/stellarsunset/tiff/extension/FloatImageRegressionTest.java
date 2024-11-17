@@ -1,14 +1,13 @@
 package com.stellarsunset.tiff.extension;
 
 import com.stellarsunset.tiff.*;
-import com.stellarsunset.tiff.baseline.StripInfo;
 import com.stellarsunset.tiff.baseline.tag.BitsPerSample;
 import com.stellarsunset.tiff.baseline.tag.Compression;
 import com.stellarsunset.tiff.baseline.tag.PhotometricInterpretation;
+import com.stellarsunset.tiff.extension.FloatImage.Float1Image;
 import com.stellarsunset.tiff.extension.tag.GeoKeyDirectory;
 import mil.nga.tiff.Rasters;
 import mil.nga.tiff.TiffReader;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -23,7 +22,6 @@ class FloatImageRegressionTest {
     private static final File FILE = tiffFile("extension/USGS_1_n52e177.tif");
 
     @Test
-    @Disabled("Tiling not ready for float images")
     void test() {
         try (TiffFile file = TiffFileReader.withMaker(Image.Maker.lazy(FloatImage.maker())).read(FileChannel.open(FILE.toPath()))) {
 
@@ -55,7 +53,9 @@ class FloatImageRegressionTest {
             Image image = file.image(0);
             Rasters rasters = readRasters();
 
-            if (unwrap(image) instanceof FloatImage f) {
+            if (unwrap(image) instanceof Float1Image f) {
+
+                TileInfo tileInfo = TileInfo.getRequired(ifd);
 
                 assertAll(
                         "Check Image(0) contents.",
@@ -63,7 +63,8 @@ class FloatImageRegressionTest {
                         () -> assertEquals(3612, f.dimensions().length(), "Image Length (256)"),
                         () -> assertEquals(rasters.getWidth(), f.dimensions().width(), "Image Width Matches"),
                         () -> assertEquals(3612, f.dimensions().width(), "Image Width (256)"),
-                        () -> assertEquals(32, StripInfo.getRequired(ifd).rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(512, tileInfo.length(), "Tile Length"),
+                        () -> assertEquals(512, tileInfo.width(), "Tile Width")
                 );
 
                 assertAll(
@@ -86,7 +87,7 @@ class FloatImageRegressionTest {
         Number[] rPixel = rasters.getPixel(column, row);
         assertEquals(1, rPixel.length, "Should return a single number for the BiLevel image pixel value.");
 
-        //Pixel.Grayscale8 iPixel = image.valueAt(row, column);
+        //Pixel.Float1 fPixel = image.valueAt(row, column);
         //assertEquals(Short.toUnsignedInt((Short) rPixel[0]), Byte.toUnsignedInt(iPixel.value()), String.format("Should contain identical values at the respective pixel (%d, %d).", row, column));
     }
 

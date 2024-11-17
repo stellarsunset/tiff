@@ -52,7 +52,7 @@ public record RgbImage(ImageDimensions dimensions, Resolution resolution, byte[]
                     ifd
             );
 
-            return new RgbImage(ImageDimensions.from(ifd), Resolution.from(ifd), bytes.bytes());
+            return new RgbImage(ImageDimensions.get(ifd), Resolution.from(ifd), bytes.bytes());
         }
     }
 }

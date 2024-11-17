@@ -119,7 +119,7 @@ public record ArrayBytesAdapter(BytesAdapter adapter) implements BytesAdapter {
      *
      * @param buffer the buffer to read floats from
      * @param offset the offset in the buffer to start the read from
-     * @param count  the number of int values to read from the buffer after the offset
+     * @param count  the number of float values to read from the buffer after the offset
      */
     public float[] readFloats(ByteBuffer buffer, int offset, int count) {
         float[] array = new float[count];
@@ -154,7 +154,7 @@ public record ArrayBytesAdapter(BytesAdapter adapter) implements BytesAdapter {
      *
      * @param buffer the buffer to read doubles from
      * @param offset the offset in the buffer to start the read from
-     * @param count  the number of long values to read from the buffer after the offset
+     * @param count  the number of double values to read from the buffer after the offset
      */
     public double[] readDoubles(ByteBuffer buffer, int offset, int count) {
         double[] array = new double[count];
