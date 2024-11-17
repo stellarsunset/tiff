@@ -134,6 +134,19 @@ class ArrayBytesAdapterTest {
     }
 
     @Test
+    void testReadFloat() {
+
+        ArrayBytesAdapter adapter = ArrayBytesAdapter.of(ByteOrder.BIG_ENDIAN);
+
+        ByteBuffer buffer = ByteBuffer.wrap(
+                new byte[]{0x01, 0x0F, (byte) 0xF0, (byte) 0xFF, 0x01, 0x0F, (byte) 0xF0, (byte) 0xFF}
+        );
+
+        float[] array = adapter.readFloats(buffer, 0, 1);
+        assertArrayEquals(new float[]{Float.intBitsToFloat(0x010FF0FF)}, array);
+    }
+
+    @Test
     void testReadLongs() {
 
         ArrayBytesAdapter adapter = ArrayBytesAdapter.of(ByteOrder.BIG_ENDIAN);
@@ -144,5 +157,18 @@ class ArrayBytesAdapterTest {
 
         long[] array = adapter.readLongs(buffer, 0, 1);
         assertArrayEquals(new long[]{0x010FF0FF010FF0FFL}, array);
+    }
+
+    @Test
+    void testReadDoubles() {
+
+        ArrayBytesAdapter adapter = ArrayBytesAdapter.of(ByteOrder.BIG_ENDIAN);
+
+        ByteBuffer buffer = ByteBuffer.wrap(
+                new byte[]{0x01, 0x0F, (byte) 0xF0, (byte) 0xFF, 0x01, 0x0F, (byte) 0xF0, (byte) 0xFF}
+        );
+
+        double[] array = adapter.readDoubles(buffer, 0, 1);
+        assertArrayEquals(new double[]{Double.longBitsToDouble(0x010FF0FF010FF0FFL)}, array);
     }
 }

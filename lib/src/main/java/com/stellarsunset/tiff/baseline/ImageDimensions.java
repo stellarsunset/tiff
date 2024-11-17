@@ -13,7 +13,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  *
  * <p>Parameter types are Java longs to contain the unsigned short/int values.
  */
-public record ImageDimensions(long imageLength, long imageWidth) {
+public record ImageDimensions(long length, long width) {
 
     public static ImageDimensions from(Ifd ifd) {
         return new ImageDimensions(ImageLength.getRequired(ifd), ImageWidth.getRequired(ifd));
@@ -21,13 +21,13 @@ public record ImageDimensions(long imageLength, long imageWidth) {
 
     public Int asIntInfo() {
 
-        checkArgument(imageLength < java.lang.Integer.MAX_VALUE,
-                "ImageLength should be less than Integer.MAX_VALUE, value was %s", imageLength);
+        checkArgument(length < java.lang.Integer.MAX_VALUE,
+                "ImageLength should be less than Integer.MAX_VALUE, value was %s", length);
 
-        checkArgument(imageWidth < java.lang.Integer.MAX_VALUE,
-                "ImageWidth should be less than Integer.MAX_VALUE, value was %s", imageWidth);
+        checkArgument(width < java.lang.Integer.MAX_VALUE,
+                "ImageWidth should be less than Integer.MAX_VALUE, value was %s", width);
 
-        return new Int((int) imageLength, (int) imageWidth);
+        return new Int((int) length, (int) width);
     }
 
     /**
@@ -37,17 +37,17 @@ public record ImageDimensions(long imageLength, long imageWidth) {
      * @param bytesPerPixel the number of bytes per pixel of the image, e.g. 1 for BiLevel, 3 for RGB
      */
     public void checkBounds(byte[][] data, int bytesPerPixel) {
-        checkArgument(data.length == imageLength(),
-                "Expected %s rows, found %s", imageLength(), data.length);
+        checkArgument(data.length == length(),
+                "Expected %s rows, found %s", length(), data.length);
 
-        checkArgument(data[0].length == imageWidth() * bytesPerPixel,
-                "Expected %s * %s columns, found %s", imageWidth(), bytesPerPixel, data[0].length);
+        checkArgument(data[0].length == width() * bytesPerPixel,
+                "Expected %s * %s columns, found %s", width(), bytesPerPixel, data[0].length);
     }
 
     /**
      * See {@link StripInfo.Int} for reasoning behind this truncation.
      */
-    public record Int(int imageLength, int imageWidth) {
+    public record Int(int length, int width) {
 
     }
 }

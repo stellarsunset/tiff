@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class StripInfoTest {
 
     @Test
-    void testFrom() {
+    void testGetRequired() {
 
         Ifd ifd = new Ifd(
                 (short) 3,
@@ -24,7 +24,7 @@ class StripInfoTest {
                 0
         );
 
-        StripInfo stripInfo = StripInfo.from(ifd);
+        StripInfo stripInfo = StripInfo.getRequired(ifd);
         assertAll(
                 () -> assertEquals(1L, stripInfo.rowsPerStrip(), "Rows Per Strip"),
                 () -> assertArrayEquals(new long[]{20, 40, 4294967295L}, stripInfo.stripOffsets(), "Strip Offset"),

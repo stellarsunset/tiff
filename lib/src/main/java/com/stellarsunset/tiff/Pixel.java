@@ -190,4 +190,12 @@ public sealed interface Pixel {
     non-sealed interface Extension extends Pixel {
 
     }
+
+    /**
+     * Represents the value of a pixel as a single 32-bit float.
+     *
+     * <p>These are typically used in extensions for storing measurements (e.g. elevations) taken on grids as images.
+     */
+    record Float(float value) implements Pixel.Extension {
+    }
 }

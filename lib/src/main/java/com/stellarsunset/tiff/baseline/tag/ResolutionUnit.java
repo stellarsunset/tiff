@@ -23,10 +23,10 @@ public final class ResolutionUnit {
     public static final short ID = 0x128;
 
     public static int getRequired(Ifd ifd) {
-        return getOptionalValue(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
     }
 
-    public static OptionalInt getOptionalValue(Ifd ifd) {
+    public static OptionalInt getOptional(Ifd ifd) {
         return switch (ifd.findTag(ID)) {
             case Entry.Short s -> OptionalInt.of(Short.toUnsignedInt(s.values()[0]));
             case Entry.NotFound _ -> OptionalInt.of(2);

@@ -38,7 +38,7 @@ class PaletteColorImageRegressionTest {
 
             int[] bitsPerSample = BitsPerSample.getRequired(ifd);
 
-            int compression = Compression.getRequired(ifd);
+            int compression = Compression.get(ifd);
             int photometricInterpretation = PhotometricInterpretation.getRequired(ifd);
 
             assertAll(
@@ -59,11 +59,11 @@ class PaletteColorImageRegressionTest {
             if (unwrap(image) instanceof PaletteColorImage p) {
                 assertAll(
                         "Check Image(0) contents.",
-                        () -> assertEquals(rasters.getHeight(), p.dimensions().imageLength(), "Image Length Matches"),
-                        () -> assertEquals(756, p.dimensions().imageLength(), "Image Length (756)"),
-                        () -> assertEquals(rasters.getWidth(), p.dimensions().imageWidth(), "Image Width Matches"),
-                        () -> assertEquals(1008, p.dimensions().imageWidth(), "Image Width (1008)"),
-                        () -> assertEquals(756, p.stripInfo().rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(rasters.getHeight(), p.dimensions().length(), "Image Length Matches"),
+                        () -> assertEquals(756, p.dimensions().length(), "Image Length (756)"),
+                        () -> assertEquals(rasters.getWidth(), p.dimensions().width(), "Image Width Matches"),
+                        () -> assertEquals(1008, p.dimensions().width(), "Image Width (1008)"),
+                        () -> assertEquals(756, StripInfo.getRequired(ifd).rowsPerStrip(), "Rows Per Strip")
                 );
 
                 assertEquals(colorMap, flattenColorMap(p.colorMap()), "Color Map");

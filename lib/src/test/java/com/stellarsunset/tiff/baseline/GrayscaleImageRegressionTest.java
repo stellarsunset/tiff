@@ -35,7 +35,7 @@ class GrayscaleImageRegressionTest {
 
             int[] bitsPerSample = BitsPerSample.getRequired(ifd);
 
-            int compression = Compression.getRequired(ifd);
+            int compression = Compression.get(ifd);
             int photometricInterpretation = PhotometricInterpretation.getRequired(ifd);
 
             assertAll(
@@ -52,11 +52,19 @@ class GrayscaleImageRegressionTest {
             if (unwrap(image) instanceof GrayscaleImage.Grayscale8Image g) {
                 assertAll(
                         "Check Image(0) contents.",
-                        () -> assertEquals(rasters.getHeight(), g.dimensions().imageLength(), "Image Length Matches"),
-                        () -> assertEquals(256, g.dimensions().imageLength(), "Image Length (256)"),
-                        () -> assertEquals(rasters.getWidth(), g.dimensions().imageWidth(), "Image Width Matches"),
-                        () -> assertEquals(256, g.dimensions().imageWidth(), "Image Width (256)"),
-                        () -> assertEquals(32, g.stripInfo().rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(rasters.getHeight(), g.dimensions().length(), "Image Length Matches"),
+                        () -> assertEquals(256, g.dimensions().length(), "Image Length (256)"),
+                        () -> assertEquals(rasters.getWidth(), g.dimensions().width(), "Image Width Matches"),
+                        () -> assertEquals(256, g.dimensions().width(), "Image Width (256)"),
+                        () -> assertEquals(32, StripInfo.getRequired(ifd).rowsPerStrip(), "Rows Per Strip")
+                );
+
+                assertAll(
+                        "Check Image(0) pixels.",
+                        () -> comparePixelValues(g, rasters, 0, 0),
+                        () -> comparePixelValues(g, rasters, 20, 100),
+                        () -> comparePixelValues(g, rasters, 150, 200),
+                        () -> comparePixelValues(g, rasters, 255, 255)
                 );
             } else {
                 fail("Image not of the correct type, image type was: " + unwrap(image).getClass().getSimpleName());
@@ -66,12 +74,12 @@ class GrayscaleImageRegressionTest {
         }
     }
 
-    private void comparePixelValues(BiLevelImage image, Rasters rasters, int row, int column) {
+    private void comparePixelValues(GrayscaleImage.Grayscale8Image image, Rasters rasters, int row, int column) {
 
         Number[] rPixel = rasters.getPixel(column, row);
         assertEquals(1, rPixel.length, "Should return a single number for the BiLevel image pixel value.");
 
-        Pixel.BlackOrWhite iPixel = image.valueAt(row, column);
+        Pixel.Grayscale8 iPixel = image.valueAt(row, column);
         assertEquals(Short.toUnsignedInt((Short) rPixel[0]), Byte.toUnsignedInt(iPixel.value()), String.format("Should contain identical values at the respective pixel (%d, %d).", row, column));
     }
 

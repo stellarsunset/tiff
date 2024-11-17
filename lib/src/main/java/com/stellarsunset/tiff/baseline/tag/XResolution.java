@@ -18,10 +18,10 @@ public final class XResolution {
     public static final short ID = 0x11A;
 
     public static Rational getRequired(Ifd ifd) {
-        return getOptionalValue(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
     }
 
-    public static Optional<Rational> getOptionalValue(Ifd ifd) {
+    public static Optional<Rational> getOptional(Ifd ifd) {
         return switch (ifd.findTag(ID)) {
             case Entry.Rational r -> Optional.of(r.rational(0));
             case Entry.NotFound _ -> Optional.empty();

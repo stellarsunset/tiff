@@ -1,17 +1,13 @@
 package com.stellarsunset.tiff.baseline;
 
-import com.stellarsunset.tiff.*;
-import com.stellarsunset.tiff.baseline.tag.Compression;
+import com.stellarsunset.tiff.Ifd;
+import com.stellarsunset.tiff.Image;
+import com.stellarsunset.tiff.Pixel;
+import com.stellarsunset.tiff.Raster;
 import com.stellarsunset.tiff.baseline.tag.SamplesPerPixel;
-import com.stellarsunset.tiff.compress.Compressor;
-import com.stellarsunset.tiff.compress.Compressors;
 
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
-import java.util.Arrays;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Represents a baseline RGB full-color image.
@@ -19,8 +15,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * <p>RGB images are provide the same coloring components as {@link PaletteColorImage}s, but store each component in its
  * own byte under-the-hood. This means they're typically three times as large, but they support far more tones.
  */
-public record RgbImage(ImageDimensions dimensions, StripInfo stripInfo, Resolution resolution,
-                       byte[][] data) implements BaselineImage {
+public record RgbImage(ImageDimensions dimensions, Resolution resolution, byte[][] data) implements BaselineImage {
 
     /**
      * There are three components per pixel in the underlying image, each is 8 bits (1 byte).
@@ -51,54 +46,13 @@ public record RgbImage(ImageDimensions dimensions, StripInfo stripInfo, Resoluti
         @Override
         public RgbImage makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
-            BytesAdapter adapter = BytesAdapter.of(order);
-            BytesReader reader = new BytesReader(channel);
-
-            Compressor compressor = Compressors.getInstance()
-                    .compressorFor(Compression.getRequired(ifd));
-
-            ImageDimensions imageDimensions = ImageDimensions.from(ifd);
-            StripInfo stripInfo = StripInfo.from(ifd);
-
-            ImageDimensions.Int intImageDimensions = imageDimensions.asIntInfo();
-            StripInfo.Int intStripInfo = stripInfo.asIntInfo();
-
-            byte[][] bytes = new byte[intImageDimensions.imageLength()][intImageDimensions.imageWidth()];
-
-            int nOffsets = stripInfo.stripOffsets().length;
-            int rowsPerStrip = intStripInfo.rowsPerStrip();
-
-            int imageWidth = intImageDimensions.imageWidth();
-
-            for (int i = 0; i < nOffsets; i++) {
-
-                long stripOffset = stripInfo.stripOffsets()[i];
-                int stripBytes = intStripInfo.stripByteCounts()[i];
-
-                ByteBuffer buffer = reader.readBytes(stripOffset, stripBytes);
-                byte[] uncompressedStrip = compressor.decompress(buffer.array(), adapter);
-
-                int rowsInStrip = uncompressedStrip.length / SAMPLES_PER_PIXEL / imageWidth;
-                if (i != nOffsets - 1) {
-                    checkArgument(rowsInStrip == rowsPerStrip,
-                            "Incorrect number of rows found (%s) in strip# (%s).", rowsInStrip, i);
-                }
-
-                for (int stripRow = 0; stripRow < rowsInStrip; stripRow++) {
-
-                    int imageRow = i * rowsPerStrip + stripRow;
-                    int stripRowStart = stripRow * imageWidth * SAMPLES_PER_PIXEL;
-
-                    bytes[imageRow] = Arrays.copyOfRange(uncompressedStrip, stripRowStart, stripRowStart + (imageWidth * 3));
-                }
-            }
-
-            return new RgbImage(
-                    imageDimensions,
-                    stripInfo,
-                    Resolution.from(ifd),
-                    bytes
+            Raster.Bytes bytes = Raster.Reader.bytes(SAMPLES_PER_PIXEL).readRaster(
+                    channel,
+                    order,
+                    ifd
             );
+
+            return new RgbImage(ImageDimensions.from(ifd), Resolution.from(ifd), bytes.bytes());
         }
     }
 }

@@ -6,7 +6,7 @@ package com.stellarsunset.tiff.baseline.tag;
  */
 public final class MissingRequiredTagException extends RuntimeException {
 
-    MissingRequiredTagException(String name, short id) {
+    public MissingRequiredTagException(String name, short id) {
         super(String.format("Missing required tag with ID: %d. User-friendly name: %s", Short.toUnsignedInt(id), name));
     }
 }

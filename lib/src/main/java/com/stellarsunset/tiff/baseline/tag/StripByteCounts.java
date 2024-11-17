@@ -18,10 +18,10 @@ public final class StripByteCounts {
     public static final short ID = 0x117;
 
     public static long[] getRequired(Ifd ifd) {
-        return getOptionalValue(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
     }
 
-    public static Optional<long[]> getOptionalValue(Ifd ifd) {
+    public static Optional<long[]> getOptional(Ifd ifd) {
         return switch (ifd.findTag(ID)) {
             case Entry.Short s -> Optional.of(Arrays.toUnsignedLongArray(s.values()));
             case Entry.Long l -> Optional.of(Arrays.toUnsignedLongArray(l.values()));

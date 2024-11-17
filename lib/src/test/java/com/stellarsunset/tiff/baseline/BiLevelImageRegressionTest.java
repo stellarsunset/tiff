@@ -32,7 +32,7 @@ class BiLevelImageRegressionTest {
 
             int[] bitsPerSample = BitsPerSample.getRequired(ifd);
 
-            int compression = Compression.getRequired(ifd);
+            int compression = Compression.get(ifd);
             int photometricInterpretation = PhotometricInterpretation.getRequired(ifd);
 
             assertAll(
@@ -49,8 +49,8 @@ class BiLevelImageRegressionTest {
 //            if (unwrap(image) instanceof BiLevelImage b) {
 //                assertAll(
 //                        "Check Image(0) contents.",
-//                        () -> assertEquals(280, b.dimensions().imageLength(), "Image Length (280)"),
-//                        () -> assertEquals(272, b.dimensions().imageWidth(), "Image Width (272)"),
+//                        () -> assertEquals(280, b.dimensions().length(), "Image Length (280)"),
+//                        () -> assertEquals(272, b.dimensions().width(), "Image Width (272)"),
 //                        () -> assertEquals(30, b.stripInfo().rowsPerStrip(), "Rows Per Strip")
 //                );
 //

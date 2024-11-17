@@ -9,9 +9,12 @@ import com.stellarsunset.tiff.baseline.BaselineImage;
  *
  * <p>This is provided as both:
  * <ol>
- *     <li>An extension point for non-baseline TIFF files types supported in library</li>
+ *     <li>An extension point for non-baseline TIFF file types supported in library</li>
  *     <li>An extension point for external libraries</li>
  * </ol>
+ *
+ * <p>In-library we define "extension image" types for images containing data in their pixel values. The interpretation
+ * of the data stored in the various pixels depends on the type of image (e.g. might be elevation data).
  */
-public non-sealed interface ExtensionImage extends Image {
+public sealed interface ExtensionImage extends Image permits IntImage, FloatImage {
 }

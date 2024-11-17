@@ -28,7 +28,7 @@ class RgbImageRegressionTest {
 
             int[] bitsPerSample = BitsPerSample.getRequired(ifd);
 
-            int compression = Compression.getRequired(ifd);
+            int compression = Compression.get(ifd);
             int photometricInterpretation = PhotometricInterpretation.getRequired(ifd);
 
             assertAll(
@@ -45,11 +45,11 @@ class RgbImageRegressionTest {
             if (unwrap(image) instanceof RgbImage r) {
                 assertAll(
                         "Check Image(0) contents.",
-                        () -> assertEquals(rasters.getHeight(), r.dimensions().imageLength(), "Image Length Matches"),
-                        () -> assertEquals(443, r.dimensions().imageLength(), "Image Length (443)"),
-                        () -> assertEquals(rasters.getWidth(), r.dimensions().imageWidth(), "Image Width Matches"),
-                        () -> assertEquals(455, r.dimensions().imageWidth(), "Image Width (455)"),
-                        () -> assertEquals(443, r.stripInfo().rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(rasters.getHeight(), r.dimensions().length(), "Image Length Matches"),
+                        () -> assertEquals(443, r.dimensions().length(), "Image Length (443)"),
+                        () -> assertEquals(rasters.getWidth(), r.dimensions().width(), "Image Width Matches"),
+                        () -> assertEquals(455, r.dimensions().width(), "Image Width (455)"),
+                        () -> assertEquals(443, StripInfo.getRequired(ifd).rowsPerStrip(), "Rows Per Strip")
                 );
 
                 assertAll(
