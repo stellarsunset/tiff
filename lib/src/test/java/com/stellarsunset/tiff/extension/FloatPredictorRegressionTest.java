@@ -24,7 +24,7 @@ class FloatPredictorRegressionTest {
     private static final File FILE = tiffFile("extension/float-predictor-rgb.tif");
 
     @Test
-    @Disabled("Differencing predictor not supported for non-8-bit images")
+    @Disabled("Differencing predictor not supported for floating point images")
     void test() {
         try (TiffFile file = TiffFileReader.withMaker(Image.Maker.baseline()).read(FileChannel.open(FILE.toPath()))) {
 

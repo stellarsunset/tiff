@@ -74,7 +74,7 @@ public sealed interface Pixel {
         }
 
         public int unsignedValue() {
-            return Byte.toUnsignedInt(value);
+            return java.lang.Byte.toUnsignedInt(value);
         }
     }
 
@@ -98,7 +98,7 @@ public sealed interface Pixel {
         }
 
         public int unsignedValue() {
-            return Byte.toUnsignedInt(value);
+            return java.lang.Byte.toUnsignedInt(value);
         }
     }
 
@@ -118,7 +118,7 @@ public sealed interface Pixel {
     record Grayscale8(byte value, boolean whiteIsZero) implements Pixel.Baseline {
 
         public int unsignedValue() {
-            return Byte.toUnsignedInt(value);
+            return java.lang.Byte.toUnsignedInt(value);
         }
     }
 
@@ -140,7 +140,7 @@ public sealed interface Pixel {
     record PaletteColor(byte index, short r, short g, short b) implements Pixel.Baseline {
 
         public int unsignedIndex() {
-            return Byte.toUnsignedInt(index);
+            return java.lang.Byte.toUnsignedInt(index);
         }
 
         public int unsignedR() {
@@ -190,6 +190,30 @@ public sealed interface Pixel {
     non-sealed interface Extension extends Pixel {
     }
 
+    sealed interface Byte extends Extension {
+    }
+
+    /**
+     * Represents the value of a pixel as a single 8-bit integer (byte).
+     *
+     * <p>Most {@link Pixel.Baseline} types can be represented a {@link Byte1} or {@link Byte3} types.
+     */
+    record Byte1(byte value) implements Pixel.Byte {
+    }
+
+    /**
+     * Represents the value of a pixel as a trio of 8-bit integer (byte) values.
+     */
+    record Byte3(byte s1, byte s2, byte s3) implements Pixel.Byte {
+    }
+
+    /**
+     * Represents the value of a pixel as an arbitrary number of 8-bit integer (byte) values.
+     */
+    record ByteN(byte[] values) implements Pixel.Byte {
+    }
+
+
     sealed interface Short extends Extension {
     }
 
@@ -208,7 +232,7 @@ public sealed interface Pixel {
     }
 
     /**
-     * Represents the value of a pixel as an arbitrary number of 16-bit float values.
+     * Represents the value of a pixel as an arbitrary number of 16-bit integer values.
      */
     record ShortN(short[] values) implements Pixel.Short {
     }

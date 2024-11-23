@@ -22,7 +22,7 @@ import java.util.Arrays;
  *
  * <p>See also {@link ShortImage} and {@link FloatImage}.
  */
-public sealed interface IntImage extends ExtensionImage {
+public sealed interface IntImage extends DataImage {
 
     static Image.Maker maker() {
         return new Maker();

@@ -1,5 +1,11 @@
 package com.stellarsunset.tiff;
 
+import com.stellarsunset.tiff.baseline.BaselineImage;
+import com.stellarsunset.tiff.compress.Compressor;
+import com.stellarsunset.tiff.extension.DataImage;
+import com.stellarsunset.tiff.extension.TileInfo;
+import com.stellarsunset.tiff.extension.tag.DifferencingPredictor;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -24,10 +30,29 @@ public final class TiffFileReader {
         this.imageMaker = requireNonNull(imageMaker);
     }
 
+    /**
+     * The baseline TIFF file reader supports the {@link BaselineImage} types defined in the TIFF 6.0 spec.
+     *
+     * <p>It also transparently bakes in support for:
+     * <ol>
+     *     <li>LZW compression, see {@link Compressor#lzw()}</li>
+     *     <li>Differencing predictors, {@link DifferencingPredictor}s</li>
+     *     <li>Tiled images, see{@link TileInfo}</li>
+     * </ol>
+     *
+     * <p>This means the baseline image maker should be suitable for reading most TIFF images.
+     */
     public static TiffFileReader baseline() {
         return new TiffFileReader(Image.Maker.baseline());
     }
 
+    /**
+     * Plugin a different {@link Image.Maker} into the harness provided by the TIFF file reader.
+     *
+     * <p>Usually this is leveraged for "data image" types via {@link DataImage#maker()}.
+     *
+     * @param maker the maker instance to use on the underlying image data
+     */
     public static TiffFileReader withMaker(Image.Maker maker) {
         return new TiffFileReader(maker);
     }

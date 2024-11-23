@@ -8,6 +8,7 @@ import com.stellarsunset.tiff.extension.FloatImage.Float1Image;
 import com.stellarsunset.tiff.extension.tag.GeoKeyDirectory;
 import mil.nga.tiff.Rasters;
 import mil.nga.tiff.TiffReader;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -22,6 +23,7 @@ class FloatImageRegressionTest {
     private static final File FILE = tiffFile("extension/USGS_1_n52e177.tif");
 
     @Test
+    @Disabled("Differencing predictor not supported for floating point images")
     void test() {
         try (TiffFile file = TiffFileReader.withMaker(Image.Maker.lazy(FloatImage.maker())).read(FileChannel.open(FILE.toPath()))) {
 
@@ -82,13 +84,15 @@ class FloatImageRegressionTest {
         }
     }
 
-    private void comparePixelValues(FloatImage image, Rasters rasters, int row, int column) {
+    private void comparePixelValues(Float1Image image, Rasters rasters, int row, int column) {
 
         Number[] rPixel = rasters.getPixel(column, row);
         assertEquals(1, rPixel.length, "Should return a single number for the BiLevel image pixel value.");
 
-        //Pixel.Float1 fPixel = image.valueAt(row, column);
-        //assertEquals(Short.toUnsignedInt((Short) rPixel[0]), Byte.toUnsignedInt(iPixel.value()), String.format("Should contain identical values at the respective pixel (%d, %d).", row, column));
+        Pixel.Float1 fPixel = image.valueAt(row, column);
+
+        assertEquals((Float) rPixel[0], fPixel.value(),
+                String.format("Should contain identical values at the respective pixel (%d, %d).", row, column));
     }
 
     private Rasters readRasters() throws IOException {

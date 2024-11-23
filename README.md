@@ -85,7 +85,7 @@ int modelType = ModelType.getRequired(gkd);
 ```
 
 These GeoKeys geo-reference baseline TIFF images (e.g. Palette-Color or RGB) in a coordinate reference system (put them 
-one a map), often indicating things like land cover (e.g. Ice vs Open Water vs etc. in a Palette-Color image).
+on a map), often indicating things like land cover (e.g. Ice vs Open Water vs etc. in a Palette-Color image).
 
 Frequently though, TIFFs with GeoTIFF tags/keys encode "data" in the pixels of the image raster as `Short/Int/FloatImage` 
 types (i.e. 16/32-bit int or 32-bit float). Often this is elevation data, these "data images" can be accessed via: 
