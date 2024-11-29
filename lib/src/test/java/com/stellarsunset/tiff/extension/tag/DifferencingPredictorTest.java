@@ -2,12 +2,14 @@ package com.stellarsunset.tiff.extension.tag;
 
 import org.junit.jupiter.api.Test;
 
+import java.nio.*;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class DifferencingPredictorTest {
 
     @Test
-    void testPackOneComponent() {
+    void testHorizontalPackOneComponent() {
 
         byte[][] bytes = new byte[][]{
                 new byte[]{1, 2, 3, 4, 5, 6},
@@ -21,14 +23,14 @@ class DifferencingPredictorTest {
                 new byte[]{10, 10, 10, 0, -10, -10}
         };
 
-        DifferencingPredictor.planarOneByteComponents(1)
-                .packAll(bytes);
+        DifferencingPredictor.horizontal(1)
+                .packAll(ByteOrder.BIG_ENDIAN, bytes);
 
         assertArrayEquals(expected, bytes);
     }
 
     @Test
-    void testUnpackOneComponent() {
+    void testHorizontalUnpackOneComponent() {
 
         byte[][] bytes = new byte[][]{
                 new byte[]{1, 1, 1, 1, 1, 1},
@@ -42,14 +44,14 @@ class DifferencingPredictorTest {
                 new byte[]{10, 20, 30, 30, 20, 10}
         };
 
-        DifferencingPredictor.planarOneByteComponents(1)
-                .unpackAll(bytes);
+        DifferencingPredictor.horizontal(1)
+                .unpackAll(ByteOrder.BIG_ENDIAN, bytes);
 
         assertArrayEquals(expected, bytes);
     }
 
     @Test
-    void testPackThreeComponents() {
+    void testHorizontalPackThreeComponents() {
 
         byte[][] bytes = new byte[][]{
                 new byte[]{1, 2, 1, 5, 4, 5, 7, 8, 7},
@@ -63,14 +65,14 @@ class DifferencingPredictorTest {
                 new byte[]{10, 20, 30, 30, 20, 0, -20, -30, -30}
         };
 
-        DifferencingPredictor.planarOneByteComponents(3)
-                .packAll(bytes);
+        DifferencingPredictor.horizontal(3)
+                .packAll(ByteOrder.BIG_ENDIAN, bytes);
 
         assertArrayEquals(expected, bytes);
     }
 
     @Test
-    void testUnpackThreeComponents() {
+    void testHorizontalUnpackThreeComponents() {
 
         byte[][] bytes = new byte[][]{
                 new byte[]{1, 2, 1, 4, 2, 4, 2, 4, 2},
@@ -84,9 +86,74 @@ class DifferencingPredictorTest {
                 new byte[]{10, 20, 30, 40, 40, 30, 20, 10, 0}
         };
 
-        DifferencingPredictor.planarOneByteComponents(3)
-                .unpackAll(bytes);
+        DifferencingPredictor.horizontal(3)
+                .unpackAll(ByteOrder.BIG_ENDIAN, bytes);
 
         assertArrayEquals(expected, bytes);
+    }
+
+    @Test
+    void testHorizontalOffsetArray() {
+        byte[] bytes = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+        var predictor = DifferencingPredictor.horizontal(1);
+
+        predictor.pack(ByteBuffer.wrap(bytes, 2, 4));
+        assertArrayEquals(new byte[]{1, 2, 3, 1, 1, 1, 7, 8, 9, 10}, bytes);
+
+        predictor.unpack(ByteBuffer.wrap(bytes, 2, 4));
+        assertArrayEquals(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, bytes);
+    }
+
+    @Test
+    void testHorizontalCharArrayIdempotent() {
+        char[] chars = new char[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        char[] expected = new char[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+        var predictor = DifferencingPredictor.horizontal(1);
+
+        predictor.pack(CharBuffer.wrap(chars));
+        predictor.unpack(CharBuffer.wrap(chars));
+
+        assertArrayEquals(expected, chars);
+    }
+
+    @Test
+    void testHorizontalShortArrayIdempotent() {
+        short[] shorts = new short[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        short[] expected = new short[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+        var predictor = DifferencingPredictor.horizontal(1);
+
+        predictor.pack(ShortBuffer.wrap(shorts));
+        predictor.unpack(ShortBuffer.wrap(shorts));
+
+        assertArrayEquals(expected, shorts);
+    }
+
+    @Test
+    void testHorizontalIntArrayIdempotent() {
+        int[] ints = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        int[] expected = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+        var predictor = DifferencingPredictor.horizontal(1);
+
+        predictor.pack(IntBuffer.wrap(ints));
+        predictor.unpack(IntBuffer.wrap(ints));
+
+        assertArrayEquals(expected, ints);
+    }
+
+    @Test
+    void testHorizontalLongArrayIdempotent() {
+        long[] longs = new long[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        long[] expected = new long[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+        var predictor = DifferencingPredictor.horizontal(1);
+
+        predictor.pack(LongBuffer.wrap(longs));
+        predictor.unpack(LongBuffer.wrap(longs));
+
+        assertArrayEquals(expected, longs);
     }
 }

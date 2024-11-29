@@ -4,6 +4,7 @@ import com.stellarsunset.tiff.Ifd;
 import com.stellarsunset.tiff.Image;
 import com.stellarsunset.tiff.baseline.BaselineImage;
 import com.stellarsunset.tiff.baseline.tag.BitsPerSample;
+import com.stellarsunset.tiff.extension.tag.SampleFormat;
 
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
@@ -43,14 +44,18 @@ public sealed interface DataImage extends ExtensionImage permits ByteImage, Shor
         public Image makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
             int[] samples = BitsPerSample.getRequired(ifd);
-            checkEqualSamples(samples);
+            checkAllEqual(samples, "Should be exactly one component pixel width in the array, instead got %s");
+
+            int[] formats = SampleFormat.get(ifd);
+            checkAllEqual(formats, "Should be exactly one format for component pixels, got %s");
 
             int bitsPerSample = samples[0];
+            int format = formats[0];
 
             Image.Maker maker = switch (bitsPerSample) {
                 case 8 -> bytes;
                 case 16 -> shorts;
-                case 32 -> ints;
+                case 32 -> format == 3 ? floats : ints;
                 default -> throw new IllegalArgumentException(
                         String.format("Unable to handle odd bits-per-sample count %s, should be 8, 16, or 32.", bitsPerSample)
                 );
@@ -59,7 +64,7 @@ public sealed interface DataImage extends ExtensionImage permits ByteImage, Shor
             return maker.makeImage(channel, order, ifd);
         }
 
-        private void checkEqualSamples(int[] samples) {
+        static void checkAllEqual(int[] samples, String messageFormat) {
 
             Set<String> sizes = IntStream.range(0, samples.length)
                     .boxed()
@@ -67,7 +72,7 @@ public sealed interface DataImage extends ExtensionImage permits ByteImage, Shor
                     .collect(toSet());
 
             checkArgument(sizes.size() == 1,
-                    "Should be exactly on component pixel width in the array, instead got: %s", String.join(",", sizes));
+                    messageFormat, String.join(",", sizes));
         }
     }
 }

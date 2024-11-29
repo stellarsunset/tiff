@@ -7,7 +7,6 @@ import com.stellarsunset.tiff.extension.ShortImage.ShortNImage;
 import com.stellarsunset.tiff.extension.tag.PlanarConfiguration;
 import mil.nga.tiff.Rasters;
 import mil.nga.tiff.TiffReader;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -22,7 +21,6 @@ class LzwPredictorRegressionTest {
     private static final File FILE = tiffFile("extension/predictor.tif");
 
     @Test
-    @Disabled("Differencing predictor not supported for non-8-bit images")
     void test() {
         try (TiffFile file = TiffFileReader.withMaker(DataImage.maker()).read(FileChannel.open(FILE.toPath()))) {
 

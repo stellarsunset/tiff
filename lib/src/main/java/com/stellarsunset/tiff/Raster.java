@@ -10,6 +10,8 @@ import com.stellarsunset.tiff.extension.tag.DifferencingPredictor;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 
@@ -145,7 +147,7 @@ public sealed interface Raster {
                                 stripRowStart + widthBytes
                         );
 
-                        predictor.unpack(bytes[imageRow]);
+                        predictor.unpack(ByteBuffer.wrap(bytes[imageRow]).order(order));
                     }
                 }
 
@@ -211,7 +213,7 @@ public sealed interface Raster {
                                 numberOfBytes
                         );
 
-                        predictor.unpack(rowBytes, oCol, numberOfBytes);
+                        predictor.unpack(ByteBuffer.wrap(rowBytes, oCol, numberOfBytes).order(order));
                     }
 
                     oCol += tileWidthBytes;
@@ -302,6 +304,8 @@ public sealed interface Raster {
                                 0,
                                 imageWidthShorts
                         );
+
+                        predictor.unpack(ShortBuffer.wrap(shorts[imageRow]));
                     }
                 }
 
@@ -372,15 +376,17 @@ public sealed interface Raster {
                                 tileWidthShorts
                         );
 
-                        int numberOfInts = Math.min(tileWidthShorts, imageWidthShorts - oCol);
+                        int numberOfShorts = Math.min(tileWidthShorts, imageWidthShorts - oCol);
 
                         System.arraycopy(
                                 fRow,
                                 0,
                                 shorts[oRow + row],
                                 oCol,
-                                numberOfInts
+                                numberOfShorts
                         );
+
+                        predictor.unpack(ShortBuffer.wrap(fRow, oCol, numberOfShorts));
                     }
 
                     oCol += tileWidthShorts;
@@ -468,6 +474,8 @@ public sealed interface Raster {
                                 0,
                                 imageWidthInts
                         );
+
+                        predictor.unpack(IntBuffer.wrap(ints[imageRow]));
                     }
                 }
 
@@ -547,6 +555,8 @@ public sealed interface Raster {
                                 oCol,
                                 numberOfInts
                         );
+
+                        predictor.unpack(IntBuffer.wrap(fRow, oCol, numberOfInts));
                     }
 
                     oCol += tileWidthInts;

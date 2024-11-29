@@ -2,10 +2,11 @@ package com.stellarsunset.tiff.extension.tag;
 
 import com.stellarsunset.tiff.Ifd;
 import com.stellarsunset.tiff.Ifd.Entry;
-import com.stellarsunset.tiff.Raster;
 import com.stellarsunset.tiff.baseline.tag.Compression;
 import com.stellarsunset.tiff.baseline.tag.SamplesPerPixel;
 import com.stellarsunset.tiff.baseline.tag.UnsupportedTypeForTagException;
+
+import java.nio.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -26,15 +27,13 @@ public interface DifferencingPredictor {
     }
 
     /**
-     * {@link DifferencingPredictor} for {@code byte[][]} data in
-     * <ol>
-     *     <li>{@link PlanarConfiguration} is one</li>
-     *     <li>One byte components</li>
-     *     <li>An arbitrary number of components per pixel, usually 1 (grayscale) or 3 (RGB)</li>
-     * </ol>
+     * {@link DifferencingPredictor} for data whose byte layout is naturally compressible by plain integer subtraction,
+     * i.e. byte, short, int, long rasters.
+     *
+     * @param componentsPerPixel the number of components per pixel
      */
-    static DifferencingPredictor planarOneByteComponents(int componentsPerPixel) {
-        return new PlanarOneByteComponents(componentsPerPixel);
+    static DifferencingPredictor horizontal(int componentsPerPixel) {
+        return new Planar1Horizontal(componentsPerPixel);
     }
 
     /**
@@ -61,12 +60,14 @@ public interface DifferencingPredictor {
                     throw new UnsupportedTypeForTagException(NAME, ID);
         };
 
+        int componentsPerPixel = SamplesPerPixel.getRequired(ifd);
+
         return switch (type) {
             case 1 -> new Noop();
-            case 2 -> new PlanarOneByteComponents(SamplesPerPixel.getRequired(ifd));
-            case 3 -> throw new IllegalArgumentException("Floating point prediction not supported.");
+            case 2 -> new Planar1Horizontal(componentsPerPixel);
+            case 3 -> new Planar1FloatComponents(componentsPerPixel);
             default -> throw new IllegalArgumentException(
-                    String.format("Illegal differencing predictor type %s, should be 1 or 2", type)
+                    String.format("Illegal differencing predictor type %s, should be 1, 2, or 3", type)
             );
         };
     }
@@ -74,78 +75,144 @@ public interface DifferencingPredictor {
     /**
      * Unpack the differenced bytes into proper values.
      *
-     * <p>I.e. run this on the {@code byte[][]} returned by a {@link Raster.Reader} prior to handing it off to an Image
-     * decorator.
+     * <p>Run this on the raw image, which may be a raster of bytes/shorts or some other primitive type, after running LZW
+     * decompression on it.
      *
-     * @param bytes uncompressed {@link Raster} bytes to un-difference.
-     * @param start the start offset in the array to begin unpacking from
-     * @param len   the number of bytes to unpack beyond the start
+     * @param buffer the underlying buffer of primitive data to unpack
      */
-    void unpack(byte[] bytes, int start, int len);
+    void unpack(Buffer buffer);
 
-    default void unpack(byte[] bytes) {
-        unpack(bytes, 0, bytes.length);
-    }
-
-    default void unpackAll(byte[][] bytes) {
+    default void unpackAll(ByteOrder order, byte[][] bytes) {
         for (byte[] row : bytes) {
-            unpack(row);
+            unpack(ByteBuffer.wrap(row).order(order));
         }
     }
 
     /**
      * Repack the raw bytes into their differenced form.
      *
-     * <p>Run this on the raw image {@link byte[][]} prior to re-compressing it with the LZW compressor.
+     * <p>Run this on the raw image, which may be a raster of bytes/shorts or some other primitive type, prior to running
+     * LZW compression on it.
      *
-     * @param bytes the raw bytes of an image we want to differentially encode
-     * @param start the start offset in the array to begin packing from
-     * @param len   the number of bytes to unpack beyond the start
+     * @param buffer the underlying buffer of primitive data to pack
      */
-    void pack(byte[] bytes, int start, int len);
+    void pack(Buffer buffer);
 
-    default void pack(byte[] bytes) {
-        pack(bytes, 0, bytes.length);
-    }
-
-
-    default void packAll(byte[][] bytes) {
+    default void packAll(ByteOrder order, byte[][] bytes) {
         for (byte[] row : bytes) {
-            pack(row, 0, row.length);
+            pack(ByteBuffer.wrap(row).order(order));
         }
     }
 
     record Noop() implements DifferencingPredictor {
         @Override
-        public void unpack(byte[] bytes, int start, int end) {
+        public void unpack(Buffer buffer) {
         }
 
         @Override
-        public void pack(byte[] bytes, int start, int end) {
+        public void pack(Buffer buffer) {
         }
     }
 
-    record PlanarOneByteComponents(int componentsPerPixel) implements DifferencingPredictor {
+    record Planar1Horizontal(int componentsPerPixel) implements DifferencingPredictor {
         @Override
-        public void unpack(byte[] bytes, int start, int len) {
-            int end = start + len;
+        public void unpack(Buffer buffer) {
             for (int component = 0; component < componentsPerPixel; component++) {
-                int begin = start + component + componentsPerPixel;
-                for (int c = begin; c < end; c += componentsPerPixel) {
-                    bytes[c] += bytes[c - componentsPerPixel];
+                int begin = buffer.position() + component + componentsPerPixel;
+                for (int c = begin; c < buffer.limit(); c += componentsPerPixel) {
+                    sum(buffer, c);
                 }
             }
         }
 
+        private void sum(Buffer buffer, int loc) {
+            switch (buffer) {
+                case ByteBuffer bBuffer -> {
+                    byte b = bBuffer.get(loc);
+                    b += bBuffer.get(loc - componentsPerPixel);
+                    bBuffer.put(loc, b);
+                }
+                case CharBuffer cBuffer -> {
+                    char c = cBuffer.get(loc);
+                    c += cBuffer.get(loc - componentsPerPixel);
+                    cBuffer.put(loc, c);
+                }
+                case ShortBuffer sBuffer -> {
+                    short s = sBuffer.get(loc);
+                    s += sBuffer.get(loc - componentsPerPixel);
+                    sBuffer.put(loc, s);
+                }
+                case IntBuffer iBuffer -> {
+                    int i = iBuffer.get(loc);
+                    i += iBuffer.get(loc - componentsPerPixel);
+                    iBuffer.put(loc, i);
+                }
+                case LongBuffer lBuffer -> {
+                    long l = lBuffer.get(loc);
+                    l += lBuffer.get(loc - componentsPerPixel);
+                    lBuffer.put(loc, l);
+                }
+                case FloatBuffer _, DoubleBuffer _ -> throw new IllegalArgumentException(
+                        "Standard horizontal differencing not supported for floating-point types."
+                );
+            }
+        }
+
         @Override
-        public void pack(byte[] bytes, int start, int len) {
-            int end = start + len;
+        public void pack(Buffer buffer) {
             for (int component = 0; component < componentsPerPixel; component++) {
-                int begin = (end - componentsPerPixel) + component;
-                for (int c = begin; c > component + start; c -= componentsPerPixel) {
-                    bytes[c] -= bytes[c - componentsPerPixel];
+                int begin = (buffer.limit() - componentsPerPixel) + component;
+                int end = component + buffer.position();
+                for (int c = begin; c > end; c -= componentsPerPixel) {
+                    difference(buffer, c);
                 }
             }
+        }
+
+        private void difference(Buffer buffer, int loc) {
+            switch (buffer) {
+                case ByteBuffer bBuffer -> {
+                    byte b = bBuffer.get(loc);
+                    b -= bBuffer.get(loc - componentsPerPixel);
+                    bBuffer.put(loc, b);
+                }
+                case CharBuffer cBuffer -> {
+                    char c = cBuffer.get(loc);
+                    c -= cBuffer.get(loc - componentsPerPixel);
+                    cBuffer.put(loc, c);
+                }
+                case ShortBuffer sBuffer -> {
+                    short s = sBuffer.get(loc);
+                    s -= sBuffer.get(loc - componentsPerPixel);
+                    sBuffer.put(loc, s);
+                }
+                case IntBuffer iBuffer -> {
+                    int i = iBuffer.get(loc);
+                    i -= iBuffer.get(loc - componentsPerPixel);
+                    iBuffer.put(loc, i);
+                }
+                case LongBuffer lBuffer -> {
+                    long l = lBuffer.get(loc);
+                    l -= lBuffer.get(loc - componentsPerPixel);
+                    lBuffer.put(loc, l);
+                }
+                case FloatBuffer _, DoubleBuffer _ -> throw new IllegalArgumentException(
+                        "Standard horizontal differencing not supported for floating-point types."
+                );
+            }
+        }
+    }
+
+    record Planar1FloatComponents(int componentsPerPixel) implements DifferencingPredictor {
+
+        @Override
+        public void unpack(Buffer buffer) {
+
+        }
+
+        @Override
+        public void pack(Buffer buffer) {
+
         }
     }
 }
