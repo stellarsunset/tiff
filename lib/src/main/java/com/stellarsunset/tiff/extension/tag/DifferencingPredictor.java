@@ -1,12 +1,14 @@
 package com.stellarsunset.tiff.extension.tag;
 
+import com.stellarsunset.tiff.BufferView;
 import com.stellarsunset.tiff.Ifd;
 import com.stellarsunset.tiff.Ifd.Entry;
 import com.stellarsunset.tiff.baseline.tag.Compression;
 import com.stellarsunset.tiff.baseline.tag.SamplesPerPixel;
 import com.stellarsunset.tiff.baseline.tag.UnsupportedTypeForTagException;
 
-import java.nio.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -81,8 +83,8 @@ public interface DifferencingPredictor {
 
         return switch (type) {
             case 1 -> new Noop();
-            case 2 -> new Planar1Horizontal(componentsPerPixel);
-            case 3 -> new Planar1FloatingPoint(new Planar1Horizontal(componentsPerPixel));
+            case 2 -> horizontal(componentsPerPixel);
+            case 3 -> floatingPoint(componentsPerPixel);
             default -> throw new IllegalArgumentException(
                     String.format("Illegal differencing predictor type %s, should be 1, 2, or 3", type)
             );
@@ -97,13 +99,7 @@ public interface DifferencingPredictor {
      *
      * @param buffer the underlying buffer of primitive data to unpack
      */
-    void unpack(Buffer buffer);
-
-    default void unpackAll(ByteOrder order, byte[][] bytes) {
-        for (byte[] row : bytes) {
-            unpack(ByteBuffer.wrap(row).order(order));
-        }
-    }
+    void unpack(BufferView buffer);
 
     /**
      * Repack the raw bytes into their differenced form.
@@ -113,107 +109,100 @@ public interface DifferencingPredictor {
      *
      * @param buffer the underlying buffer of primitive data to pack
      */
-    void pack(Buffer buffer);
-
-    default void packAll(ByteOrder order, byte[][] bytes) {
-        for (byte[] row : bytes) {
-            pack(ByteBuffer.wrap(row).order(order));
-        }
-    }
+    void pack(BufferView buffer);
 
     record Noop() implements DifferencingPredictor {
         @Override
-        public void unpack(Buffer buffer) {
+        public void unpack(BufferView buffer) {
         }
 
         @Override
-        public void pack(Buffer buffer) {
+        public void pack(BufferView buffer) {
         }
     }
 
     record Planar1Horizontal(int componentsPerPixel) implements DifferencingPredictor {
         @Override
-        public void unpack(Buffer buffer) {
+        public void unpack(BufferView buffer) {
             for (int component = 0; component < componentsPerPixel; component++) {
-                int begin = buffer.position() + component + componentsPerPixel;
-                for (int c = begin; c < buffer.limit(); c += componentsPerPixel) {
+                int begin = component + componentsPerPixel;
+                for (int c = begin; c < buffer.len(); c += componentsPerPixel) {
                     sum(buffer, c);
                 }
             }
         }
 
-        private void sum(Buffer buffer, int loc) {
+        private void sum(BufferView buffer, int loc) {
             switch (buffer) {
-                case ByteBuffer bBuffer -> {
-                    byte b = bBuffer.get(loc);
-                    b += bBuffer.get(loc - componentsPerPixel);
-                    bBuffer.put(loc, b);
+                case BufferView.Byte bBuffer -> {
+                    byte b = bBuffer.getByte(loc);
+                    b += bBuffer.getByte(loc - componentsPerPixel);
+                    bBuffer.putByte(loc, b);
                 }
-                case CharBuffer cBuffer -> {
-                    char c = cBuffer.get(loc);
-                    c += cBuffer.get(loc - componentsPerPixel);
-                    cBuffer.put(loc, c);
+                case BufferView.Char cBuffer -> {
+                    char c = cBuffer.getChar(loc);
+                    c += cBuffer.getChar(loc - componentsPerPixel);
+                    cBuffer.putChar(loc, c);
                 }
-                case ShortBuffer sBuffer -> {
-                    short s = sBuffer.get(loc);
-                    s += sBuffer.get(loc - componentsPerPixel);
-                    sBuffer.put(loc, s);
+                case BufferView.Short sBuffer -> {
+                    short s = sBuffer.getShort(loc);
+                    s += sBuffer.getShort(loc - componentsPerPixel);
+                    sBuffer.putShort(loc, s);
                 }
-                case IntBuffer iBuffer -> {
-                    int i = iBuffer.get(loc);
-                    i += iBuffer.get(loc - componentsPerPixel);
-                    iBuffer.put(loc, i);
+                case BufferView.Int iBuffer -> {
+                    int i = iBuffer.getInt(loc);
+                    i += iBuffer.getInt(loc - componentsPerPixel);
+                    iBuffer.putInt(loc, i);
                 }
-                case LongBuffer lBuffer -> {
-                    long l = lBuffer.get(loc);
-                    l += lBuffer.get(loc - componentsPerPixel);
-                    lBuffer.put(loc, l);
+                case BufferView.Long lBuffer -> {
+                    long l = lBuffer.getLong(loc);
+                    l += lBuffer.getLong(loc - componentsPerPixel);
+                    lBuffer.putLong(loc, l);
                 }
-                case FloatBuffer _, DoubleBuffer _ -> throw new IllegalArgumentException(
+                case BufferView.Float _, BufferView.Double _ -> throw new IllegalArgumentException(
                         "Standard horizontal differencing not supported for floating-point types."
                 );
             }
         }
 
         @Override
-        public void pack(Buffer buffer) {
+        public void pack(BufferView buffer) {
             for (int component = 0; component < componentsPerPixel; component++) {
-                int begin = (buffer.limit() - componentsPerPixel) + component;
-                int end = component + buffer.position();
-                for (int c = begin; c > end; c -= componentsPerPixel) {
+                int begin = (buffer.len() - componentsPerPixel) + component;
+                for (int c = begin; c > component; c -= componentsPerPixel) {
                     difference(buffer, c);
                 }
             }
         }
 
-        private void difference(Buffer buffer, int loc) {
+        private void difference(BufferView buffer, int loc) {
             switch (buffer) {
-                case ByteBuffer bBuffer -> {
-                    byte b = bBuffer.get(loc);
-                    b -= bBuffer.get(loc - componentsPerPixel);
-                    bBuffer.put(loc, b);
+                case BufferView.Byte bBuffer -> {
+                    byte b = bBuffer.getByte(loc);
+                    b -= bBuffer.getByte(loc - componentsPerPixel);
+                    bBuffer.putByte(loc, b);
                 }
-                case CharBuffer cBuffer -> {
-                    char c = cBuffer.get(loc);
-                    c -= cBuffer.get(loc - componentsPerPixel);
-                    cBuffer.put(loc, c);
+                case BufferView.Char cBuffer -> {
+                    char c = cBuffer.getChar(loc);
+                    c -= cBuffer.getChar(loc - componentsPerPixel);
+                    cBuffer.putChar(loc, c);
                 }
-                case ShortBuffer sBuffer -> {
-                    short s = sBuffer.get(loc);
-                    s -= sBuffer.get(loc - componentsPerPixel);
-                    sBuffer.put(loc, s);
+                case BufferView.Short sBuffer -> {
+                    short s = sBuffer.getShort(loc);
+                    s -= sBuffer.getShort(loc - componentsPerPixel);
+                    sBuffer.putShort(loc, s);
                 }
-                case IntBuffer iBuffer -> {
-                    int i = iBuffer.get(loc);
-                    i -= iBuffer.get(loc - componentsPerPixel);
-                    iBuffer.put(loc, i);
+                case BufferView.Int iBuffer -> {
+                    int i = iBuffer.getInt(loc);
+                    i -= iBuffer.getInt(loc - componentsPerPixel);
+                    iBuffer.putInt(loc, i);
                 }
-                case LongBuffer lBuffer -> {
-                    long l = lBuffer.get(loc);
-                    l -= lBuffer.get(loc - componentsPerPixel);
-                    lBuffer.put(loc, l);
+                case BufferView.Long lBuffer -> {
+                    long l = lBuffer.getLong(loc);
+                    l -= lBuffer.getLong(loc - componentsPerPixel);
+                    lBuffer.putLong(loc, l);
                 }
-                case FloatBuffer _, DoubleBuffer _ -> throw new IllegalArgumentException(
+                case BufferView.Float _, BufferView.Double _ -> throw new IllegalArgumentException(
                         "Standard horizontal differencing not supported for floating-point types."
                 );
             }
@@ -223,11 +212,11 @@ public interface DifferencingPredictor {
     record Planar1FloatingPoint(Planar1Horizontal horizontal) implements DifferencingPredictor {
 
         @Override
-        public void unpack(Buffer buffer) {
-            if (buffer instanceof ByteBuffer bBuffer) {
+        public void unpack(BufferView buffer) {
+            if (buffer instanceof BufferView.Byte bBuffer) {
                 horizontal.unpack(bBuffer);
 
-                int len = buffer.limit() - buffer.position();
+                int len = bBuffer.lengthBytes();
                 int quadrantSize = len / 4;
 
                 int expHi = 0;
@@ -235,16 +224,16 @@ public interface DifferencingPredictor {
                 int mantissaHi = 2 * quadrantSize;
                 int mantissaLo = 3 * quadrantSize;
 
-                ByteBuffer temp = ByteBuffer.allocate(len).order(bBuffer.order());
+                ByteBuffer temp = ByteBuffer.allocate(len);
                 for (int i = 0; i < quadrantSize; i++) {
 
-                    byte expHiI = bBuffer.get(expHi + i);
-                    byte expLoI = bBuffer.get(expLo + i);
-                    byte mantissaHiI = bBuffer.get(mantissaHi + i);
-                    byte mantissaLoI = bBuffer.get(mantissaLo + i);
+                    byte expHiI = bBuffer.getByte(expHi + i);
+                    byte expLoI = bBuffer.getByte(expLo + i);
+                    byte mantissaHiI = bBuffer.getByte(mantissaHi + i);
+                    byte mantissaLoI = bBuffer.getByte(mantissaLo + i);
 
                     int offset = i * 4;
-                    if (bBuffer.order().equals(ByteOrder.LITTLE_ENDIAN)) {
+                    if (bBuffer.delegate().order().equals(ByteOrder.LITTLE_ENDIAN)) {
                         temp.put(offset, mantissaLoI);
                         temp.put(offset + 1, mantissaHiI);
                         temp.put(offset + 2, expLoI);
@@ -258,7 +247,7 @@ public interface DifferencingPredictor {
                 }
 
                 for (int i = 0; i < len; i++) {
-                    bBuffer.put(bBuffer.position() + i, temp.get(i));
+                    bBuffer.putByte(i, temp.get(i));
                 }
             } else {
                 throw new IllegalArgumentException(
@@ -268,8 +257,7 @@ public interface DifferencingPredictor {
         }
 
         @Override
-        public void pack(Buffer buffer) {
-
+        public void pack(BufferView buffer) {
             horizontal.pack(buffer);
         }
     }

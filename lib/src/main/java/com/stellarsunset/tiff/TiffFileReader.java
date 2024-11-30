@@ -72,9 +72,7 @@ public final class TiffFileReader {
 
             TiffHeader header = readHeader(channel);
 
-            BytesAdapter adapter = BytesAdapter.of(header.order());
-
-            IfdReader ifdReader = new IfdReader(adapter);
+            IfdReader ifdReader = new IfdReader(header.order());
 
             Ifd first = ifdReader
                     .read(channel, header.unsignedFirstIfdOffset());

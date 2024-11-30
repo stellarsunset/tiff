@@ -1,6 +1,7 @@
 package com.stellarsunset.tiff.extension;
 
 import com.stellarsunset.tiff.*;
+import com.stellarsunset.tiff.baseline.RasterHelpers;
 import com.stellarsunset.tiff.baseline.RgbImage;
 import com.stellarsunset.tiff.baseline.tag.BitsPerSample;
 import com.stellarsunset.tiff.baseline.tag.Compression;
@@ -71,32 +72,13 @@ class TiledImageRegressionTest {
                         () -> assertEquals(32, tileInfo.width(), "Tile Width (32)")
                 );
 
-                assertAll(
-                        "Check Image(0) pixels.",
-                        () -> comparePixelValues(r, rasters, 0, 0),
-                        () -> comparePixelValues(r, rasters, 20, 20),
-                        () -> comparePixelValues(r, rasters, 50, 110),
-                        () -> comparePixelValues(r, rasters, 35, 80)
-                );
+                assertArrayEquals(RasterHelpers.toByteRaster(rasters), r.data(), "Raster Data");
             } else {
                 fail("Image not of the correct type, image type was: " + unwrap(image).getClass().getSimpleName());
             }
         } catch (Exception e) {
             fail(e);
         }
-    }
-
-    private void comparePixelValues(RgbImage image, Rasters rasters, int row, int column) {
-
-        Number[] rPixel = rasters.getPixel(column, row);
-        assertEquals(3, rPixel.length, "Should return a single number for the BiLevel image pixel value.");
-
-        Pixel.Rgb iPixel = image.valueAt(row, column);
-        assertAll(
-                () -> assertEquals(Short.toUnsignedInt((Short) rPixel[0]), Byte.toUnsignedInt(iPixel.r()), String.format("Should contain identical Red values at the respective pixel (%d, %d).", row, column)),
-                () -> assertEquals(Short.toUnsignedInt((Short) rPixel[1]), Byte.toUnsignedInt(iPixel.g()), String.format("Should contain identical Green values at the respective pixel (%d, %d).", row, column)),
-                () -> assertEquals(Short.toUnsignedInt((Short) rPixel[2]), Byte.toUnsignedInt(iPixel.b()), String.format("Should contain identical Blue values at the respective pixel (%d, %d).", row, column))
-        );
     }
 
     private Rasters readRasters() throws IOException {

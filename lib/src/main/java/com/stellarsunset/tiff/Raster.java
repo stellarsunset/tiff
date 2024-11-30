@@ -10,8 +10,6 @@ import com.stellarsunset.tiff.extension.tag.DifferencingPredictor;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-import java.nio.ShortBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 
@@ -147,7 +145,11 @@ public sealed interface Raster {
                                 stripRowStart + widthBytes
                         );
 
-                        predictor.unpack(ByteBuffer.wrap(bytes[imageRow]).order(order));
+                        predictor.unpack(
+                                BufferView.bytes(
+                                        ByteBuffer.wrap(bytes[imageRow]).order(order)
+                                )
+                        );
                     }
                 }
 
@@ -213,7 +215,11 @@ public sealed interface Raster {
                                 numberOfBytes
                         );
 
-                        predictor.unpack(ByteBuffer.wrap(rowBytes, oCol, numberOfBytes).order(order));
+                        predictor.unpack(
+                                BufferView.bytes(
+                                        ByteBuffer.wrap(rowBytes, oCol, numberOfBytes).order(order)
+                                )
+                        );
                     }
 
                     oCol += tileWidthBytes;
@@ -249,13 +255,10 @@ public sealed interface Raster {
 
         record ShortStrips(int componentsPerPixel) implements Reader {
 
-            private static final int BYTES_PER_SHORT = 2;
-
             @Override
             public Shorts readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
                 BytesAdapter adapter = BytesAdapter.of(order);
-                ArrayBytesAdapter arrayAdapter = ArrayBytesAdapter.of(order);
 
                 BytesReader reader = new BytesReader(channel);
 
@@ -276,7 +279,7 @@ public sealed interface Raster {
                 int nOffsets = stripInfo.stripOffsets().length;
                 int rowsPerStrip = intStripInfo.rowsPerStrip();
 
-                int widthBytes = imageWidthShorts * BYTES_PER_SHORT;
+                int widthBytes = imageWidthShorts * Short.BYTES;
 
                 DifferencingPredictor predictor = DifferencingPredictor.get(ifd);
 
@@ -299,13 +302,10 @@ public sealed interface Raster {
                         int imageRow = i * rowsPerStrip + stripRow;
                         int stripRowStart = stripRow * widthBytes;
 
-                        shorts[imageRow] = arrayAdapter.readShorts(
-                                ByteBuffer.wrap(uncompressedStrip, stripRowStart, widthBytes),
-                                0,
-                                imageWidthShorts
-                        );
+                        var view = BufferView.shorts(ByteBuffer.wrap(uncompressedStrip, stripRowStart, widthBytes).order(order));
+                        predictor.unpack(view);
 
-                        predictor.unpack(ShortBuffer.wrap(shorts[imageRow]));
+                        shorts[imageRow] = view.readShorts(0, imageWidthShorts);
                     }
                 }
 
@@ -315,13 +315,10 @@ public sealed interface Raster {
 
         record ShortTiles(int componentsPerPixel) implements Reader {
 
-            private static final int BYTES_PER_SHORT = 2;
-
             @Override
             public Shorts readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
                 BytesAdapter adapter = BytesAdapter.of(order);
-                ArrayBytesAdapter arrayAdapter = ArrayBytesAdapter.of(order);
 
                 BytesReader reader = new BytesReader(channel);
 
@@ -335,7 +332,7 @@ public sealed interface Raster {
                 TileInfo.Int intTileInfo = tileInfo.asIntInfo();
 
                 int imageWidthShorts = intImageDimensions.width() * componentsPerPixel;
-                int imageWidthBytes = imageWidthShorts * BYTES_PER_SHORT;
+                int imageWidthBytes = imageWidthShorts * Short.BYTES;
 
                 short[][] shorts = new short[intImageDimensions.length()][imageWidthShorts];
 
@@ -347,7 +344,7 @@ public sealed interface Raster {
                 int oCol = 0;
 
                 int tileWidthShorts = intTileInfo.width() * componentsPerPixel;
-                int tileWidthBytes = tileWidthShorts * BYTES_PER_SHORT;
+                int tileWidthBytes = tileWidthShorts * Short.BYTES;
 
                 DifferencingPredictor predictor = DifferencingPredictor.get(ifd);
 
@@ -370,11 +367,10 @@ public sealed interface Raster {
 
                         int tileRowStart = row * tileWidthBytes;
 
-                        short[] fRow = arrayAdapter.readShorts(
-                                ByteBuffer.wrap(uncompressedTile, tileRowStart, tileWidthBytes),
-                                0,
-                                tileWidthShorts
-                        );
+                        var view = BufferView.shorts(ByteBuffer.wrap(uncompressedTile, tileRowStart, tileWidthBytes).order(order));
+                        predictor.unpack(view);
+
+                        short[] fRow = view.readShorts(0, tileWidthShorts);
 
                         int numberOfShorts = Math.min(tileWidthShorts, imageWidthShorts - oCol);
 
@@ -385,8 +381,6 @@ public sealed interface Raster {
                                 oCol,
                                 numberOfShorts
                         );
-
-                        predictor.unpack(ShortBuffer.wrap(fRow, oCol, numberOfShorts));
                     }
 
                     oCol += tileWidthShorts;
@@ -419,13 +413,10 @@ public sealed interface Raster {
 
         record IntStrips(int componentsPerPixel) implements Reader {
 
-            private static final int BYTES_PER_INT = 4;
-
             @Override
             public Ints readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
                 BytesAdapter adapter = BytesAdapter.of(order);
-                ArrayBytesAdapter arrayAdapter = ArrayBytesAdapter.of(order);
 
                 BytesReader reader = new BytesReader(channel);
 
@@ -446,7 +437,7 @@ public sealed interface Raster {
                 int nOffsets = stripInfo.stripOffsets().length;
                 int rowsPerStrip = intStripInfo.rowsPerStrip();
 
-                int widthBytes = imageWidthInts * BYTES_PER_INT;
+                int widthBytes = imageWidthInts * Integer.BYTES;
 
                 DifferencingPredictor predictor = DifferencingPredictor.get(ifd);
 
@@ -458,7 +449,7 @@ public sealed interface Raster {
                     ByteBuffer buffer = reader.readBytes(stripOffset, stripBytes);
                     byte[] uncompressedStrip = compressor.decompress(buffer.array(), adapter);
 
-                    int rowsInStrip = uncompressedStrip.length / imageWidth / BYTES_PER_INT / componentsPerPixel;
+                    int rowsInStrip = uncompressedStrip.length / imageWidth / Integer.BYTES / componentsPerPixel;
                     if (i != nOffsets - 1) {
                         checkArgument(rowsInStrip == rowsPerStrip,
                                 "Incorrect number of rows found (%s) not (%s) in strip# (%s).", rowsInStrip, rowsPerStrip, i);
@@ -469,13 +460,10 @@ public sealed interface Raster {
                         int imageRow = i * rowsPerStrip + stripRow;
                         int stripRowStart = stripRow * widthBytes;
 
-                        ints[imageRow] = arrayAdapter.readInts(
-                                ByteBuffer.wrap(uncompressedStrip, stripRowStart, widthBytes),
-                                0,
-                                imageWidthInts
-                        );
+                        var view = BufferView.ints(ByteBuffer.wrap(uncompressedStrip, stripRowStart, widthBytes).order(order));
+                        predictor.unpack(view);
 
-                        predictor.unpack(IntBuffer.wrap(ints[imageRow]));
+                        ints[imageRow] = view.readInts(0, imageWidthInts);
                     }
                 }
 
@@ -485,13 +473,10 @@ public sealed interface Raster {
 
         record IntTiles(int componentsPerPixel) implements Reader {
 
-            private static final int BYTES_PER_INT = 4;
-
             @Override
             public Ints readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
                 BytesAdapter adapter = BytesAdapter.of(order);
-                ArrayBytesAdapter arrayAdapter = ArrayBytesAdapter.of(order);
 
                 BytesReader reader = new BytesReader(channel);
 
@@ -505,7 +490,7 @@ public sealed interface Raster {
                 TileInfo.Int intTileInfo = tileInfo.asIntInfo();
 
                 int imageWidthInts = intImageDimensions.width() * componentsPerPixel;
-                int imageWidthBytes = imageWidthInts * BYTES_PER_INT;
+                int imageWidthBytes = imageWidthInts * Integer.BYTES;
 
                 int[][] ints = new int[intImageDimensions.length()][imageWidthInts];
 
@@ -517,7 +502,7 @@ public sealed interface Raster {
                 int oCol = 0;
 
                 int tileWidthInts = intTileInfo.width() * componentsPerPixel;
-                int tileWidthBytes = tileWidthInts * BYTES_PER_INT;
+                int tileWidthBytes = tileWidthInts * Integer.BYTES;
 
                 DifferencingPredictor predictor = DifferencingPredictor.get(ifd);
 
@@ -540,11 +525,10 @@ public sealed interface Raster {
 
                         int tileRowStart = row * tileWidthBytes;
 
-                        int[] fRow = arrayAdapter.readInts(
-                                ByteBuffer.wrap(uncompressedTile, tileRowStart, tileWidthBytes),
-                                0,
-                                tileWidthInts
-                        );
+                        var view = BufferView.ints(ByteBuffer.wrap(uncompressedTile, tileRowStart, tileWidthBytes).order(order));
+                        predictor.unpack(view);
+
+                        int[] fRow = view.readInts(0, imageWidthInts);
 
                         int numberOfInts = Math.min(tileWidthInts, imageWidthInts - oCol);
 
@@ -555,8 +539,6 @@ public sealed interface Raster {
                                 oCol,
                                 numberOfInts
                         );
-
-                        predictor.unpack(IntBuffer.wrap(fRow, oCol, numberOfInts));
                     }
 
                     oCol += tileWidthInts;
@@ -589,13 +571,10 @@ public sealed interface Raster {
 
         record FloatStrips(int componentsPerPixel) implements Reader {
 
-            private static final int BYTES_PER_FLOAT = 4;
-
             @Override
             public Floats readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
                 BytesAdapter adapter = BytesAdapter.of(order);
-                ArrayBytesAdapter arrayAdapter = ArrayBytesAdapter.of(order);
 
                 BytesReader reader = new BytesReader(channel);
 
@@ -616,7 +595,7 @@ public sealed interface Raster {
                 int nOffsets = stripInfo.stripOffsets().length;
                 int rowsPerStrip = intStripInfo.rowsPerStrip();
 
-                int widthBytes = imageWidthFloats * BYTES_PER_FLOAT;
+                int widthBytes = imageWidthFloats * Float.BYTES;
 
                 DifferencingPredictor predictor = DifferencingPredictor.get(ifd);
 
@@ -628,7 +607,7 @@ public sealed interface Raster {
                     ByteBuffer buffer = reader.readBytes(stripOffset, stripBytes);
                     byte[] uncompressedStrip = compressor.decompress(buffer.array(), adapter);
 
-                    int rowsInStrip = uncompressedStrip.length / imageWidth / BYTES_PER_FLOAT / componentsPerPixel;
+                    int rowsInStrip = uncompressedStrip.length / imageWidth / Float.BYTES / componentsPerPixel;
                     if (i != nOffsets - 1) {
                         checkArgument(rowsInStrip == rowsPerStrip,
                                 "Incorrect number of rows found (%s) not (%s) in strip# (%s).", rowsInStrip, rowsPerStrip, i);
@@ -639,10 +618,11 @@ public sealed interface Raster {
                         int imageRow = i * rowsPerStrip + stripRow;
                         int stripRowStart = stripRow * widthBytes;
 
-                        var bytes = ByteBuffer.wrap(uncompressedStrip, stripRowStart, widthBytes).order(order);
-                        predictor.unpack(bytes);
+                        var bytes = ByteBuffer.wrap(uncompressedStrip, stripRowStart, widthBytes);
+                        predictor.unpack(BufferView.bytes(bytes));
 
-                        floats[imageRow] = arrayAdapter.readFloats(bytes, 0, imageWidthFloats);
+                        floats[imageRow] = BufferView.floats(bytes.order(order))
+                                .readFloats(0, imageWidthFloats);
                     }
                 }
 
@@ -652,13 +632,10 @@ public sealed interface Raster {
 
         record FloatTiles(int componentsPerPixel) implements Reader {
 
-            private static final int BYTES_PER_FLOAT = 4;
-
             @Override
             public Floats readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
                 BytesAdapter adapter = BytesAdapter.of(order);
-                ArrayBytesAdapter arrayAdapter = ArrayBytesAdapter.of(order);
 
                 BytesReader reader = new BytesReader(channel);
 
@@ -672,7 +649,7 @@ public sealed interface Raster {
                 TileInfo.Int intTileInfo = tileInfo.asIntInfo();
 
                 int imageWidthFloats = intImageDimensions.width() * componentsPerPixel;
-                int imageWidthBytes = imageWidthFloats * BYTES_PER_FLOAT;
+                int imageWidthBytes = imageWidthFloats * Float.BYTES;
 
                 float[][] floats = new float[intImageDimensions.length()][imageWidthFloats];
 
@@ -684,7 +661,7 @@ public sealed interface Raster {
                 int oCol = 0;
 
                 int tileWidthFloats = intTileInfo.width() * componentsPerPixel;
-                int tileWidthBytes = tileWidthFloats * BYTES_PER_FLOAT;
+                int tileWidthBytes = tileWidthFloats * Float.BYTES;
 
                 DifferencingPredictor predictor = DifferencingPredictor.get(ifd);
 
@@ -708,9 +685,11 @@ public sealed interface Raster {
                         int tileRowStart = row * tileWidthBytes;
 
                         var bytes = ByteBuffer.wrap(uncompressedTile, tileRowStart, tileWidthBytes).order(order);
-                        predictor.unpack(bytes);
+                        predictor.unpack(BufferView.bytes(bytes));
 
-                        float[] fRow = arrayAdapter.readFloats(bytes, 0, tileWidthFloats);
+                        float[] fRow = BufferView.floats(bytes.order(order))
+                                .readFloats(0, tileWidthFloats);
+
                         int numberOfFloats = Math.min(tileWidthFloats, imageWidthFloats - oCol);
 
                         System.arraycopy(

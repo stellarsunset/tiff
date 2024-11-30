@@ -7,7 +7,7 @@ import java.nio.channels.SeekableByteChannel;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-class SByteEntryMakerTest {
+class AsciiEntryMakerTest {
 
     @Test
     void testReader_ValueAtOffset_BE() {
@@ -16,7 +16,7 @@ class SByteEntryMakerTest {
 
         SeekableByteChannel channel = ByteArrayChannel.fromByteArray(theArray);
 
-        IfdEntryMaker.SByte maker = new IfdEntryMaker.SByte(
+        IfdEntryMaker.Ascii maker = new IfdEntryMaker.Ascii(
                 new BytesReader(channel),
                 BytesAdapter.of(ByteOrder.BIG_ENDIAN)
         );
@@ -34,7 +34,7 @@ class SByteEntryMakerTest {
 
         SeekableByteChannel channel = ByteArrayChannel.fromByteArray(theArray);
 
-        IfdEntryMaker.SByte maker = new IfdEntryMaker.SByte(
+        IfdEntryMaker.Ascii maker = new IfdEntryMaker.Ascii(
                 new BytesReader(channel),
                 BytesAdapter.of(ByteOrder.LITTLE_ENDIAN)
         );

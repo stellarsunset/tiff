@@ -18,7 +18,7 @@ class SShortEntryMakerTest {
 
         IfdEntryMaker.SShort maker = new IfdEntryMaker.SShort(
                 new BytesReader(channel),
-                ArrayBytesAdapter.of(ByteOrder.BIG_ENDIAN)
+                BytesAdapter.of(ByteOrder.BIG_ENDIAN)
         );
 
         short[] values = maker.makeEntry((short) 0, 3, 0)
@@ -36,7 +36,7 @@ class SShortEntryMakerTest {
 
         IfdEntryMaker.SShort maker = new IfdEntryMaker.SShort(
                 new BytesReader(channel),
-                ArrayBytesAdapter.of(ByteOrder.LITTLE_ENDIAN)
+                BytesAdapter.of(ByteOrder.LITTLE_ENDIAN)
         );
 
         short[] values = maker.makeEntry((short) 0, 3, 0)

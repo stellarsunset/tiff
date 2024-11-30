@@ -1,8 +1,12 @@
 package com.stellarsunset.tiff.extension;
 
 import com.stellarsunset.tiff.*;
+import com.stellarsunset.tiff.baseline.RasterHelpers;
 import com.stellarsunset.tiff.baseline.StripInfo;
-import com.stellarsunset.tiff.baseline.tag.*;
+import com.stellarsunset.tiff.baseline.tag.BitsPerSample;
+import com.stellarsunset.tiff.baseline.tag.Compression;
+import com.stellarsunset.tiff.baseline.tag.PhotometricInterpretation;
+import com.stellarsunset.tiff.baseline.tag.SamplesPerPixel;
 import com.stellarsunset.tiff.extension.ShortImage.ShortNImage;
 import com.stellarsunset.tiff.extension.tag.PlanarConfiguration;
 import mil.nga.tiff.Rasters;
@@ -65,30 +69,13 @@ class LzwPredictorRegressionTest {
                         () -> assertEquals(1, StripInfo.getRequired(ifd).rowsPerStrip(), "Rows Per Strip")
                 );
 
-                assertAll(
-                        "Check Image(0) pixels.",
-                        () -> comparePixelValues(r, rasters, 0, 0),
-                        () -> comparePixelValues(r, rasters, 20, 20),
-                        () -> comparePixelValues(r, rasters, 50, 110),
-                        () -> comparePixelValues(r, rasters, 35, 80)
-                );
+                assertArrayEquals(RasterHelpers.toShortRaster(rasters), r.data(), "Raster Data");
             } else {
                 fail("Image not of the correct type, image type was: " + unwrap(image).getClass().getSimpleName());
             }
         } catch (Exception e) {
             fail(e);
         }
-    }
-
-    private void comparePixelValues(ShortNImage image, Rasters rasters, int row, int column) {
-
-        Number[] rPixel = rasters.getPixel(column, row);
-        assertEquals(15, rPixel.length, "Should return a single number for the BiLevel image pixel value.");
-
-        Pixel.ShortN sPixel = image.valueAt(row, column);
-
-        assertArrayEquals(toIntArray(rPixel), Arrays.toUnsignedIntArray(sPixel.values()),
-                String.format("Should contain identical values at the respective pixel (%d, %d).", row, column));
     }
 
     private Rasters readRasters() throws IOException {
@@ -101,13 +88,5 @@ class LzwPredictorRegressionTest {
 
     private static File tiffFile(String name) {
         return new File(System.getProperty("user.dir") + "/src/test/resources/" + name);
-    }
-
-    private int[] toIntArray(Number[] numbers) {
-        int[] array = new int[numbers.length];
-        for (int i = 0; i < numbers.length; i++) {
-            array[i] = (Integer) numbers[i];
-        }
-        return array;
     }
 }

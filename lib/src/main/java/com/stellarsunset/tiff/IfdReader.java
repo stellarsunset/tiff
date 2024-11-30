@@ -3,6 +3,7 @@ package com.stellarsunset.tiff;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
 
 /**
@@ -27,7 +28,7 @@ import java.nio.channels.SeekableByteChannel;
  *
  * <p>Note: entries in a TIFF IFD are sorted by their tag identifier.
  */
-record IfdReader(BytesAdapter adapter) {
+record IfdReader(ByteOrder order) {
 
     /**
      * Read the {@link Ifd} in the TIFF file pointed to by the {@code channel} starting at the provided {@code offset}.
@@ -38,6 +39,7 @@ record IfdReader(BytesAdapter adapter) {
     Ifd read(SeekableByteChannel channel, long position) throws IOException {
 
         BytesReader reader = new BytesReader(channel);
+        BytesAdapter adapter = BytesAdapter.of(order);
 
         short entryCount = adapter.adaptRawShort(
                 reader.readBytes(position, 2).getShort(0)
@@ -75,7 +77,7 @@ record IfdReader(BytesAdapter adapter) {
 
     private IfdEntryMaker entryMaker(BytesReader reader, short type) {
         int typeInt = Short.toUnsignedInt(type);
-        var adapter = new ArrayBytesAdapter(adapter());
+        var adapter = BytesAdapter.of(order);
         return switch (typeInt) {
             case 1 -> new IfdEntryMaker.Byte(reader, adapter);
             case 2 -> new IfdEntryMaker.Ascii(reader, adapter);

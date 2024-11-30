@@ -67,28 +67,13 @@ class PaletteColorImageRegressionTest {
                 );
 
                 assertEquals(colorMap, flattenColorMap(p.colorMap()), "Color Map");
-
-                assertAll(
-                        "Checking Image(0) pixels.",
-                        () -> comparePixelValues(p, rasters, 0, 0),
-                        () -> comparePixelValues(p, rasters, 250, 321),
-                        () -> comparePixelValues(p, rasters, 442, 454)
-                );
+                assertArrayEquals(RasterHelpers.toByteRaster(rasters), p.data(), "Raster Data");
             } else {
                 fail("Image not of the correct type, image type was: " + unwrap(image).getClass().getSimpleName());
             }
         } catch (Exception e) {
             fail(e);
         }
-    }
-
-    private void comparePixelValues(PaletteColorImage image, Rasters rasters, int row, int column) {
-
-        Number[] rPixel = rasters.getPixel(column, row);
-        assertEquals(1, rPixel.length, "Should return a single number for the Palette-Color image pixel value.");
-
-        Pixel.PaletteColor iPixel = image.valueAt(row, column);
-        assertEquals(Short.toUnsignedInt((Short) rPixel[0]), iPixel.unsignedIndex(), String.format("Should contain identical ColorMap index at the respective pixel (%d, %d).", row, column));
     }
 
     private List<Integer> flattenColorMap(ColorMap colorMap) {

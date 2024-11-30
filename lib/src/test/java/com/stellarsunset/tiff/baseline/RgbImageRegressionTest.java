@@ -52,31 +52,13 @@ class RgbImageRegressionTest {
                         () -> assertEquals(443, StripInfo.getRequired(ifd).rowsPerStrip(), "Rows Per Strip")
                 );
 
-                assertAll(
-                        "Checking Image(0) pixels.",
-                        () -> comparePixelValues(r, rasters, 0, 0),
-                        () -> comparePixelValues(r, rasters, 250, 321),
-                        () -> comparePixelValues(r, rasters, 442, 454)
-                );
+                assertArrayEquals(RasterHelpers.toByteRaster(rasters), r.data(), "Raster Data");
             } else {
                 fail("Image not of the correct type, image type was: " + unwrap(image).getClass().getSimpleName());
             }
         } catch (Exception e) {
             fail(e);
         }
-    }
-
-    private void comparePixelValues(RgbImage image, Rasters rasters, int row, int column) {
-
-        Number[] rPixel = rasters.getPixel(column, row);
-        assertEquals(3, rPixel.length, "Should return a single number for the BiLevel image pixel value.");
-
-        Pixel.Rgb iPixel = image.valueAt(row, column);
-        assertAll(
-                () -> assertEquals(Short.toUnsignedInt((Short) rPixel[0]), Byte.toUnsignedInt(iPixel.r()), String.format("Should contain identical Red values at the respective pixel (%d, %d).", row, column)),
-                () -> assertEquals(Short.toUnsignedInt((Short) rPixel[1]), Byte.toUnsignedInt(iPixel.g()), String.format("Should contain identical Green values at the respective pixel (%d, %d).", row, column)),
-                () -> assertEquals(Short.toUnsignedInt((Short) rPixel[2]), Byte.toUnsignedInt(iPixel.b()), String.format("Should contain identical Blue values at the respective pixel (%d, %d).", row, column))
-        );
     }
 
     private Rasters readRasters() throws IOException {

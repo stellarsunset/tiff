@@ -15,7 +15,7 @@ sealed interface IfdEntryMaker {
      */
     Ifd.Entry makeEntry(short tag, int count, int rawValueOffsetBytes);
 
-    record Byte(BytesReader reader, ArrayBytesAdapter adapter) implements IfdEntryMaker {
+    record Byte(BytesReader reader, BytesAdapter adapter) implements IfdEntryMaker {
         @Override
         public Ifd.Entry.Byte makeEntry(short tag, int count, int rawValueOffsetBytes) {
 
@@ -31,15 +31,12 @@ sealed interface IfdEntryMaker {
                     Integer.toUnsignedLong(adapter.adaptRawInt(rawValueOffsetBytes)),
                     count
             );
-            return adapter.readBytes(
-                    buffer,
-                    0,
-                    count
-            );
+            return BufferView.bytes(buffer.order(adapter.order()))
+                    .readBytes(0, count);
         }
     }
 
-    record Ascii(BytesReader reader, ArrayBytesAdapter adapter) implements IfdEntryMaker {
+    record Ascii(BytesReader reader, BytesAdapter adapter) implements IfdEntryMaker {
         @Override
         public Ifd.Entry.Ascii makeEntry(short tag, int count, int rawValueOffsetBytes) {
 
@@ -55,15 +52,12 @@ sealed interface IfdEntryMaker {
                     Integer.toUnsignedLong(adapter.adaptRawInt(rawValueOffsetBytes)),
                     count
             );
-            return adapter.readBytes(
-                    buffer,
-                    0,
-                    count
-            );
+            return BufferView.bytes(buffer.order(adapter.order()))
+                    .readBytes(0, count);
         }
     }
 
-    record Short(BytesReader reader, ArrayBytesAdapter adapter) implements IfdEntryMaker {
+    record Short(BytesReader reader, BytesAdapter adapter) implements IfdEntryMaker {
         @Override
         public Ifd.Entry.Short makeEntry(short tag, int count, int rawValueOffsetBytes) {
 
@@ -79,15 +73,12 @@ sealed interface IfdEntryMaker {
                     Integer.toUnsignedLong(adapter.adaptRawInt(rawValueOffsetBytes)),
                     count * 2
             );
-            return adapter.readShorts(
-                    buffer,
-                    0,
-                    count
-            );
+            return BufferView.shorts(buffer.order(adapter.order()))
+                    .readShorts(0, count);
         }
     }
 
-    record Long(BytesReader reader, ArrayBytesAdapter adapter) implements IfdEntryMaker {
+    record Long(BytesReader reader, BytesAdapter adapter) implements IfdEntryMaker {
         @Override
         public Ifd.Entry.Long makeEntry(short tag, int count, int rawValueOffsetBytes) {
 
@@ -103,15 +94,12 @@ sealed interface IfdEntryMaker {
                     Integer.toUnsignedLong(adapter.adaptRawInt(rawValueOffsetBytes)),
                     count * 4
             );
-            return adapter.readInts(
-                    buffer,
-                    0,
-                    count
-            );
+            return BufferView.ints(buffer.order(adapter.order()))
+                    .readInts(0, count);
         }
     }
 
-    record Rational(BytesReader reader, ArrayBytesAdapter adapter) implements IfdEntryMaker {
+    record Rational(BytesReader reader, BytesAdapter adapter) implements IfdEntryMaker {
         @Override
         public Ifd.Entry.Rational makeEntry(short tag, int count, int rawValueOffsetBytes) {
 
@@ -121,7 +109,7 @@ sealed interface IfdEntryMaker {
             );
 
             int[][] rationals = split(
-                    adapter.readInts(buffer, 0, count * 2)
+                    BufferView.ints(buffer.order(adapter.order())).readInts(0, count * 2)
             );
 
             return new Ifd.Entry.Rational(tag, rationals[0], rationals[1]);
@@ -136,7 +124,7 @@ sealed interface IfdEntryMaker {
         }
     }
 
-    record SByte(BytesReader reader, ArrayBytesAdapter adapter) implements IfdEntryMaker {
+    record SByte(BytesReader reader, BytesAdapter adapter) implements IfdEntryMaker {
         @Override
         public Ifd.Entry.SByte makeEntry(short tag, int count, int rawValueOffsetBytes) {
 
@@ -152,15 +140,12 @@ sealed interface IfdEntryMaker {
                     Integer.toUnsignedLong(adapter.adaptRawInt(rawValueOffsetBytes)),
                     count
             );
-            return adapter.readBytes(
-                    buffer,
-                    0,
-                    count
-            );
+            return BufferView.bytes(buffer.order(adapter.order()))
+                    .readBytes(0, count);
         }
     }
 
-    record Undefined(BytesReader reader, ArrayBytesAdapter adapter) implements IfdEntryMaker {
+    record Undefined(BytesReader reader, BytesAdapter adapter) implements IfdEntryMaker {
         @Override
         public Ifd.Entry.Undefined makeEntry(short tag, int count, int rawValueOffsetBytes) {
 
@@ -177,15 +162,12 @@ sealed interface IfdEntryMaker {
                     Integer.toUnsignedLong(adapter.adaptRawInt(rawValueOffsetBytes)),
                     count
             );
-            return adapter.readBytes(
-                    buffer,
-                    0,
-                    count
-            );
+            return BufferView.bytes(buffer.order(adapter.order()))
+                    .readBytes(0, count);
         }
     }
 
-    record SShort(BytesReader reader, ArrayBytesAdapter adapter) implements IfdEntryMaker {
+    record SShort(BytesReader reader, BytesAdapter adapter) implements IfdEntryMaker {
         @Override
         public Ifd.Entry.SShort makeEntry(short tag, int count, int rawValueOffsetBytes) {
 
@@ -201,15 +183,12 @@ sealed interface IfdEntryMaker {
                     Integer.toUnsignedLong(adapter.adaptRawInt(rawValueOffsetBytes)),
                     count * 2
             );
-            return adapter.readShorts(
-                    buffer,
-                    0,
-                    count
-            );
+            return BufferView.shorts(buffer.order(adapter.order()))
+                    .readShorts(0, count);
         }
     }
 
-    record SLong(BytesReader reader, ArrayBytesAdapter adapter) implements IfdEntryMaker {
+    record SLong(BytesReader reader, BytesAdapter adapter) implements IfdEntryMaker {
         @Override
         public Ifd.Entry.SLong makeEntry(short tag, int count, int rawValueOffsetBytes) {
 
@@ -225,15 +204,12 @@ sealed interface IfdEntryMaker {
                     Integer.toUnsignedLong(adapter.adaptRawInt(rawValueOffsetBytes)),
                     count * 4
             );
-            return adapter.readInts(
-                    buffer,
-                    0,
-                    count
-            );
+            return BufferView.ints(buffer.order(adapter.order()))
+                    .readInts(0, count);
         }
     }
 
-    record SRational(BytesReader reader, ArrayBytesAdapter adapter) implements IfdEntryMaker {
+    record SRational(BytesReader reader, BytesAdapter adapter) implements IfdEntryMaker {
         @Override
         public Ifd.Entry.SRational makeEntry(short tag, int count, int rawValueOffsetBytes) {
 
@@ -243,14 +219,14 @@ sealed interface IfdEntryMaker {
             );
 
             int[][] rationals = Rational.split(
-                    adapter.readInts(buffer, 0, count * 2)
+                    BufferView.ints(buffer.order(adapter.order())).readInts(0, count * 2)
             );
 
             return new Ifd.Entry.SRational(tag, rationals[0], rationals[1]);
         }
     }
 
-    record Float(BytesReader reader, ArrayBytesAdapter adapter) implements IfdEntryMaker {
+    record Float(BytesReader reader, BytesAdapter adapter) implements IfdEntryMaker {
         @Override
         public Ifd.Entry.Float makeEntry(short tag, int count, int rawValueOffsetBytes) {
 
@@ -268,18 +244,12 @@ sealed interface IfdEntryMaker {
                     count * 4
             );
 
-            float[] array = new float[count];
-            for (int i = 0; i < count; i++) {
-                array[i] = java.lang.Float.intBitsToFloat(
-                        adapter.adaptRawInt(buffer.getInt(i * 4))
-                );
-            }
-
-            return array;
+            return BufferView.floats(buffer.order(adapter.order()))
+                    .readFloats(0, count);
         }
     }
 
-    record Double(BytesReader reader, ArrayBytesAdapter adapter) implements IfdEntryMaker {
+    record Double(BytesReader reader, BytesAdapter adapter) implements IfdEntryMaker {
         @Override
         public Ifd.Entry.Double makeEntry(short tag, int count, int rawValueOffsetBytes) {
 
@@ -288,14 +258,10 @@ sealed interface IfdEntryMaker {
                     count * 8
             );
 
-            double[] array = new double[count];
-            for (int i = 0; i < count; i++) {
-                array[i] = java.lang.Double.longBitsToDouble(
-                        adapter.adaptRawLong(buffer.getLong(i * 8))
-                );
-            }
-
-            return new Ifd.Entry.Double(tag, array);
+            return new Ifd.Entry.Double(
+                    tag,
+                    BufferView.doubles(buffer.order(adapter.order())).readDoubles(0, count)
+            );
         }
     }
 }
