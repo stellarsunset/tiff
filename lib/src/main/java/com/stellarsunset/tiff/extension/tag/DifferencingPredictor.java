@@ -37,6 +37,23 @@ public interface DifferencingPredictor {
     }
 
     /**
+     * {@link DifferencingPredictor} for floating-point data where taking standard arithmetic differences doesn't result
+     * in byte sequences which are more compressible (due how IEEE 754 orders the bytes).
+     *
+     * <p>Long story short the bytes of the floating-point numbers are re-ordered such that the exponent bits and mantissa
+     * bits of different floating values are grouped together into contiguous ranges prior to differencing.
+     *
+     * <p>The basic algorithm is outlined in the <a href="http://chriscox.org/TIFFTN3d1.pdf">Adobe Technical Note 3</a>.
+     *
+     * <p>There is a nice image include in <a href="https://github.com/image-rs/image-tiff/issues/89">this PR</a>.
+     *
+     * @param componentsPerPixel the number of components per pixel
+     */
+    static DifferencingPredictor floatingPoint(int componentsPerPixel) {
+        return new Planar1FloatingPoint(new Planar1Horizontal(componentsPerPixel));
+    }
+
+    /**
      * Return the {@link DifferencingPredictor} which should be applied ot the image data post decompression but prior
      * to interpretation as pixel values (if applicable).
      *
@@ -65,7 +82,7 @@ public interface DifferencingPredictor {
         return switch (type) {
             case 1 -> new Noop();
             case 2 -> new Planar1Horizontal(componentsPerPixel);
-            case 3 -> new Planar1FloatComponents(componentsPerPixel);
+            case 3 -> new Planar1FloatingPoint(new Planar1Horizontal(componentsPerPixel));
             default -> throw new IllegalArgumentException(
                     String.format("Illegal differencing predictor type %s, should be 1, 2, or 3", type)
             );
@@ -203,16 +220,57 @@ public interface DifferencingPredictor {
         }
     }
 
-    record Planar1FloatComponents(int componentsPerPixel) implements DifferencingPredictor {
+    record Planar1FloatingPoint(Planar1Horizontal horizontal) implements DifferencingPredictor {
 
         @Override
         public void unpack(Buffer buffer) {
+            if (buffer instanceof ByteBuffer bBuffer) {
+                horizontal.unpack(bBuffer);
 
+                int len = buffer.limit() - buffer.position();
+                int quadrantSize = len / 4;
+
+                int expHi = 0;
+                int expLo = quadrantSize;
+                int mantissaHi = 2 * quadrantSize;
+                int mantissaLo = 3 * quadrantSize;
+
+                ByteBuffer temp = ByteBuffer.allocate(len).order(bBuffer.order());
+                for (int i = 0; i < quadrantSize; i++) {
+
+                    byte expHiI = bBuffer.get(expHi + i);
+                    byte expLoI = bBuffer.get(expLo + i);
+                    byte mantissaHiI = bBuffer.get(mantissaHi + i);
+                    byte mantissaLoI = bBuffer.get(mantissaLo + i);
+
+                    int offset = i * 4;
+                    if (bBuffer.order().equals(ByteOrder.LITTLE_ENDIAN)) {
+                        temp.put(offset, mantissaLoI);
+                        temp.put(offset + 1, mantissaHiI);
+                        temp.put(offset + 2, expLoI);
+                        temp.put(offset + 3, expHiI);
+                    } else {
+                        temp.put(offset, expHiI);
+                        temp.put(offset + 1, expLoI);
+                        temp.put(offset + 2, mantissaHiI);
+                        temp.put(offset + 3, mantissaLoI);
+                    }
+                }
+
+                for (int i = 0; i < len; i++) {
+                    bBuffer.put(bBuffer.position() + i, temp.get(i));
+                }
+            } else {
+                throw new IllegalArgumentException(
+                        String.format("The floating-point predictor MUST be run on the raw re-ordered bytes, got %s", buffer.getClass().getSimpleName())
+                );
+            }
         }
 
         @Override
         public void pack(Buffer buffer) {
 
+            horizontal.pack(buffer);
         }
     }
 }

@@ -639,11 +639,10 @@ public sealed interface Raster {
                         int imageRow = i * rowsPerStrip + stripRow;
                         int stripRowStart = stripRow * widthBytes;
 
-                        floats[imageRow] = arrayAdapter.readFloats(
-                                ByteBuffer.wrap(uncompressedStrip, stripRowStart, widthBytes),
-                                0,
-                                imageWidthFloats
-                        );
+                        var bytes = ByteBuffer.wrap(uncompressedStrip, stripRowStart, widthBytes).order(order);
+                        predictor.unpack(bytes);
+
+                        floats[imageRow] = arrayAdapter.readFloats(bytes, 0, imageWidthFloats);
                     }
                 }
 
@@ -708,12 +707,10 @@ public sealed interface Raster {
 
                         int tileRowStart = row * tileWidthBytes;
 
-                        float[] fRow = arrayAdapter.readFloats(
-                                ByteBuffer.wrap(uncompressedTile, tileRowStart, tileWidthBytes),
-                                0,
-                                tileWidthFloats
-                        );
+                        var bytes = ByteBuffer.wrap(uncompressedTile, tileRowStart, tileWidthBytes).order(order);
+                        predictor.unpack(bytes);
 
+                        float[] fRow = arrayAdapter.readFloats(bytes, 0, tileWidthFloats);
                         int numberOfFloats = Math.min(tileWidthFloats, imageWidthFloats - oCol);
 
                         System.arraycopy(

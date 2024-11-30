@@ -6,10 +6,10 @@ import java.nio.*;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-class DifferencingPredictorTest {
+class HorizontalDifferencingPredictorTest {
 
     @Test
-    void testHorizontalPackOneComponent() {
+    void testPackOneComponent() {
 
         byte[][] bytes = new byte[][]{
                 new byte[]{1, 2, 3, 4, 5, 6},
@@ -30,7 +30,7 @@ class DifferencingPredictorTest {
     }
 
     @Test
-    void testHorizontalUnpackOneComponent() {
+    void testUnpackOneComponent() {
 
         byte[][] bytes = new byte[][]{
                 new byte[]{1, 1, 1, 1, 1, 1},
@@ -51,7 +51,7 @@ class DifferencingPredictorTest {
     }
 
     @Test
-    void testHorizontalPackThreeComponents() {
+    void testPackThreeComponents() {
 
         byte[][] bytes = new byte[][]{
                 new byte[]{1, 2, 1, 5, 4, 5, 7, 8, 7},
@@ -72,7 +72,7 @@ class DifferencingPredictorTest {
     }
 
     @Test
-    void testHorizontalUnpackThreeComponents() {
+    void testUnpackThreeComponents() {
 
         byte[][] bytes = new byte[][]{
                 new byte[]{1, 2, 1, 4, 2, 4, 2, 4, 2},
@@ -93,7 +93,7 @@ class DifferencingPredictorTest {
     }
 
     @Test
-    void testHorizontalOffsetArray() {
+    void testOffsetArray() {
         byte[] bytes = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
         var predictor = DifferencingPredictor.horizontal(1);
@@ -106,7 +106,7 @@ class DifferencingPredictorTest {
     }
 
     @Test
-    void testHorizontalCharArrayIdempotent() {
+    void testCharArrayIdempotent() {
         char[] chars = new char[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         char[] expected = new char[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
@@ -119,7 +119,7 @@ class DifferencingPredictorTest {
     }
 
     @Test
-    void testHorizontalShortArrayIdempotent() {
+    void testShortArrayIdempotent() {
         short[] shorts = new short[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         short[] expected = new short[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
@@ -132,7 +132,7 @@ class DifferencingPredictorTest {
     }
 
     @Test
-    void testHorizontalIntArrayIdempotent() {
+    void testIntArrayIdempotent() {
         int[] ints = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         int[] expected = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
@@ -145,7 +145,7 @@ class DifferencingPredictorTest {
     }
 
     @Test
-    void testHorizontalLongArrayIdempotent() {
+    void testLongArrayIdempotent() {
         long[] longs = new long[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         long[] expected = new long[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
