@@ -19,6 +19,8 @@ public interface BytesAdapter {
         return ByteOrder.LITTLE_ENDIAN.equals(order) ? new LittleEndian() : new BigEndian();
     }
 
+    ByteOrder order();
+
     byte adaptRawByte(byte rawByte);
 
     short adaptRawShort(short rawShort);
@@ -27,7 +29,38 @@ public interface BytesAdapter {
 
     long adaptRawLong(long rawLong);
 
+    /**
+     * Attempt to read the integer value of the offset associated with an IFD entry as an array of left-justified
+     * bytes, taking into account the endianness.
+     */
+    default byte[] readAsBytes(int rawInt, int count) {
+        byte[] values = new byte[count];
+        for (int i = 0, bytes = rawInt; i < count; i++) {
+            values[i] = adaptRawByte((byte) (bytes >> 24));
+            bytes = bytes << 8;
+        }
+        return values;
+    }
+
+    /**
+     * Attempt to read the integer value of the offset associated with an IFD entry as an array of left-justified
+     * shorts, taking into account the endianness.
+     */
+    default short[] readAsShorts(int rawInt, int count) {
+        short[] values = new short[count];
+        for (int i = 0, bytes = rawInt; i < count; i++) {
+            values[i] = adaptRawShort((short) (bytes >> 16));
+            bytes = bytes << 16;
+        }
+        return values;
+    }
+
     record BigEndian() implements BytesAdapter {
+
+        @Override
+        public ByteOrder order() {
+            return ByteOrder.BIG_ENDIAN;
+        }
 
         @Override
         public byte adaptRawByte(byte rawByte) {
@@ -51,6 +84,11 @@ public interface BytesAdapter {
     }
 
     record LittleEndian() implements BytesAdapter {
+
+        @Override
+        public ByteOrder order() {
+            return ByteOrder.LITTLE_ENDIAN;
+        }
 
         @Override
         public byte adaptRawByte(byte rawByte) {

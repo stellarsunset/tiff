@@ -18,6 +18,10 @@ import java.util.function.Supplier;
  */
 public sealed interface BaselineImage extends Image permits BiLevelImage, GrayscaleImage, PaletteColorImage, RgbImage {
 
+    static Image.Maker maker() {
+        return new Maker();
+    }
+
     record Maker(Image.Maker biLevel, Image.Maker grayscale, Image.Maker fullColor,
                  Image.Maker palette) implements Image.Maker {
 

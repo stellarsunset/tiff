@@ -18,7 +18,7 @@ class SLongEntryMakerTest {
 
         IfdEntryMaker.SLong maker = new IfdEntryMaker.SLong(
                 new BytesReader(channel),
-                ArrayBytesAdapter.of(ByteOrder.BIG_ENDIAN)
+                BytesAdapter.of(ByteOrder.BIG_ENDIAN)
         );
 
         int[] values = maker.makeEntry((short) 0, 3, 0)
@@ -36,7 +36,7 @@ class SLongEntryMakerTest {
 
         IfdEntryMaker.SLong maker = new IfdEntryMaker.SLong(
                 new BytesReader(channel),
-                ArrayBytesAdapter.of(ByteOrder.LITTLE_ENDIAN)
+                BytesAdapter.of(ByteOrder.LITTLE_ENDIAN)
         );
 
         int[] values = maker.makeEntry((short) 0, 3, 0)

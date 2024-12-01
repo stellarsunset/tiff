@@ -14,7 +14,7 @@ record GkdEntryMaker(Ifd ifd) {
      * Make the fully inflated entry values for all GeoKey entries pulled from the IDF.
      *
      * @param geoKeyEntries the {@link short[]} of entries pulled from the GKD
-     * @param offset        the start offset in the array (always 4)
+     * @param offset        the startByte offset in the array (always 4)
      */
     public Ifd.Entry[] makeAllEntries(short[] geoKeyEntries, int offset) {
 

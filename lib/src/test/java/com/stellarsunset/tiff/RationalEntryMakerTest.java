@@ -19,7 +19,7 @@ class RationalEntryMakerTest {
 
         IfdEntryMaker.Rational maker = new IfdEntryMaker.Rational(
                 new BytesReader(channel),
-                ArrayBytesAdapter.of(ByteOrder.BIG_ENDIAN)
+                BytesAdapter.of(ByteOrder.BIG_ENDIAN)
         );
 
         var entry = maker.makeEntry((short) 0, 2, 0);
@@ -39,7 +39,7 @@ class RationalEntryMakerTest {
 
         IfdEntryMaker.Rational maker = new IfdEntryMaker.Rational(
                 new BytesReader(channel),
-                ArrayBytesAdapter.of(ByteOrder.LITTLE_ENDIAN)
+                BytesAdapter.of(ByteOrder.LITTLE_ENDIAN)
         );
 
         var entry = maker.makeEntry((short) 0, 2, 0);

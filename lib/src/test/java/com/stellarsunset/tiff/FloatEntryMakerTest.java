@@ -21,7 +21,7 @@ class FloatEntryMakerTest {
 
         IfdEntryMaker.Float maker = new IfdEntryMaker.Float(
                 new BytesReader(channel),
-                ArrayBytesAdapter.of(ByteOrder.BIG_ENDIAN)
+                BytesAdapter.of(ByteOrder.BIG_ENDIAN)
         );
 
         float[] values = maker.makeEntry((short) 0, 3, 0)
@@ -39,7 +39,7 @@ class FloatEntryMakerTest {
 
         IfdEntryMaker.Float maker = new IfdEntryMaker.Float(
                 new BytesReader(channel),
-                ArrayBytesAdapter.of(ByteOrder.LITTLE_ENDIAN)
+                BytesAdapter.of(ByteOrder.LITTLE_ENDIAN)
         );
 
         float[] values = maker.makeEntry((short) 0, 3, 0)

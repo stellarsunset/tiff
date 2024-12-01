@@ -75,7 +75,7 @@ public record BiLevelImage(Interpretation type, ImageDimensions dimensions, Reso
 
             return new BiLevelImage(
                     Interpretation.from(ifd),
-                    ImageDimensions.from(ifd),
+                    ImageDimensions.get(ifd),
                     Resolution.from(ifd),
                     bytes.bytes()
             );

@@ -15,7 +15,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public record ImageDimensions(long length, long width) {
 
-    public static ImageDimensions from(Ifd ifd) {
+    public static ImageDimensions get(Ifd ifd) {
         return new ImageDimensions(ImageLength.getRequired(ifd), ImageWidth.getRequired(ifd));
     }
 
@@ -31,7 +31,7 @@ public record ImageDimensions(long length, long width) {
     }
 
     /**
-     * Shorthand to check the bounds materialized image data against the expected image dimensions.
+     * Shorthand to check the bounds materialized image data against the expected byte image dimensions.
      *
      * @param data          the materialized image bytes
      * @param bytesPerPixel the number of bytes per pixel of the image, e.g. 1 for BiLevel, 3 for RGB
@@ -42,6 +42,48 @@ public record ImageDimensions(long length, long width) {
 
         checkArgument(data[0].length == width() * bytesPerPixel,
                 "Expected %s * %s columns, found %s", width(), bytesPerPixel, data[0].length);
+    }
+
+    /**
+     * Shorthand to check the bounds materialized image data against the expected short image dimensions.
+     *
+     * @param data           the materialized image bytes
+     * @param shortsPerPixel the number of shorts per pixel of the image
+     */
+    public void checkBounds(short[][] data, int shortsPerPixel) {
+        checkArgument(data.length == length(),
+                "Expected %s rows, found %s", length(), data.length);
+
+        checkArgument(data[0].length == width() * shortsPerPixel,
+                "Expected %s * %s columns, found %s", width(), shortsPerPixel, data[0].length);
+    }
+
+    /**
+     * Shorthand to check the bounds materialized image data against the expected integer image dimensions.
+     *
+     * @param data         the materialized image bytes
+     * @param intsPerPixel the number of integers per pixel of the image
+     */
+    public void checkBounds(int[][] data, int intsPerPixel) {
+        checkArgument(data.length == length(),
+                "Expected %s rows, found %s", length(), data.length);
+
+        checkArgument(data[0].length == width() * intsPerPixel,
+                "Expected %s * %s columns, found %s", width(), intsPerPixel, data[0].length);
+    }
+
+    /**
+     * Shorthand to check the bounds materialized image data against the expected float image dimensions.
+     *
+     * @param data           the materialized image bytes
+     * @param floatsPerPixel the number of floats per pixel of the image
+     */
+    public void checkBounds(float[][] data, int floatsPerPixel) {
+        checkArgument(data.length == length(),
+                "Expected %s rows, found %s", length(), data.length);
+
+        checkArgument(data[0].length == width() * floatsPerPixel,
+                "Expected %s * %s columns, found %s", width(), floatsPerPixel, data[0].length);
     }
 
     /**

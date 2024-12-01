@@ -1,4 +1,4 @@
-package com.stellarsunset.tiff.baseline.geokey;
+package com.stellarsunset.tiff.extension.geokey;
 
 import com.stellarsunset.tiff.Ifd;
 import com.stellarsunset.tiff.extension.geokey.GeodeticCrs;

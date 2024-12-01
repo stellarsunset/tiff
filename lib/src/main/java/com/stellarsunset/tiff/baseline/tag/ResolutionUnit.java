@@ -30,8 +30,9 @@ public final class ResolutionUnit {
         return switch (ifd.findTag(ID)) {
             case Entry.Short s -> OptionalInt.of(Short.toUnsignedInt(s.values()[0]));
             case Entry.NotFound _ -> OptionalInt.of(2);
-            case Entry.Byte _, Entry.Ascii _, Entry.Long _, Entry.Rational _, Entry.SByte _, Entry.Undefined _, Entry.SShort _, Entry.SLong _, Entry.SRational _,
-                    Entry.Float _, Entry.Double _ -> throw new UnsupportedTypeForTagException(NAME, ID);
+            case Entry.Byte _, Entry.Ascii _, Entry.Long _, Entry.Rational _, Entry.SByte _, Entry.Undefined _,
+                 Entry.SShort _, Entry.SLong _, Entry.SRational _, Entry.Float _, Entry.Double _ ->
+                    throw new UnsupportedTypeForTagException(NAME, ID);
         };
     }
 }

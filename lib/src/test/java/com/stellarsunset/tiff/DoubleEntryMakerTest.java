@@ -21,7 +21,7 @@ class DoubleEntryMakerTest {
 
         IfdEntryMaker.Double maker = new IfdEntryMaker.Double(
                 new BytesReader(channel),
-                ArrayBytesAdapter.of(ByteOrder.BIG_ENDIAN)
+                BytesAdapter.of(ByteOrder.BIG_ENDIAN)
         );
 
         double[] values = maker.makeEntry((short) 0, 3, 0)
@@ -39,7 +39,7 @@ class DoubleEntryMakerTest {
 
         IfdEntryMaker.Double maker = new IfdEntryMaker.Double(
                 new BytesReader(channel),
-                ArrayBytesAdapter.of(ByteOrder.LITTLE_ENDIAN)
+                BytesAdapter.of(ByteOrder.LITTLE_ENDIAN)
         );
 
         double[] values = maker.makeEntry((short) 0, 3, 0)

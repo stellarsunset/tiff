@@ -74,7 +74,7 @@ public sealed interface Pixel {
         }
 
         public int unsignedValue() {
-            return Byte.toUnsignedInt(value);
+            return java.lang.Byte.toUnsignedInt(value);
         }
     }
 
@@ -98,7 +98,7 @@ public sealed interface Pixel {
         }
 
         public int unsignedValue() {
-            return Byte.toUnsignedInt(value);
+            return java.lang.Byte.toUnsignedInt(value);
         }
     }
 
@@ -118,7 +118,7 @@ public sealed interface Pixel {
     record Grayscale8(byte value, boolean whiteIsZero) implements Pixel.Baseline {
 
         public int unsignedValue() {
-            return Byte.toUnsignedInt(value);
+            return java.lang.Byte.toUnsignedInt(value);
         }
     }
 
@@ -140,19 +140,19 @@ public sealed interface Pixel {
     record PaletteColor(byte index, short r, short g, short b) implements Pixel.Baseline {
 
         public int unsignedIndex() {
-            return Byte.toUnsignedInt(index);
+            return java.lang.Byte.toUnsignedInt(index);
         }
 
         public int unsignedR() {
-            return Short.toUnsignedInt(r);
+            return java.lang.Short.toUnsignedInt(r);
         }
 
         public int unsignedG() {
-            return Short.toUnsignedInt(g);
+            return java.lang.Short.toUnsignedInt(g);
         }
 
         public int unsignedB() {
-            return Short.toUnsignedInt(b);
+            return java.lang.Short.toUnsignedInt(b);
         }
     }
 
@@ -169,15 +169,15 @@ public sealed interface Pixel {
     record Rgb(byte r, byte g, byte b) implements Pixel.Baseline {
 
         public int unsignedR() {
-            return Short.toUnsignedInt(r);
+            return java.lang.Byte.toUnsignedInt(r);
         }
 
         public int unsignedG() {
-            return Short.toUnsignedInt(g);
+            return java.lang.Byte.toUnsignedInt(g);
         }
 
         public int unsignedB() {
-            return Short.toUnsignedInt(b);
+            return java.lang.Byte.toUnsignedInt(b);
         }
     }
 
@@ -188,7 +188,127 @@ public sealed interface Pixel {
      * hierarchy.
      */
     non-sealed interface Extension extends Pixel {
+    }
 
+    sealed interface Byte extends Extension {
+    }
+
+    /**
+     * Represents the value of a pixel as a single 8-bit integer (byte).
+     *
+     * <p>Most {@link Pixel.Baseline} types can be represented a {@link Byte1} or {@link Byte3} types.
+     */
+    record Byte1(byte value) implements Pixel.Byte {
+
+        public int unsignedValue() {
+            return java.lang.Byte.toUnsignedInt(value);
+        }
+    }
+
+    /**
+     * Represents the value of a pixel as a trio of 8-bit integer (byte) values.
+     */
+    record Byte3(byte b1, byte b2, byte b3) implements Pixel.Byte {
+
+        public int unsignedB1() {
+            return java.lang.Byte.toUnsignedInt(b1);
+        }
+
+        public int unsignedB2() {
+            return java.lang.Byte.toUnsignedInt(b2);
+        }
+
+        public int unsignedB3() {
+            return java.lang.Byte.toUnsignedInt(b3);
+        }
+    }
+
+    /**
+     * Represents the value of a pixel as an arbitrary number of 8-bit integer (byte) values.
+     */
+    record ByteN(byte[] values) implements Pixel.Byte {
+    }
+
+
+    sealed interface Short extends Extension {
+    }
+
+    /**
+     * Represents the value of a pixel as a single 16-bit integer.
+     *
+     * <p>These are typically used in extensions for storing measurements (e.g. elevations) taken on grids as images.
+     */
+    record Short1(short value) implements Pixel.Short {
+
+        public int unsignedValue() {
+            return java.lang.Short.toUnsignedInt(value);
+        }
+    }
+
+    /**
+     * Represents the value of a pixel as a trio of 16-bit integer values.
+     */
+    record Short3(short s1, short s2, short s3) implements Pixel.Short {
+
+        public int unsignedS1() {
+            return java.lang.Short.toUnsignedInt(s1);
+        }
+
+        public int unsignedS2() {
+            return java.lang.Short.toUnsignedInt(s2);
+        }
+
+        public int unsignedS3() {
+            return java.lang.Short.toUnsignedInt(s3);
+        }
+    }
+
+    /**
+     * Represents the value of a pixel as an arbitrary number of 16-bit integer values.
+     */
+    record ShortN(short[] values) implements Pixel.Short {
+    }
+
+    sealed interface Int extends Extension {
+    }
+
+    /**
+     * Represents the value of a pixel as a single 32-bit integer.
+     *
+     * <p>These are typically used in extensions for storing measurements (e.g. elevations) taken on grids as images.
+     */
+    record Int1(int value) implements Pixel.Int {
+
+        public long unsignedValue() {
+            return Integer.toUnsignedLong(value);
+        }
+    }
+
+    /**
+     * Represents the value of a pixel as a trio of 32-bit integer values.
+     */
+    record Int3(int i1, int i2, int i3) implements Pixel.Int {
+
+        public long unsignedI1() {
+            return java.lang.Integer.toUnsignedLong(i1);
+        }
+
+        public long unsignedI2() {
+            return java.lang.Integer.toUnsignedLong(i2);
+        }
+
+        public long unsignedI3() {
+            return java.lang.Integer.toUnsignedLong(i3);
+        }
+    }
+
+    /**
+     * Represents the value of a pixel as an arbitrary number of 32-bit integer values.
+     */
+    record IntN(int[] values) implements Pixel.Int {
+    }
+
+    sealed interface Float extends Extension {
     }
 
     /**
@@ -196,6 +316,18 @@ public sealed interface Pixel {
      *
      * <p>These are typically used in extensions for storing measurements (e.g. elevations) taken on grids as images.
      */
-    record Float(float value) implements Pixel.Extension {
+    record Float1(float value) implements Pixel.Float {
+    }
+
+    /**
+     * Represents the value of a pixel as a trio of 32-bit float values.
+     */
+    record Float3(float f1, float f2, float f3) implements Pixel.Float {
+    }
+
+    /**
+     * Represents the value of a pixel as an arbitrary number of 32-bit float values.
+     */
+    record FloatN(float[] values) implements Pixel.Float {
     }
 }

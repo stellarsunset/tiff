@@ -1,11 +1,14 @@
 package com.stellarsunset.tiff.baseline.tag;
 
-public final class Arrays {
+/**
+ * Keep package private to keep off client classpath.
+ */
+final class Arrays {
 
     private Arrays() {
     }
 
-    public static int[] toUnsignedIntArray(short[] shorts) {
+    static int[] toUnsignedIntArray(short[] shorts) {
         int[] ints = new int[shorts.length];
         for (int i = 0; i < shorts.length; i++) {
             ints[i] = Short.toUnsignedInt(shorts[i]);
@@ -13,7 +16,7 @@ public final class Arrays {
         return ints;
     }
 
-    public static long[] toUnsignedLongArray(short[] shorts) {
+    static long[] toUnsignedLongArray(short[] shorts) {
         long[] longs = new long[shorts.length];
         for (int i = 0; i < shorts.length; i++) {
             longs[i] = Short.toUnsignedLong(shorts[i]);
@@ -21,7 +24,7 @@ public final class Arrays {
         return longs;
     }
 
-    public static long[] toUnsignedLongArray(int[] ints) {
+    static long[] toUnsignedLongArray(int[] ints) {
         long[] longs = new long[ints.length];
         for (int i = 0; i < ints.length; i++) {
             longs[i] = Integer.toUnsignedLong(ints[i]);

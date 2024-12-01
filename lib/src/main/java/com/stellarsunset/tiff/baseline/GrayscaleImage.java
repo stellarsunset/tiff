@@ -119,13 +119,13 @@ public sealed interface GrayscaleImage extends BaselineImage {
             return switch (ShadesOfGray.from(ifd)) {
                 case N16 -> new Grayscale4Image(
                         Interpretation.from(ifd),
-                        ImageDimensions.from(ifd),
+                        ImageDimensions.get(ifd),
                         Resolution.from(ifd),
                         bytes.bytes()
                 );
                 case N256 -> new Grayscale8Image(
                         Interpretation.from(ifd),
-                        ImageDimensions.from(ifd),
+                        ImageDimensions.get(ifd),
                         Resolution.from(ifd),
                         bytes.bytes()
                 );

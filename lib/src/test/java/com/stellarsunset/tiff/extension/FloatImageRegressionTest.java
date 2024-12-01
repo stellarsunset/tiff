@@ -1,14 +1,13 @@
 package com.stellarsunset.tiff.extension;
 
 import com.stellarsunset.tiff.*;
-import com.stellarsunset.tiff.baseline.StripInfo;
+import com.stellarsunset.tiff.baseline.RasterHelpers;
 import com.stellarsunset.tiff.baseline.tag.BitsPerSample;
 import com.stellarsunset.tiff.baseline.tag.Compression;
 import com.stellarsunset.tiff.baseline.tag.PhotometricInterpretation;
-import com.stellarsunset.tiff.extension.tag.GeoKeyDirectory;
+import com.stellarsunset.tiff.extension.FloatImage.Float1Image;
 import mil.nga.tiff.Rasters;
 import mil.nga.tiff.TiffReader;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -20,12 +19,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FloatImageRegressionTest {
 
-    private static final File FILE = tiffFile("extension/USGS_1_n52e177.tif");
+    /**
+     * This is USGS elevation data, which is the only reason I wrote this library...
+     */
+    private static final File FILE = tiffFile("extension/float-predictor-tiled.tif");
 
     @Test
-    @Disabled("Tiling not ready for float images")
     void test() {
-        try (TiffFile file = TiffFileReader.withMaker(Image.Maker.lazy(FloatImage.maker())).read(FileChannel.open(FILE.toPath()))) {
+        try (TiffFile file = TiffFileReader.withMaker(DataImage.maker()).read(FileChannel.open(FILE.toPath()))) {
 
             TiffHeader header = file.header();
 
@@ -50,44 +51,30 @@ class FloatImageRegressionTest {
                     () -> assertEquals(1, photometricInterpretation, "Photometric Interpretation")
             );
 
-            GeoKeyDirectory gkd = GeoKeyDirectory.getRequired(ifd);
-
             Image image = file.image(0);
             Rasters rasters = readRasters();
 
-            if (unwrap(image) instanceof FloatImage f) {
+            if (unwrap(image) instanceof Float1Image f) {
+
+                TileInfo tileInfo = TileInfo.getRequired(ifd);
 
                 assertAll(
                         "Check Image(0) contents.",
                         () -> assertEquals(rasters.getHeight(), f.dimensions().length(), "Image Length Matches"),
-                        () -> assertEquals(3612, f.dimensions().length(), "Image Length (256)"),
+                        () -> assertEquals(1812, f.dimensions().length(), "Image Length (1812)"),
                         () -> assertEquals(rasters.getWidth(), f.dimensions().width(), "Image Width Matches"),
-                        () -> assertEquals(3612, f.dimensions().width(), "Image Width (256)"),
-                        () -> assertEquals(32, StripInfo.getRequired(ifd).rowsPerStrip(), "Rows Per Strip")
+                        () -> assertEquals(1812, f.dimensions().width(), "Image Width (1812)"),
+                        () -> assertEquals(512, tileInfo.length(), "Tile Length"),
+                        () -> assertEquals(512, tileInfo.width(), "Tile Width")
                 );
 
-                assertAll(
-                        "Check Image(0) pixels.",
-                        () -> comparePixelValues(f, rasters, 0, 0),
-                        () -> comparePixelValues(f, rasters, 20, 100),
-                        () -> comparePixelValues(f, rasters, 150, 200),
-                        () -> comparePixelValues(f, rasters, 255, 255)
-                );
+                assertArrayEquals(RasterHelpers.toFloatRaster(rasters), f.data(), "Raster Data");
             } else {
                 fail("Image not of the correct type, image type was: " + unwrap(image).getClass().getSimpleName());
             }
         } catch (Exception e) {
             fail(e);
         }
-    }
-
-    private void comparePixelValues(FloatImage image, Rasters rasters, int row, int column) {
-
-        Number[] rPixel = rasters.getPixel(column, row);
-        assertEquals(1, rPixel.length, "Should return a single number for the BiLevel image pixel value.");
-
-        //Pixel.Grayscale8 iPixel = image.valueAt(row, column);
-        //assertEquals(Short.toUnsignedInt((Short) rPixel[0]), Byte.toUnsignedInt(iPixel.value()), String.format("Should contain identical values at the respective pixel (%d, %d).", row, column));
     }
 
     private Rasters readRasters() throws IOException {

@@ -2,6 +2,9 @@ package com.stellarsunset.tiff;
 
 import com.stellarsunset.tiff.baseline.*;
 import com.stellarsunset.tiff.extension.ExtensionImage;
+import com.stellarsunset.tiff.extension.FloatImage;
+import com.stellarsunset.tiff.extension.IntImage;
+import com.stellarsunset.tiff.extension.ShortImage;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -30,6 +33,17 @@ class SanityCheckTest {
                 }
             }
             case ExtensionImage extensionImage -> {
+                switch (extensionImage) {
+                    case ShortImage s -> {
+                    }
+                    case IntImage i -> {
+                    }
+                    case FloatImage f -> {
+                    }
+                    default -> {
+                        throw new IllegalArgumentException();
+                    }
+                }
             }
         }
     }

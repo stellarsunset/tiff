@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
-public sealed interface Image permits Image.Unknown, Image.Lazy, BaselineImage, ExtensionImage {
+public sealed interface Image permits Image.Lazy, Image.Unknown, BaselineImage, ExtensionImage {
 
     /**
      * Handle for an unknown image type detected in a file.

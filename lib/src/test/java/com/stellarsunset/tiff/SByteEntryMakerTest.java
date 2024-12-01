@@ -18,7 +18,7 @@ class SByteEntryMakerTest {
 
         IfdEntryMaker.SByte maker = new IfdEntryMaker.SByte(
                 new BytesReader(channel),
-                ArrayBytesAdapter.of(ByteOrder.BIG_ENDIAN)
+                BytesAdapter.of(ByteOrder.BIG_ENDIAN)
         );
 
         byte[] values = maker.makeEntry((short) 0, 5, 0)
@@ -36,7 +36,7 @@ class SByteEntryMakerTest {
 
         IfdEntryMaker.SByte maker = new IfdEntryMaker.SByte(
                 new BytesReader(channel),
-                ArrayBytesAdapter.of(ByteOrder.LITTLE_ENDIAN)
+                BytesAdapter.of(ByteOrder.LITTLE_ENDIAN)
         );
 
         byte[] values = maker.makeEntry((short) 0, 5, 0)

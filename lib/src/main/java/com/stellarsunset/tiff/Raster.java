@@ -32,6 +32,18 @@ public sealed interface Raster {
     }
 
     /**
+     * Represents a {@link Raster} as a 2D matrix of shorts. There may be multiple shorts per pixel.
+     */
+    record Shorts(short[][] shorts, int componentsPerPixel) implements Raster {
+    }
+
+    /**
+     * Represents a {@link Raster} as a 2D matrix of ints. There may be multiple ints per pixel.
+     */
+    record Ints(int[][] ints, int componentsPerPixel) implements Raster {
+    }
+
+    /**
      * Represents a {@link Raster} as a 2D matrix of floats. There may be multiple floats per pixel.
      */
     record Floats(float[][] floats, int componentsPerPixel) implements Raster {
@@ -41,6 +53,14 @@ public sealed interface Raster {
 
         static ByteTilesOrStrips bytes(int componentsPerPixel) {
             return new ByteTilesOrStrips(componentsPerPixel);
+        }
+
+        static ShortTilesOrStrips shorts(int componentsPerPixel) {
+            return new ShortTilesOrStrips(componentsPerPixel);
+        }
+
+        static IntTilesOrStrips ints(int componentsPerPixel) {
+            return new IntTilesOrStrips(componentsPerPixel);
         }
 
         static FloatTilesOrStrips floats(int componentsPerPixel) {
@@ -82,18 +102,20 @@ public sealed interface Raster {
                 Compressor compressor = Compressors.getInstance()
                         .compressorFor(Compression.get(ifd));
 
-                ImageDimensions imageDimensions = ImageDimensions.from(ifd);
+                ImageDimensions imageDimensions = ImageDimensions.get(ifd);
                 StripInfo stripInfo = StripInfo.getRequired(ifd);
 
                 ImageDimensions.Int intImageDimensions = imageDimensions.asIntInfo();
                 StripInfo.Int intStripInfo = stripInfo.asIntInfo();
 
-                byte[][] bytes = new byte[intImageDimensions.length()][intImageDimensions.width() * componentsPerPixel];
+                int imageWidth = intImageDimensions.width();
+                int imageWidthBytes = imageWidth * componentsPerPixel;
+
+                byte[][] bytes = new byte[intImageDimensions.length()][imageWidthBytes];
 
                 int nOffsets = stripInfo.stripOffsets().length;
                 int rowsPerStrip = intStripInfo.rowsPerStrip();
 
-                int imageWidth = intImageDimensions.width();
                 int widthBytes = imageWidth * componentsPerPixel;
 
                 DifferencingPredictor predictor = DifferencingPredictor.get(ifd);
@@ -106,7 +128,7 @@ public sealed interface Raster {
                     ByteBuffer buffer = reader.readBytes(stripOffset, stripBytes);
                     byte[] uncompressedStrip = compressor.decompress(buffer.array(), adapter);
 
-                    int rowsInStrip = uncompressedStrip.length / imageWidth / componentsPerPixel;
+                    int rowsInStrip = uncompressedStrip.length / widthBytes;
                     if (i != nOffsets - 1) {
                         checkArgument(rowsInStrip == rowsPerStrip,
                                 "Incorrect number of rows found (%s) in strip# (%s).", rowsInStrip, i);
@@ -123,7 +145,11 @@ public sealed interface Raster {
                                 stripRowStart + widthBytes
                         );
 
-                        predictor.unpack(bytes[imageRow]);
+                        predictor.unpack(
+                                BufferView.bytes(
+                                        ByteBuffer.wrap(bytes[imageRow]).order(order)
+                                )
+                        );
                     }
                 }
 
@@ -142,17 +168,18 @@ public sealed interface Raster {
                 Compressor compressor = Compressors.getInstance()
                         .compressorFor(Compression.get(ifd));
 
-                ImageDimensions imageDimensions = ImageDimensions.from(ifd);
+                ImageDimensions imageDimensions = ImageDimensions.get(ifd);
                 TileInfo tileInfo = TileInfo.getRequired(ifd);
 
                 ImageDimensions.Int intImageDimensions = imageDimensions.asIntInfo();
                 TileInfo.Int intTileInfo = tileInfo.asIntInfo();
 
-                byte[][] bytes = new byte[intImageDimensions.length()][intImageDimensions.width() * componentsPerPixel];
+                int imageWidth = intImageDimensions.width();
+                int imageWidthBytes = imageWidth * componentsPerPixel;
+
+                byte[][] bytes = new byte[intImageDimensions.length()][imageWidthBytes];
 
                 int nOffsets = tileInfo.offsets().length;
-
-                int imageWidthBytes = intImageDimensions.width() * componentsPerPixel;
                 int tileWidthBytes = intTileInfo.width() * componentsPerPixel;
 
                 int oRow = 0;
@@ -188,7 +215,11 @@ public sealed interface Raster {
                                 numberOfBytes
                         );
 
-                        predictor.unpack(rowBytes, oCol, numberOfBytes);
+                        predictor.unpack(
+                                BufferView.bytes(
+                                        ByteBuffer.wrap(rowBytes, oCol, numberOfBytes).order(order)
+                                )
+                        );
                     }
 
                     oCol += tileWidthBytes;
@@ -203,6 +234,322 @@ public sealed interface Raster {
                 checkArgument(oRow > intImageDimensions.length(), "Should increment oRow past the end of the image, %s", oRow);
 
                 return new Bytes(bytes, componentsPerPixel);
+            }
+        }
+
+        record ShortTilesOrStrips(int componentsPerPixel) implements Reader {
+
+            @Override
+            public Shorts readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
+                if (StripInfo.getOptional(ifd).isPresent()) {
+                    return new ShortStrips(componentsPerPixel).readRaster(channel, order, ifd);
+                }
+                if (TileInfo.getOptional(ifd).isPresent()) {
+                    return new ShortTiles(componentsPerPixel).readRaster(channel, order, ifd);
+                }
+                throw new IllegalArgumentException(
+                        "Unable to read short (uint16) contents of file, neither strip or tile layout was found."
+                );
+            }
+        }
+
+        record ShortStrips(int componentsPerPixel) implements Reader {
+
+            @Override
+            public Shorts readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
+
+                BytesAdapter adapter = BytesAdapter.of(order);
+
+                BytesReader reader = new BytesReader(channel);
+
+                Compressor compressor = Compressors.getInstance()
+                        .compressorFor(Compression.get(ifd));
+
+                ImageDimensions imageDimensions = ImageDimensions.get(ifd);
+                StripInfo stripInfo = StripInfo.getRequired(ifd);
+
+                ImageDimensions.Int intImageDimensions = imageDimensions.asIntInfo();
+                StripInfo.Int intStripInfo = stripInfo.asIntInfo();
+
+                int imageWidth = intImageDimensions.width();
+                int imageWidthShorts = imageWidth * componentsPerPixel;
+
+                short[][] shorts = new short[intImageDimensions.length()][imageWidthShorts];
+
+                int nOffsets = stripInfo.stripOffsets().length;
+                int rowsPerStrip = intStripInfo.rowsPerStrip();
+
+                int widthBytes = imageWidthShorts * Short.BYTES;
+
+                DifferencingPredictor predictor = DifferencingPredictor.get(ifd);
+
+                for (int i = 0; i < nOffsets; i++) {
+
+                    long stripOffset = stripInfo.stripOffsets()[i];
+                    int stripBytes = intStripInfo.stripByteCounts()[i];
+
+                    ByteBuffer buffer = reader.readBytes(stripOffset, stripBytes);
+                    byte[] uncompressedStrip = compressor.decompress(buffer.array(), adapter);
+
+                    int rowsInStrip = uncompressedStrip.length / widthBytes;
+                    if (i != nOffsets - 1) {
+                        checkArgument(rowsInStrip == rowsPerStrip,
+                                "Incorrect number of rows found (%s) not (%s) in strip# (%s).", rowsInStrip, rowsPerStrip, i);
+                    }
+
+                    for (int stripRow = 0; stripRow < rowsInStrip; stripRow++) {
+
+                        int imageRow = i * rowsPerStrip + stripRow;
+                        int stripRowStart = stripRow * widthBytes;
+
+                        var view = BufferView.shorts(ByteBuffer.wrap(uncompressedStrip, stripRowStart, widthBytes).order(order));
+                        predictor.unpack(view);
+
+                        shorts[imageRow] = view.readShorts(0, imageWidthShorts);
+                    }
+                }
+
+                return new Shorts(shorts, componentsPerPixel);
+            }
+        }
+
+        record ShortTiles(int componentsPerPixel) implements Reader {
+
+            @Override
+            public Shorts readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
+
+                BytesAdapter adapter = BytesAdapter.of(order);
+
+                BytesReader reader = new BytesReader(channel);
+
+                Compressor compressor = Compressors.getInstance()
+                        .compressorFor(Compression.get(ifd));
+
+                ImageDimensions imageDimensions = ImageDimensions.get(ifd);
+                TileInfo tileInfo = TileInfo.getRequired(ifd);
+
+                ImageDimensions.Int intImageDimensions = imageDimensions.asIntInfo();
+                TileInfo.Int intTileInfo = tileInfo.asIntInfo();
+
+                int imageWidthShorts = intImageDimensions.width() * componentsPerPixel;
+                int imageWidthBytes = imageWidthShorts * Short.BYTES;
+
+                short[][] shorts = new short[intImageDimensions.length()][imageWidthShorts];
+
+                int nOffsets = tileInfo.offsets().length;
+
+                // The current x,y coordinate of the upper-left corner of the tile in the overall
+                // image array
+                int oRow = 0;
+                int oCol = 0;
+
+                int tileWidthShorts = intTileInfo.width() * componentsPerPixel;
+                int tileWidthBytes = tileWidthShorts * Short.BYTES;
+
+                DifferencingPredictor predictor = DifferencingPredictor.get(ifd);
+
+                for (int i = 0; i < nOffsets; i++) {
+
+                    long tileOffset = tileInfo.offsets()[i];
+                    int tileBytes = intTileInfo.byteCounts()[i];
+
+                    ByteBuffer buffer = reader.readBytes(tileOffset, tileBytes);
+                    byte[] uncompressedTile = compressor.decompress(buffer.array(), adapter);
+
+                    checkArgument(uncompressedTile.length == tileWidthBytes * intTileInfo.length(),
+                            "Incorrect number of uncompressed bytes in tile, (%s) for tile w (%s) and l (%s)",
+                            uncompressedTile.length,
+                            tileInfo.width(),
+                            tileInfo.length()
+                    );
+
+                    for (int row = 0; row < intTileInfo.length() && oRow + row < intImageDimensions.length(); row++) {
+
+                        int tileRowStart = row * tileWidthBytes;
+
+                        var view = BufferView.shorts(ByteBuffer.wrap(uncompressedTile, tileRowStart, tileWidthBytes).order(order));
+                        predictor.unpack(view);
+
+                        short[] fRow = view.readShorts(0, tileWidthShorts);
+
+                        int numberOfShorts = Math.min(tileWidthShorts, imageWidthShorts - oCol);
+
+                        System.arraycopy(
+                                fRow,
+                                0,
+                                shorts[oRow + row],
+                                oCol,
+                                numberOfShorts
+                        );
+                    }
+
+                    oCol += tileWidthShorts;
+
+                    if (oCol >= imageWidthShorts) {
+                        oRow += intTileInfo.length();
+                        oCol = 0;
+                    }
+                }
+
+                return new Shorts(shorts, componentsPerPixel);
+            }
+        }
+
+        record IntTilesOrStrips(int componentsPerPixel) implements Reader {
+
+            @Override
+            public Ints readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
+                if (StripInfo.getOptional(ifd).isPresent()) {
+                    return new IntStrips(componentsPerPixel).readRaster(channel, order, ifd);
+                }
+                if (TileInfo.getOptional(ifd).isPresent()) {
+                    return new IntTiles(componentsPerPixel).readRaster(channel, order, ifd);
+                }
+                throw new IllegalArgumentException(
+                        "Unable to read integer (uint32) contents of file, neither strip or tile layout was found."
+                );
+            }
+        }
+
+        record IntStrips(int componentsPerPixel) implements Reader {
+
+            @Override
+            public Ints readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
+
+                BytesAdapter adapter = BytesAdapter.of(order);
+
+                BytesReader reader = new BytesReader(channel);
+
+                Compressor compressor = Compressors.getInstance()
+                        .compressorFor(Compression.get(ifd));
+
+                ImageDimensions imageDimensions = ImageDimensions.get(ifd);
+                StripInfo stripInfo = StripInfo.getRequired(ifd);
+
+                ImageDimensions.Int intImageDimensions = imageDimensions.asIntInfo();
+                StripInfo.Int intStripInfo = stripInfo.asIntInfo();
+
+                int imageWidth = intImageDimensions.width();
+                int imageWidthInts = imageWidth * componentsPerPixel;
+
+                int[][] ints = new int[intImageDimensions.length()][imageWidthInts];
+
+                int nOffsets = stripInfo.stripOffsets().length;
+                int rowsPerStrip = intStripInfo.rowsPerStrip();
+
+                int widthBytes = imageWidthInts * Integer.BYTES;
+
+                DifferencingPredictor predictor = DifferencingPredictor.get(ifd);
+
+                for (int i = 0; i < nOffsets; i++) {
+
+                    long stripOffset = stripInfo.stripOffsets()[i];
+                    int stripBytes = intStripInfo.stripByteCounts()[i];
+
+                    ByteBuffer buffer = reader.readBytes(stripOffset, stripBytes);
+                    byte[] uncompressedStrip = compressor.decompress(buffer.array(), adapter);
+
+                    int rowsInStrip = uncompressedStrip.length / imageWidth / Integer.BYTES / componentsPerPixel;
+                    if (i != nOffsets - 1) {
+                        checkArgument(rowsInStrip == rowsPerStrip,
+                                "Incorrect number of rows found (%s) not (%s) in strip# (%s).", rowsInStrip, rowsPerStrip, i);
+                    }
+
+                    for (int stripRow = 0; stripRow < rowsInStrip; stripRow++) {
+
+                        int imageRow = i * rowsPerStrip + stripRow;
+                        int stripRowStart = stripRow * widthBytes;
+
+                        var view = BufferView.ints(ByteBuffer.wrap(uncompressedStrip, stripRowStart, widthBytes).order(order));
+                        predictor.unpack(view);
+
+                        ints[imageRow] = view.readInts(0, imageWidthInts);
+                    }
+                }
+
+                return new Ints(ints, componentsPerPixel);
+            }
+        }
+
+        record IntTiles(int componentsPerPixel) implements Reader {
+
+            @Override
+            public Ints readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
+
+                BytesAdapter adapter = BytesAdapter.of(order);
+
+                BytesReader reader = new BytesReader(channel);
+
+                Compressor compressor = Compressors.getInstance()
+                        .compressorFor(Compression.get(ifd));
+
+                ImageDimensions imageDimensions = ImageDimensions.get(ifd);
+                TileInfo tileInfo = TileInfo.getRequired(ifd);
+
+                ImageDimensions.Int intImageDimensions = imageDimensions.asIntInfo();
+                TileInfo.Int intTileInfo = tileInfo.asIntInfo();
+
+                int imageWidthInts = intImageDimensions.width() * componentsPerPixel;
+                int imageWidthBytes = imageWidthInts * Integer.BYTES;
+
+                int[][] ints = new int[intImageDimensions.length()][imageWidthInts];
+
+                int nOffsets = tileInfo.offsets().length;
+
+                // The current x,y coordinate of the upper-left corner of the tile in the overall
+                // image array
+                int oRow = 0;
+                int oCol = 0;
+
+                int tileWidthInts = intTileInfo.width() * componentsPerPixel;
+                int tileWidthBytes = tileWidthInts * Integer.BYTES;
+
+                DifferencingPredictor predictor = DifferencingPredictor.get(ifd);
+
+                for (int i = 0; i < nOffsets; i++) {
+
+                    long tileOffset = tileInfo.offsets()[i];
+                    int tileBytes = intTileInfo.byteCounts()[i];
+
+                    ByteBuffer buffer = reader.readBytes(tileOffset, tileBytes);
+                    byte[] uncompressedTile = compressor.decompress(buffer.array(), adapter);
+
+                    checkArgument(uncompressedTile.length == tileWidthBytes * intTileInfo.length(),
+                            "Incorrect number of uncompressed bytes in tile, (%s) for tile w (%s) and l (%s)",
+                            uncompressedTile.length,
+                            tileInfo.width(),
+                            tileInfo.length()
+                    );
+
+                    for (int row = 0; row < intTileInfo.length() && oRow + row < intImageDimensions.length(); row++) {
+
+                        int tileRowStart = row * tileWidthBytes;
+
+                        var view = BufferView.ints(ByteBuffer.wrap(uncompressedTile, tileRowStart, tileWidthBytes).order(order));
+                        predictor.unpack(view);
+
+                        int[] fRow = view.readInts(0, imageWidthInts);
+
+                        int numberOfInts = Math.min(tileWidthInts, imageWidthInts - oCol);
+
+                        System.arraycopy(
+                                fRow,
+                                0,
+                                ints[oRow + row],
+                                oCol,
+                                numberOfInts
+                        );
+                    }
+
+                    oCol += tileWidthInts;
+
+                    if (oCol >= imageWidthInts) {
+                        oRow += intTileInfo.length();
+                        oCol = 0;
+                    }
+                }
+
+                return new Ints(ints, componentsPerPixel);
             }
         }
 
@@ -224,32 +571,33 @@ public sealed interface Raster {
 
         record FloatStrips(int componentsPerPixel) implements Reader {
 
-            private static final int BYTES_PER_FLOAT = 4;
-
             @Override
             public Floats readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
                 BytesAdapter adapter = BytesAdapter.of(order);
-                ArrayBytesAdapter arrayAdapter = ArrayBytesAdapter.of(order);
 
                 BytesReader reader = new BytesReader(channel);
 
                 Compressor compressor = Compressors.getInstance()
                         .compressorFor(Compression.get(ifd));
 
-                ImageDimensions imageDimensions = ImageDimensions.from(ifd);
+                ImageDimensions imageDimensions = ImageDimensions.get(ifd);
                 StripInfo stripInfo = StripInfo.getRequired(ifd);
 
                 ImageDimensions.Int intImageDimensions = imageDimensions.asIntInfo();
                 StripInfo.Int intStripInfo = stripInfo.asIntInfo();
 
-                float[][] floats = new float[intImageDimensions.length()][intImageDimensions.width() * componentsPerPixel];
+                int imageWidth = intImageDimensions.width();
+                int imageWidthFloats = imageWidth * componentsPerPixel;
+
+                float[][] floats = new float[intImageDimensions.length()][imageWidthFloats];
 
                 int nOffsets = stripInfo.stripOffsets().length;
                 int rowsPerStrip = intStripInfo.rowsPerStrip();
 
-                int imageWidth = intImageDimensions.width();
-                int widthBytes = imageWidth * BYTES_PER_FLOAT * componentsPerPixel;
+                int widthBytes = imageWidthFloats * Float.BYTES;
+
+                DifferencingPredictor predictor = DifferencingPredictor.get(ifd);
 
                 for (int i = 0; i < nOffsets; i++) {
 
@@ -259,7 +607,7 @@ public sealed interface Raster {
                     ByteBuffer buffer = reader.readBytes(stripOffset, stripBytes);
                     byte[] uncompressedStrip = compressor.decompress(buffer.array(), adapter);
 
-                    int rowsInStrip = uncompressedStrip.length / imageWidth / BYTES_PER_FLOAT / componentsPerPixel;
+                    int rowsInStrip = uncompressedStrip.length / imageWidth / Float.BYTES / componentsPerPixel;
                     if (i != nOffsets - 1) {
                         checkArgument(rowsInStrip == rowsPerStrip,
                                 "Incorrect number of rows found (%s) not (%s) in strip# (%s).", rowsInStrip, rowsPerStrip, i);
@@ -270,11 +618,11 @@ public sealed interface Raster {
                         int imageRow = i * rowsPerStrip + stripRow;
                         int stripRowStart = stripRow * widthBytes;
 
-                        floats[imageRow] = arrayAdapter.readFloats(
-                                ByteBuffer.wrap(uncompressedStrip, stripRowStart, stripRowStart + widthBytes),
-                                0,
-                                imageWidth
-                        );
+                        var bytes = ByteBuffer.wrap(uncompressedStrip, stripRowStart, widthBytes).order(order);
+                        predictor.unpack(BufferView.bytes(bytes));
+
+                        floats[imageRow] = BufferView.floats(bytes.order(order))
+                                .readFloats(0, imageWidthFloats);
                     }
                 }
 
@@ -284,24 +632,26 @@ public sealed interface Raster {
 
         record FloatTiles(int componentsPerPixel) implements Reader {
 
-            private static final int BYTES_PER_FLOAT = 4;
-
             @Override
             public Floats readRaster(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
                 BytesAdapter adapter = BytesAdapter.of(order);
+
                 BytesReader reader = new BytesReader(channel);
 
                 Compressor compressor = Compressors.getInstance()
                         .compressorFor(Compression.get(ifd));
 
-                ImageDimensions imageDimensions = ImageDimensions.from(ifd);
+                ImageDimensions imageDimensions = ImageDimensions.get(ifd);
                 TileInfo tileInfo = TileInfo.getRequired(ifd);
 
                 ImageDimensions.Int intImageDimensions = imageDimensions.asIntInfo();
                 TileInfo.Int intTileInfo = tileInfo.asIntInfo();
 
-                float[][] floats = new float[intImageDimensions.length()][intImageDimensions.width() * componentsPerPixel];
+                int imageWidthFloats = intImageDimensions.width() * componentsPerPixel;
+                int imageWidthBytes = imageWidthFloats * Float.BYTES;
+
+                float[][] floats = new float[intImageDimensions.length()][imageWidthFloats];
 
                 int nOffsets = tileInfo.offsets().length;
 
@@ -309,6 +659,11 @@ public sealed interface Raster {
                 // image array
                 int oRow = 0;
                 int oCol = 0;
+
+                int tileWidthFloats = intTileInfo.width() * componentsPerPixel;
+                int tileWidthBytes = tileWidthFloats * Float.BYTES;
+
+                DifferencingPredictor predictor = DifferencingPredictor.get(ifd);
 
                 for (int i = 0; i < nOffsets; i++) {
 
@@ -318,28 +673,39 @@ public sealed interface Raster {
                     ByteBuffer buffer = reader.readBytes(tileOffset, tileBytes);
                     byte[] uncompressedTile = compressor.decompress(buffer.array(), adapter);
 
-                    checkArgument(uncompressedTile.length == tileInfo.width() * tileInfo.length() * componentsPerPixel,
+                    checkArgument(uncompressedTile.length == tileWidthBytes * intTileInfo.length(),
                             "Incorrect number of uncompressed bytes in tile, (%s) for tile w (%s) and l (%s)",
                             uncompressedTile.length,
                             tileInfo.width(),
                             tileInfo.length()
                     );
 
-                    for (int row = 0; row < tileInfo.width(); row++) {
-//                        System.arraycopy(
-//                                uncompressedTile,
-//                                row * (int) tileInfo.width(),
-//                                bytes[oRow + row],
-//                                oCol,
-//                                (int) tileInfo.width()
-//                        );
+                    for (int row = 0; row < intTileInfo.length() && oRow + row < intImageDimensions.length(); row++) {
+
+                        int tileRowStart = row * tileWidthBytes;
+
+                        var bytes = ByteBuffer.wrap(uncompressedTile, tileRowStart, tileWidthBytes).order(order);
+                        predictor.unpack(BufferView.bytes(bytes));
+
+                        float[] fRow = BufferView.floats(bytes.order(order))
+                                .readFloats(0, tileWidthFloats);
+
+                        int numberOfFloats = Math.min(tileWidthFloats, imageWidthFloats - oCol);
+
+                        System.arraycopy(
+                                fRow,
+                                0,
+                                floats[oRow + row],
+                                oCol,
+                                numberOfFloats
+                        );
                     }
 
-                    if (oRow + intTileInfo.width() > intImageDimensions.width()) {
-                        oRow = 0;
-                        oCol += intTileInfo.length();
-                    } else {
-                        oRow += intTileInfo.width();
+                    oCol += tileWidthFloats;
+
+                    if (oCol >= imageWidthFloats) {
+                        oRow += intTileInfo.length();
+                        oCol = 0;
                     }
                 }
 
