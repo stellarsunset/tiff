@@ -618,7 +618,7 @@ public sealed interface Raster {
                         int imageRow = i * rowsPerStrip + stripRow;
                         int stripRowStart = stripRow * widthBytes;
 
-                        var bytes = ByteBuffer.wrap(uncompressedStrip, stripRowStart, widthBytes);
+                        var bytes = ByteBuffer.wrap(uncompressedStrip, stripRowStart, widthBytes).order(order);
                         predictor.unpack(BufferView.bytes(bytes));
 
                         floats[imageRow] = BufferView.floats(bytes.order(order))

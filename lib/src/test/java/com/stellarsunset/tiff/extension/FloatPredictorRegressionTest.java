@@ -10,7 +10,6 @@ import com.stellarsunset.tiff.extension.FloatImage.Float3Image;
 import com.stellarsunset.tiff.extension.tag.PlanarConfiguration;
 import mil.nga.tiff.Rasters;
 import mil.nga.tiff.TiffReader;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -22,10 +21,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FloatPredictorRegressionTest {
 
-    private static final File FILE = tiffFile("extension/float-predictor-rgb.tif");
+    private static final File FILE = tiffFile("extension/float-predictor-strips.tif");
 
     @Test
-    @Disabled("Differencing predictor not supported for floating point images")
     void test() {
         try (TiffFile file = TiffFileReader.withMaker(DataImage.maker()).read(FileChannel.open(FILE.toPath()))) {
 

@@ -258,7 +258,7 @@ public interface DifferencingPredictor {
 
         @Override
         public void pack(BufferView buffer) {
-            horizontal.pack(buffer);
+            throw new UnsupportedOperationException("Not yet implemented.");
         }
     }
 }
