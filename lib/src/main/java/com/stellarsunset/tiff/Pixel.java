@@ -169,15 +169,15 @@ public sealed interface Pixel {
     record Rgb(byte r, byte g, byte b) implements Pixel.Baseline {
 
         public int unsignedR() {
-            return java.lang.Short.toUnsignedInt(r);
+            return java.lang.Byte.toUnsignedInt(r);
         }
 
         public int unsignedG() {
-            return java.lang.Short.toUnsignedInt(g);
+            return java.lang.Byte.toUnsignedInt(g);
         }
 
         public int unsignedB() {
-            return java.lang.Short.toUnsignedInt(b);
+            return java.lang.Byte.toUnsignedInt(b);
         }
     }
 
@@ -199,12 +199,28 @@ public sealed interface Pixel {
      * <p>Most {@link Pixel.Baseline} types can be represented a {@link Byte1} or {@link Byte3} types.
      */
     record Byte1(byte value) implements Pixel.Byte {
+
+        public int unsignedValue() {
+            return java.lang.Byte.toUnsignedInt(value);
+        }
     }
 
     /**
      * Represents the value of a pixel as a trio of 8-bit integer (byte) values.
      */
-    record Byte3(byte s1, byte s2, byte s3) implements Pixel.Byte {
+    record Byte3(byte b1, byte b2, byte b3) implements Pixel.Byte {
+
+        public int unsignedB1() {
+            return java.lang.Byte.toUnsignedInt(b1);
+        }
+
+        public int unsignedB2() {
+            return java.lang.Byte.toUnsignedInt(b2);
+        }
+
+        public int unsignedB3() {
+            return java.lang.Byte.toUnsignedInt(b3);
+        }
     }
 
     /**
@@ -223,12 +239,28 @@ public sealed interface Pixel {
      * <p>These are typically used in extensions for storing measurements (e.g. elevations) taken on grids as images.
      */
     record Short1(short value) implements Pixel.Short {
+
+        public int unsignedValue() {
+            return java.lang.Short.toUnsignedInt(value);
+        }
     }
 
     /**
      * Represents the value of a pixel as a trio of 16-bit integer values.
      */
     record Short3(short s1, short s2, short s3) implements Pixel.Short {
+
+        public int unsignedS1() {
+            return java.lang.Short.toUnsignedInt(s1);
+        }
+
+        public int unsignedS2() {
+            return java.lang.Short.toUnsignedInt(s2);
+        }
+
+        public int unsignedS3() {
+            return java.lang.Short.toUnsignedInt(s3);
+        }
     }
 
     /**
@@ -246,12 +278,28 @@ public sealed interface Pixel {
      * <p>These are typically used in extensions for storing measurements (e.g. elevations) taken on grids as images.
      */
     record Int1(int value) implements Pixel.Int {
+
+        public long unsignedValue() {
+            return Integer.toUnsignedLong(value);
+        }
     }
 
     /**
      * Represents the value of a pixel as a trio of 32-bit integer values.
      */
     record Int3(int i1, int i2, int i3) implements Pixel.Int {
+
+        public long unsignedI1() {
+            return java.lang.Integer.toUnsignedLong(i1);
+        }
+
+        public long unsignedI2() {
+            return java.lang.Integer.toUnsignedLong(i2);
+        }
+
+        public long unsignedI3() {
+            return java.lang.Integer.toUnsignedLong(i3);
+        }
     }
 
     /**

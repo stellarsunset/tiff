@@ -1,4 +1,4 @@
-package com.stellarsunset.tiff.baseline.tag;
+package com.stellarsunset.tiff.extension.tag;
 
 /**
  * Keep package private to keep off client classpath.

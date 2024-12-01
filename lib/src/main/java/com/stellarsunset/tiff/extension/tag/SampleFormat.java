@@ -2,7 +2,6 @@ package com.stellarsunset.tiff.extension.tag;
 
 import com.stellarsunset.tiff.Ifd;
 import com.stellarsunset.tiff.Ifd.Entry;
-import com.stellarsunset.tiff.baseline.tag.Arrays;
 import com.stellarsunset.tiff.baseline.tag.SamplesPerPixel;
 import com.stellarsunset.tiff.baseline.tag.UnsupportedTypeForTagException;
 
