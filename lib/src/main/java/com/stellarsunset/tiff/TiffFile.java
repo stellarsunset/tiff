@@ -1,5 +1,6 @@
 package com.stellarsunset.tiff;
 
+import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -42,7 +43,7 @@ public record TiffFile(SeekableByteChannel channel, TiffHeader header, Ifd[] ifd
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         channel.close();
     }
 }

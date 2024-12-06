@@ -109,12 +109,12 @@ int rasterType = RasterType.getRequired(gkd);
 int modelType = ModelType.getRequired(gkd);
 ```
 
-GeoKeys allow clients to geo-reference TIFF raster data, i.e. put pixels on a map. 
+GeoKeys allow clients to geo-reference TIFF raster data, i.e. put pixels on a map.
 
-Images are used to indicate land cover (e.g. Ice vs Open Water vs etc. in a Palette-Color image). Or may encode data such 
+Images are used to indicate land cover (e.g. Ice vs Open Water vs etc. in a Palette-Color image) or may encode data such
 as elevations in the raster.
 
-This library purposefully doesn't include a coordinate transform system so clients can pick one that suits their needs 
+This library purposefully doesn't include a coordinate transform system so clients can pick one that suits their needs
 without dependency conflicts.
 
 ## Notes

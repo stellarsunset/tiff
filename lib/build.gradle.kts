@@ -6,6 +6,7 @@ plugins {
     `java-library`
     jacoco
     id("com.vanniktech.maven.publish") version "0.28.0"
+    id("me.champeau.jmh") version "0.7.2"
 }
 
 repositories {
@@ -47,6 +48,10 @@ tasks.check {
     dependsOn(tasks.jacocoTestReport)
 }
 
+jmh {
+    threads = 4
+}
+
 mavenPublishing {
     configure(JavaLibrary(javadocJar = JavadocJar.Javadoc(), sourcesJar = true))
 
@@ -67,7 +72,6 @@ mavenPublishing {
         developers {
             developer {
                 id = "stellarsunset"
-                name = "Alex Cramer"
                 email = "stellarsunset@proton.me"
             }
         }
