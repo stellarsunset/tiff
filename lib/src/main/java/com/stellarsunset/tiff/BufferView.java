@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * of the given type (e.g. short, int, long) within that range (as opposed to the byte offset).
  *
  * <p>Together these classes prevents errors in callers like the following:
- * <pre>
+ * <pre>{@code
  *     /// populate an array of shorts from the buffer
  *     ByteBuffer buffer = ByteBuffer.wrap(...);
  *     short[] shorts = new short[numberOfShorts];
@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  *     byte b = buffer.get(5);
  *     // wrong, get requires an absolute index within the underlying array, so you'd have to use:
  *     b = buffer.get(offset + 5)
- * </pre>
+ * }</pre>
  */
 public sealed interface BufferView {
 

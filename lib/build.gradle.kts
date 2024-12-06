@@ -47,6 +47,10 @@ tasks.check {
     dependsOn(tasks.jacocoTestReport)
 }
 
+tasks.javadoc {
+    options.outputLevel = JavadocOutputLevel.QUIET
+}
+
 mavenPublishing {
     configure(JavaLibrary(javadocJar = JavadocJar.Javadoc(), sourcesJar = true))
 
