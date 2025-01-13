@@ -1,6 +1,7 @@
 package com.stellarsunset.tiff;
 
 import com.stellarsunset.tiff.baseline.BaselineImage;
+import com.stellarsunset.tiff.extension.DataImage;
 import com.stellarsunset.tiff.extension.ExtensionImage;
 
 import java.nio.ByteOrder;
@@ -96,6 +97,17 @@ public sealed interface Image permits Image.Lazy, Image.Unknown, BaselineImage, 
          */
         static Maker baseline() {
             return new BaselineImage.Maker();
+        }
+
+        /**
+         * Returns a new {@link Image.Maker} for {@link Image}s that supports reading TIFF image data into generic rasters
+         * of "data", i.e. no syntactic sugar like we get in {@link Pixel}s for {@link BaselineImage}s.
+         *
+         * <p>The this maker supports reading all the {@link BaselineImage} types, but treating their contents as pure
+         * data without additional interpretation.
+         */
+        static Maker data() {
+            return new DataImage.Maker();
         }
 
         /**
