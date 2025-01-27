@@ -5,6 +5,7 @@ import com.vanniktech.maven.publish.SonatypeHost
 plugins {
     `java-library`
     jacoco
+    id("io.github.stellarsunset.auto-semver") version "0.0.6"
     id("com.vanniktech.maven.publish") version "0.28.0"
 }
 
@@ -56,7 +57,7 @@ mavenPublishing {
 
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
 
-    coordinates("io.github.stellarsunset", "tiff", "0.0.4")
+    coordinates("io.github.stellarsunset", "tiff", project.version.toString())
 
     pom {
         name = "tiff"

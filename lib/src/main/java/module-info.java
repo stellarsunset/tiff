@@ -3,12 +3,12 @@ module tiff.lib.main {
     requires org.checkerframework.checker.qual;
     requires java.desktop;
 
-    exports com.stellarsunset.tiff;
-    exports com.stellarsunset.tiff.compress;
+    exports io.github.stellarsunset.tiff;
+    exports io.github.stellarsunset.tiff.compress;
 
-    exports com.stellarsunset.tiff.baseline;
-    exports com.stellarsunset.tiff.baseline.tag;
+    exports io.github.stellarsunset.tiff.baseline;
+    exports io.github.stellarsunset.tiff.baseline.tag;
 
-    exports com.stellarsunset.tiff.extension;
-    exports com.stellarsunset.tiff.extension.tag;
+    exports io.github.stellarsunset.tiff.extension;
+    exports io.github.stellarsunset.tiff.extension.tag;
 }
