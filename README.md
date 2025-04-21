@@ -63,7 +63,7 @@ This library out-of-the-box supports a subset of these extensions including:
 ### "Data" Images
 
 The baseline TIFF spec standardizes displaying and formatting for a "baseline" set of images, however TIFF image rasters
-(the array of pixels) can also be used to carry through "data" in the more traditional sense.
+(the array of pixels) can also be used to carry through data in the more traditional sense.
 
 A good example is GeoTIFF where image data is often 32-bit floating-point elevation data. Built-in to the library are a
 small number of `DataImage` types for handling these more generic rasters.
