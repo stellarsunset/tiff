@@ -54,7 +54,7 @@ tasks.javadoc {
 mavenPublishing {
     configure(JavaLibrary(javadocJar = JavadocJar.Javadoc(), sourcesJar = true))
 
-    publishToMavenCentral()
+    publishToMavenCentral(automaticRelease = true)
 
     coordinates("io.github.stellarsunset", "tiff", project.version.toString())
 
