@@ -1,20 +1,35 @@
 {
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "packageRules": [
     {
-      "matchUpdateTypes": ["patch", "minor"],
+      "matchUpdateTypes": [
+        "patch",
+        "minor"
+      ],
       "automerge": true,
       "automergeType": "pr",
-      "labels": ["dependencies", "automerge"]
+      "labels": [
+        "dependencies",
+        "automerge"
+      ]
     },
     {
-      "matchUpdateTypes": ["major"],
-      "labels": ["dependencies", "major-update"],
-      "schedule": ["before 5am on saturday"]
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "labels": [
+        "dependencies",
+        "major-update"
+      ],
+      "schedule": [
+        "before 5am on saturday"
+      ]
     }
   ],
-  "schedule": ["before 5am on saturday"],
+  "schedule": [
+    "before 5am on saturday"
+  ],
   "prConcurrentLimit": 5
 }
