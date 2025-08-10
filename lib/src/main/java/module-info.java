@@ -11,4 +11,5 @@ module tiff.lib.main {
 
     exports io.github.stellarsunset.tiff.extension;
     exports io.github.stellarsunset.tiff.extension.tag;
+    exports io.github.stellarsunset.tiff.extension.geokey;
 }

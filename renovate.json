@@ -1,0 +1,20 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true,
+      "automergeType": "pr",
+      "labels": ["dependencies", "automerge"]
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "labels": ["dependencies", "major-update"],
+      "schedule": ["before 5am on saturday"]
+    }
+  ],
+  "schedule": ["before 5am on saturday"],
+  "prConcurrentLimit": 5
+}
