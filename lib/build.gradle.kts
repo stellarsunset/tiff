@@ -4,7 +4,7 @@ import com.vanniktech.maven.publish.JavadocJar
 plugins {
     `java-library`
     jacoco
-    id("io.github.stellarsunset.auto-semver") version "1.0.0"
+    id("io.github.stellarsunset.auto-semver") version "2.0.0"
     id("com.vanniktech.maven.publish") version "0.34.0"
 }
 
