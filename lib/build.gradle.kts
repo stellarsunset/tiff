@@ -5,7 +5,7 @@ plugins {
     `java-library`
     jacoco
     id("io.github.stellarsunset.auto-semver") version "0.0.6"
-    id("com.vanniktech.maven.publish") version "0.34.0"
+    id("com.vanniktech.maven.publish") version "0.30.0"
 }
 
 repositories {
