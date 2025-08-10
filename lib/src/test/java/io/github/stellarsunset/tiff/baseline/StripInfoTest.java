@@ -32,4 +32,24 @@ class StripInfoTest {
                 () -> assertThrows(IllegalArgumentException.class, stripInfo::asIntInfo, "Should fail on narrowing to int values.")
         );
     }
+
+    @Test
+    void testAsIntInfo() {
+        Ifd ifd = new Ifd(
+                (short) 3,
+                new Entry[]{
+                        new Entry.Long(RowsPerStrip.ID, new int[]{1}),
+                        new Entry.Long(StripOffsets.ID, new int[]{20, 40, 1}),
+                        new Entry.Long(StripByteCounts.ID, new int[]{10, 10, 1})
+                },
+                0
+        );
+
+        StripInfo.Int stripInfo = StripInfo.getRequired(ifd).asIntInfo();
+        assertAll(
+                () -> assertEquals(1L, stripInfo.rowsPerStrip(), "Rows Per Strip"),
+                () -> assertArrayEquals(new long[]{20, 40, 1}, stripInfo.stripOffsets(), "Strip Offset"),
+                () -> assertArrayEquals(new int[]{10, 10, 1}, stripInfo.stripByteCounts(), "Strip Byte Counts")
+        );
+    }
 }
