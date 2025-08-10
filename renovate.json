@@ -29,7 +29,7 @@
     }
   ],
   "schedule": [
-    "before 5am on saturday"
+    "at any time"
   ],
   "prConcurrentLimit": 5
 }
