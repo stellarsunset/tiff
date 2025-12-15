@@ -1,6 +1,7 @@
 package io.github.stellarsunset.tiff.extension;
 
 import io.github.stellarsunset.tiff.Image;
+import io.github.stellarsunset.tiff.Pixel;
 import io.github.stellarsunset.tiff.baseline.BaselineImage;
 
 /**
@@ -17,4 +18,7 @@ import io.github.stellarsunset.tiff.baseline.BaselineImage;
  * of the data stored in the various pixels depends on the type of image (e.g. might be elevation data).
  */
 public non-sealed interface ExtensionImage extends Image {
+
+    @Override
+    Pixel.Extension valueAt(int row, int col);
 }

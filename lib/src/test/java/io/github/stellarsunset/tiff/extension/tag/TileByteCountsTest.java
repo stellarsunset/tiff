@@ -26,7 +26,7 @@ class TileByteCountsTest {
     void testMissingId() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(StripByteCounts.ID, new short[]{1})
+                new Ifd.Entry.Short(StripByteCounts.TAG.id(), new short[]{1})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);

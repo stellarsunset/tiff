@@ -2,6 +2,7 @@ package io.github.stellarsunset.tiff.baseline.tag;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Ifd.Entry;
+import io.github.stellarsunset.tiff.Tag;
 
 import java.util.OptionalInt;
 
@@ -16,23 +17,16 @@ import java.util.OptionalInt;
  *     <li>3 = Centimeter.</li>
  * </ul>
  */
-public final class ResolutionUnit {
+public final class ResolutionUnit implements Tag.Value {
 
-    public static final String NAME = "RESOLUTION_UNIT";
+    public static final Tag TAG = new Tag((short) 0x128, "RESOLUTION_UNIT");
 
-    public static final short ID = 0x128;
-
-    public static int getRequired(Ifd ifd) {
-        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
-    }
-
-    public static OptionalInt getOptional(Ifd ifd) {
-        return switch (ifd.findTag(ID)) {
-            case Entry.Short s -> OptionalInt.of(Short.toUnsignedInt(s.values()[0]));
-            case Entry.NotFound _ -> OptionalInt.of(2);
-            case Entry.Byte _, Entry.Ascii _, Entry.Long _, Entry.Rational _, Entry.SByte _, Entry.Undefined _,
-                 Entry.SShort _, Entry.SLong _, Entry.SRational _, Entry.Float _, Entry.Double _ ->
-                    throw new UnsupportedTypeForTagException(NAME, ID);
-        };
+    /**
+     * Unless otherwise specified the resolution units of the TIFF file are in inches, therefore this always returns a
+     * value.
+     */
+    public static int get(Ifd ifd) {
+        OptionalInt maybeRes = Tag.Value.optionalUShort(TAG, ifd);
+        return maybeRes.isPresent() ? maybeRes.getAsInt() : 2;
     }
 }

@@ -1,5 +1,6 @@
 module tiff.lib.main {
     requires com.google.common;
+    requires java.desktop;
 
     exports io.github.stellarsunset.tiff;
     exports io.github.stellarsunset.tiff.compress;

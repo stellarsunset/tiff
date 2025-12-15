@@ -43,7 +43,7 @@ public final class SampleFormat {
     }
 
     static int[] createDefault(Ifd ifd) {
-        int samplesPerPixel = SamplesPerPixel.getRequired(ifd);
+        int samplesPerPixel = SamplesPerPixel.get(ifd);
         int[] array = new int[samplesPerPixel];
         java.util.Arrays.fill(array, 1);
         return array;

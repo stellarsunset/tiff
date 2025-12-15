@@ -40,7 +40,7 @@ class FloatPredictorRegressionTest {
             int[] bitsPerSample = BitsPerSample.getRequired(ifd);
 
             int compression = Compression.get(ifd);
-            int photometricInterpretation = PhotometricInterpretation.getRequired(ifd);
+            int photometricInterpretation = PhotometricInterpretation.get(ifd);
             int planarConfiguration = PlanarConfiguration.getRequired(ifd);
 
             assertAll(

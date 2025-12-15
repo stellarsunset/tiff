@@ -9,46 +9,36 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class BitsPerSampleTest {
 
     @Test
-    void testCreateDefault() {
-        Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(SamplesPerPixel.ID, new short[]{4})
-        };
-
-        Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertArrayEquals(new int[]{1, 1, 1, 1}, BitsPerSample.createDefault(ifd));
-    }
-
-    @Test
     void testWrongType() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Float(BitsPerSample.ID, new float[]{1.0f})
+                new Ifd.Entry.Float(BitsPerSample.TAG.id(), new float[]{1.0f})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertThrows(UnsupportedTypeForTagException.class, () -> BitsPerSample.getRequired(ifd));
+        assertThrows(UnsupportedTypeForTagException.class, () -> BitsPerSample.get(ifd));
     }
 
     @Test
     void testMissingId() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(SamplesPerPixel.ID, new short[]{1}),
-                new Ifd.Entry.Short(YResolution.ID, new short[]{8})
+                new Ifd.Entry.Short(SamplesPerPixel.TAG.id(), new short[]{1}),
+                new Ifd.Entry.Short(YResolution.TAG.id(), new short[]{8})
         };
 
         Ifd ifd = new Ifd((short) 2, entry, 0);
-        assertArrayEquals(new int[]{1}, BitsPerSample.getRequired(ifd), "Has a default value...");
+        assertArrayEquals(new int[]{1}, BitsPerSample.get(ifd), "Has a default value...");
     }
 
     @Test
     void testCorrect() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(BitsPerSample.ID, new short[]{8})
+                new Ifd.Entry.Short(BitsPerSample.TAG.id(), new short[]{8})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertArrayEquals(new int[]{8}, BitsPerSample.getRequired(ifd));
+        assertArrayEquals(new int[]{8}, BitsPerSample.get(ifd));
     }
 }

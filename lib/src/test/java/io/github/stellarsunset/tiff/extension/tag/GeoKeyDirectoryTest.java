@@ -25,7 +25,7 @@ class GeoKeyDirectoryTest {
     void testMissingId() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(YResolution.ID, new short[]{1})
+                new Ifd.Entry.Short(YResolution.TAG.id(), new short[]{1})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);

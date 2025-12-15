@@ -20,14 +20,14 @@ import java.util.OptionalLong;
 public record StripInfo(long rowsPerStrip, long[] stripOffsets, long[] stripByteCounts) {
 
     public static StripInfo getRequired(Ifd ifd) {
-        return new StripInfo(RowsPerStrip.getRequired(ifd), StripOffsets.getRequired(ifd), StripByteCounts.getRequired(ifd));
+        return new StripInfo(RowsPerStrip.get(ifd), StripOffsets.get(ifd), StripByteCounts.get(ifd));
     }
 
     public static Optional<StripInfo> getOptional(Ifd ifd) {
 
-        OptionalLong rowsPerStrip = RowsPerStrip.getOptional(ifd);
-        Optional<long[]> offsets = StripOffsets.getOptional(ifd);
-        Optional<long[]> byteCounts = StripByteCounts.getOptional(ifd);
+        OptionalLong rowsPerStrip = RowsPerStrip.getIfPresent(ifd);
+        Optional<long[]> offsets = StripOffsets.getIfPresent(ifd);
+        Optional<long[]> byteCounts = StripByteCounts.getIfPresent(ifd);
 
         if (rowsPerStrip.isPresent() && offsets.isPresent() && byteCounts.isPresent()) {
             return Optional.of(

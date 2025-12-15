@@ -55,7 +55,7 @@ public record PaletteColorImage(ImageDimensions dimensions, Resolution resolutio
             return new PaletteColorImage(
                     ImageDimensions.get(ifd),
                     Resolution.from(ifd),
-                    ColorMap.getRequired(ifd),
+                    ColorMap.get(ifd),
                     bytes.bytes()
             );
         }

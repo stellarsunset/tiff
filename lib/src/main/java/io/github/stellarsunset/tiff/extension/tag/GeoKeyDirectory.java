@@ -4,6 +4,9 @@ import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Ifd.Entry;
 import io.github.stellarsunset.tiff.baseline.tag.MissingRequiredTagException;
 import io.github.stellarsunset.tiff.baseline.tag.UnsupportedTypeForTagException;
+import io.github.stellarsunset.tiff.extension.geokey.GeodeticCrs;
+import io.github.stellarsunset.tiff.extension.geokey.ProjectedCrs;
+import io.github.stellarsunset.tiff.extension.geokey.VerticalCrs;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -26,8 +29,16 @@ import static com.google.common.base.Preconditions.checkArgument;
  * <p>This directory can be searched just like an {@link Ifd} for tags and returns normal {@link Entry} objects. For TIFF
  * tag-like handles for GeoKeys see the {@code ..extension.geokey} package.
  *
- * <p>See the <a href="https://docs.ogc.org/is/19-008r4/19-008r4.html#_underlying_tiff_requirements">GeoTIFF</a> spec for
- * more details.
+ * <p>Generally speaking there are three GeoKeys to start with:
+ * <ol>
+ *     <li>{@link GeodeticCrs} - this or the projected will be provided, see the docs on the tag accessor for details</li>
+ *     <li>{@link ProjectedCrs} - this or the geodetic will be provided, see the docs on the tag accessor for details</li>
+ *     <li>{@link VerticalCrs} - this is optionally provided if the values of the pixels in the raster required further
+ *     details for interpretation, e.g. if they are elevations</li>
+ * </ol>
+ *
+ * <p>See the <a href="https://docs.ogc.org/is/19-008r4/19-008r4.html#_underlying_tiff_requirements">GeoTIFF</a> spec or
+ * the <a href="http://geotiff.maptools.org/spec/geotiff6.html">GeoTIFF maptools</a> link more tag info.
  */
 public record GeoKeyDirectory(short keyDirectoryVersion,
                               short keyRevision,

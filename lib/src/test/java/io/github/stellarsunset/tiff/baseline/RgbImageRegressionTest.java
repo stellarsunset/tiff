@@ -29,7 +29,7 @@ class RgbImageRegressionTest {
             int[] bitsPerSample = BitsPerSample.getRequired(ifd);
 
             int compression = Compression.get(ifd);
-            int photometricInterpretation = PhotometricInterpretation.getRequired(ifd);
+            int photometricInterpretation = PhotometricInterpretation.get(ifd);
 
             assertAll(
                     () -> assertEquals(ByteOrder.BIG_ENDIAN, header.order(), "ByteOrder"),

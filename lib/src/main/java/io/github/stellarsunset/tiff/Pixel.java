@@ -9,6 +9,8 @@ import io.github.stellarsunset.tiff.extension.ExtensionImage;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+// TODO - move Pixels into {Baseline,Data,Short}Image, e.g. PaletteColorImage.Pixel implements Image.Pixel
+
 /**
  * Represents the value of a row/col (y/x) pixel in an image.
  *

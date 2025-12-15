@@ -2,6 +2,7 @@ package io.github.stellarsunset.tiff.baseline.tag;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Ifd.Entry;
+import io.github.stellarsunset.tiff.Tag;
 
 import java.util.OptionalLong;
 
@@ -15,23 +16,15 @@ import java.util.OptionalLong;
  * <p>RowsPerStrip and ImageLength together tell us the number of strips in the entire image. The equation is:
  * {@code StripsPerImage = floor ((ImageLength + RowsPerStrip - 1) / RowsPerStrip)}
  */
-public final class RowsPerStrip {
+public final class RowsPerStrip implements Tag.Value {
 
-    public static final String NAME = "ROWS_PER_STRIP";
+    public static final Tag TAG = new Tag((short) 0x116, "ROWS_PER_STRIP");
 
-    public static final short ID = 0x116;
-
-    public static long getRequired(Ifd ifd) {
-        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+    public static long get(Ifd ifd) {
+        return getIfPresent(ifd).orElseThrow(() -> new MissingRequiredTagException(TAG));
     }
 
-    public static OptionalLong getOptional(Ifd ifd) {
-        return switch (ifd.findTag(ID)) {
-            case Entry.Short s -> OptionalLong.of(Short.toUnsignedLong(s.values()[0]));
-            case Entry.Long l -> OptionalLong.of(Integer.toUnsignedLong(l.values()[0]));
-            case Entry.NotFound _ -> OptionalLong.of(2);
-            case Entry.Byte _, Entry.Ascii _, Entry.Rational _, Entry.SByte _, Entry.Undefined _, Entry.SShort _, Entry.SLong _, Entry.SRational _,
-                    Entry.Float _, Entry.Double _ -> throw new UnsupportedTypeForTagException(NAME, ID);
-        };
+    public static OptionalLong getIfPresent(Ifd ifd) {
+        return Tag.Value.optionalUInt(TAG, ifd);
     }
 }

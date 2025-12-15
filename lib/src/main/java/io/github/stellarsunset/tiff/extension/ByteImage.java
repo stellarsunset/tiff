@@ -83,7 +83,7 @@ public sealed interface ByteImage extends DataImage {
         @Override
         public ByteImage makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
-            int componentsPerPixel = SamplesPerPixel.getRequired(ifd);
+            int componentsPerPixel = SamplesPerPixel.get(ifd);
 
             Raster.Bytes bytes = Raster.Reader.bytes(componentsPerPixel).readRaster(
                     channel,

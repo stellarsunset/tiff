@@ -11,6 +11,6 @@ import io.github.stellarsunset.tiff.baseline.tag.YResolution;
 public record Resolution(Rational xResolution, Rational yResolution) {
 
     public static Resolution from(Ifd ifd) {
-        return new Resolution(XResolution.getRequired(ifd), YResolution.getRequired(ifd));
+        return new Resolution(XResolution.get(ifd), YResolution.get(ifd));
     }
 }

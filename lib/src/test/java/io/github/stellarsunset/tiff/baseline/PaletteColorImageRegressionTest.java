@@ -39,7 +39,7 @@ class PaletteColorImageRegressionTest {
             int[] bitsPerSample = BitsPerSample.getRequired(ifd);
 
             int compression = Compression.get(ifd);
-            int photometricInterpretation = PhotometricInterpretation.getRequired(ifd);
+            int photometricInterpretation = PhotometricInterpretation.get(ifd);
 
             assertAll(
                     "Check IFD(0) contents.",

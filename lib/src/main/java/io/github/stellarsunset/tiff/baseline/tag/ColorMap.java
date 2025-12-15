@@ -2,17 +2,16 @@ package io.github.stellarsunset.tiff.baseline.tag;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Ifd.Entry;
+import io.github.stellarsunset.tiff.Tag;
 import io.github.stellarsunset.tiff.baseline.PaletteColorImage;
 
 import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
-public final class ColorMap {
+public final class ColorMap implements Tag.Value {
 
-    public static final String NAME = "COLOR_MAP";
-
-    public static final short ID = 0x140;
+    public static final Tag TAG = new Tag((short) 0x140, "COLOR_MAP");
 
     private final Rgb[] rgbValues;
 
@@ -20,24 +19,25 @@ public final class ColorMap {
         this.rgbValues = requireNonNull(rgbValues);
     }
 
-    public static ColorMap getRequired(Ifd ifd) {
-        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+    public static ColorMap get(Ifd ifd) {
+        return getIfPresent(ifd).orElseThrow(() -> new MissingRequiredTagException(TAG));
     }
 
-    public static Optional<ColorMap> getOptional(Ifd ifd) {
-        return switch (ifd.findTag(ID)) {
+    public static Optional<ColorMap> getIfPresent(Ifd ifd) {
+        Ifd.Entry entry = ifd.findTag(TAG.id());
+        return switch (entry) {
             case Entry.Short s -> Optional.of(ColorMap.create(s.values()));
             case Entry.NotFound _ -> Optional.empty();
             case Entry.Byte _, Entry.Ascii _, Entry.Long _, Entry.Rational _, Entry.SByte _, Entry.Undefined _,
                  Entry.SShort _, Entry.SLong _, Entry.SRational _,
-                 Entry.Float _, Entry.Double _ -> throw new UnsupportedTypeForTagException(NAME, ID);
+                 Entry.Float _, Entry.Double _ -> throw new UnsupportedTypeForTagException(TAG, entry.getClass());
         };
     }
 
     /**
      * Create a new {@link ColorMap} from an array of provided shorts.
      *
-     * <p>This is mostly used for testing, applications should expect to go through {@link #getRequired(Ifd)} etc. in
+     * <p>This is mostly used for testing, applications should expect to go through {@link #get(Ifd)} etc. in
      * most normal cases to retrieve the map from an IFD.
      */
     public static ColorMap create(short[] shorts) {

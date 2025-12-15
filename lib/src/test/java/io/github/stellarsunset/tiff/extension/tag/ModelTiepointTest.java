@@ -24,7 +24,7 @@ class ModelTiepointTest {
     void testMissingId() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Double(YResolution.ID, new double[]{1.0})
+                new Ifd.Entry.Double(YResolution.TAG.id(), new double[]{1.0})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);

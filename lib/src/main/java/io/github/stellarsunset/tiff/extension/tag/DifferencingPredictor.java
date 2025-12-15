@@ -2,10 +2,9 @@ package io.github.stellarsunset.tiff.extension.tag;
 
 import io.github.stellarsunset.tiff.BufferView;
 import io.github.stellarsunset.tiff.Ifd;
-import io.github.stellarsunset.tiff.Ifd.Entry;
+import io.github.stellarsunset.tiff.Tag;
 import io.github.stellarsunset.tiff.baseline.tag.Compression;
 import io.github.stellarsunset.tiff.baseline.tag.SamplesPerPixel;
-import io.github.stellarsunset.tiff.baseline.tag.UnsupportedTypeForTagException;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -18,11 +17,9 @@ import static com.google.common.base.Preconditions.checkArgument;
  * <p>Currently this field is used only with LZW ({@link Compression}=5) encoding because LZW is probably the only TIFF
  * encoding scheme that benefits significantly from a predictor step.
  */
-public interface DifferencingPredictor {
+public interface DifferencingPredictor extends Tag.Value {
 
-    String NAME = "DIFFERENCING_PREDICTOR";
-
-    short ID = 0x13D;
+    Tag TAG = new Tag((short) 0x13D, "DIFFERENCING_PREDICTOR");
 
     static DifferencingPredictor noop() {
         return new Noop();
@@ -71,15 +68,8 @@ public interface DifferencingPredictor {
         checkArgument(planarConfiguration == 1,
                 "Predictors only supported on PlanarConfiguration 1, was %s", planarConfiguration);
 
-        int type = switch (ifd.findTag(ID)) {
-            case Entry.Short s -> Short.toUnsignedInt(s.values()[0]);
-            case Entry.NotFound _ -> 1;
-            case Entry.Byte _, Entry.Ascii _, Entry.Long _, Entry.Rational _, Entry.SByte _, Entry.Undefined _,
-                 Entry.SShort _, Entry.SLong _, Entry.SRational _, Entry.Float _, Entry.Double _ ->
-                    throw new UnsupportedTypeForTagException(NAME, ID);
-        };
-
-        int componentsPerPixel = SamplesPerPixel.getRequired(ifd);
+        int type = Tag.Value.optionalUShort(TAG, ifd).orElse(1);
+        int componentsPerPixel = SamplesPerPixel.get(ifd);
 
         return switch (type) {
             case 1 -> new Noop();

@@ -82,7 +82,7 @@ public sealed interface ShortImage extends DataImage {
         @Override
         public ShortImage makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
-            int componentsPerPixel = SamplesPerPixel.getRequired(ifd);
+            int componentsPerPixel = SamplesPerPixel.get(ifd);
 
             Raster.Shorts shorts = Raster.Reader.shorts(componentsPerPixel).readRaster(
                     channel,

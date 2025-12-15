@@ -52,7 +52,7 @@ public record BiLevelImage(Interpretation type, ImageDimensions dimensions, Reso
         }
 
         private static Interpretation from(Ifd ifd) {
-            int photometricCode = PhotometricInterpretation.getRequired(ifd);
+            int photometricCode = PhotometricInterpretation.get(ifd);
             return switch (photometricCode) {
                 case 0 -> Interpretation.WHITE_IS_ZERO;
                 case 1 -> Interpretation.BLACK_IS_ZERO;

@@ -2,8 +2,12 @@ package io.github.stellarsunset.tiff.baseline;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Image;
+import io.github.stellarsunset.tiff.Pixel;
+import io.github.stellarsunset.tiff.Tag;
 import io.github.stellarsunset.tiff.baseline.tag.BitsPerSample;
 import io.github.stellarsunset.tiff.baseline.tag.PhotometricInterpretation;
+import io.github.stellarsunset.tiff.extension.DataImage;
+import io.github.stellarsunset.tiff.extension.ExtensionImage;
 
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
@@ -13,14 +17,17 @@ import java.util.function.Supplier;
  * Seals image types defined as "baseline" in the TIFF 6.0 specification, these are the image types <em>all</em> TIFF
  * file parsers are supposed to support.
  *
- * <p>Baseline vs Extension was introduced as a way to introduce some predictability into what's any otherwise almost
- * arbitrarily extensible specification and align on at least some standard image layouts/types all parsers support.
+ * <p>See also {@link ExtensionImage} and {@link DataImage} for image types that are TIFF-compliant but not part of the
+ * baseline TIFF 6.0 specification.
  */
 public sealed interface BaselineImage extends Image permits BiLevelImage, GrayscaleImage, PaletteColorImage, RgbImage {
 
     static Image.Maker maker() {
         return new Maker();
     }
+
+    @Override
+    Pixel.Baseline valueAt(int row, int col);
 
     record Maker(Image.Maker biLevel, Image.Maker grayscale, Image.Maker fullColor,
                  Image.Maker palette) implements Image.Maker {
@@ -37,7 +44,7 @@ public sealed interface BaselineImage extends Image permits BiLevelImage, Graysc
         @Override
         public Image makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
-            int photometricCode = PhotometricInterpretation.getRequired(ifd);
+            int photometricCode = PhotometricInterpretation.get(ifd);
 
             Supplier<Image> supplier = () -> switch (photometricCode) {
                 case 0, 1 -> grayscaleOrBiLevel(channel, order, ifd);
@@ -50,11 +57,22 @@ public sealed interface BaselineImage extends Image permits BiLevelImage, Graysc
         }
 
         private Image grayscaleOrBiLevel(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
-            return BitsPerSample.getOptional(ifd)
+            return BitsPerSample.getIfPresent(ifd)
                     .filter(bps -> bps.length == 1 && (bps[0] == 4 || bps[0] == 8))
                     .map(_ -> grayscale.makeImage(channel, order, ifd))
                     .orElseGet(() -> biLevel.makeImage(channel, order, ifd));
         }
+    }
+
+    /**
+     * Container class for all {@link Tag}s associated with {@link BaselineImage}s.
+     */
+    final class Tags {
+
+        private Tags() {
+        }
+
+
     }
 }
 

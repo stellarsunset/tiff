@@ -16,8 +16,8 @@ class ImageDimensionsTest {
         Ifd ifd = new Ifd(
                 (short) 2,
                 new Entry[]{
-                        new Entry.Short(ImageWidth.ID, new short[]{10}),
-                        new Entry.Short(ImageLength.ID, new short[]{20})
+                        new Entry.Short(ImageWidth.TAG.id(), new short[]{10}),
+                        new Entry.Short(ImageLength.TAG.id(), new short[]{20})
                 },
                 0
         );
@@ -36,8 +36,8 @@ class ImageDimensionsTest {
         Ifd ifd = new Ifd(
                 (short) 2,
                 new Entry[]{
-                        new Entry.Long(ImageWidth.ID, new int[]{-1}),
-                        new Entry.Long(ImageLength.ID, new int[]{-1})
+                        new Entry.Long(ImageWidth.TAG.id(), new int[]{-1}),
+                        new Entry.Long(ImageLength.TAG.id(), new int[]{-1})
                 },
                 0
         );
