@@ -3,7 +3,6 @@ package io.github.stellarsunset.tiff.baseline;
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Image;
 import io.github.stellarsunset.tiff.Pixel;
-import io.github.stellarsunset.tiff.Tag;
 import io.github.stellarsunset.tiff.baseline.tag.BitsPerSample;
 import io.github.stellarsunset.tiff.baseline.tag.PhotometricInterpretation;
 import io.github.stellarsunset.tiff.extension.DataImage;
@@ -62,17 +61,6 @@ public sealed interface BaselineImage extends Image permits BiLevelImage, Graysc
                     .map(_ -> grayscale.makeImage(channel, order, ifd))
                     .orElseGet(() -> biLevel.makeImage(channel, order, ifd));
         }
-    }
-
-    /**
-     * Container class for all {@link Tag}s associated with {@link BaselineImage}s.
-     */
-    final class Tags {
-
-        private Tags() {
-        }
-
-
     }
 }
 
