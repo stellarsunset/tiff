@@ -29,6 +29,12 @@ public sealed interface DataImage extends ExtensionImage permits ByteImage, Shor
         return new Maker();
     }
 
+    @Override
+    Pixel valueAt(int row, int column);
+
+    sealed interface Pixel extends ExtensionImage.Pixel permits ByteImage.Pixel, FloatImage.Pixel, IntImage.Pixel, ShortImage.Pixel {
+    }
+
     record Maker(Image.Maker bytes, Image.Maker shorts, Image.Maker ints, Image.Maker floats) implements Image.Maker {
 
         public Maker() {

@@ -2,7 +2,6 @@ package io.github.stellarsunset.tiff.baseline;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Image;
-import io.github.stellarsunset.tiff.Pixel;
 import io.github.stellarsunset.tiff.Raster;
 import io.github.stellarsunset.tiff.baseline.tag.SamplesPerPixel;
 
@@ -33,12 +32,37 @@ public record RgbImage(ImageDimensions dimensions, Resolution resolution, byte[]
     }
 
     @Override
-    public Pixel.Rgb valueAt(int row, int col) {
+    public Pixel valueAt(int row, int col) {
         int offset = col * SAMPLES_PER_PIXEL;
         byte r = data[row][offset];
         byte g = data[row][offset + 1];
         byte b = data[row][offset + 2];
-        return new Pixel.Rgb(r, g, b);
+        return new Pixel(r, g, b);
+    }
+
+    /**
+     * Represents the value of a pixel as a Red, Green, Blue set of components. In baseline RBG images each component is
+     * only 8 bits, and so they can be carried through as bytes.
+     *
+     * <p>Remember these values are unsigned, so to compare actual values apply the correct unsigned Java conversion.
+     *
+     * @param r the red component
+     * @param g the green component
+     * @param b the blue component
+     */
+    public record Pixel(byte r, byte g, byte b) implements BaselineImage.Pixel {
+
+        public int unsignedR() {
+            return java.lang.Byte.toUnsignedInt(r);
+        }
+
+        public int unsignedG() {
+            return java.lang.Byte.toUnsignedInt(g);
+        }
+
+        public int unsignedB() {
+            return java.lang.Byte.toUnsignedInt(b);
+        }
     }
 
     record Maker() implements Image.Maker {

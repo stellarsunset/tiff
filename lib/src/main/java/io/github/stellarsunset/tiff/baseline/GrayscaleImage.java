@@ -2,13 +2,14 @@ package io.github.stellarsunset.tiff.baseline;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Image;
-import io.github.stellarsunset.tiff.Pixel;
 import io.github.stellarsunset.tiff.Raster;
 import io.github.stellarsunset.tiff.baseline.tag.BitsPerSample;
 import io.github.stellarsunset.tiff.baseline.tag.PhotometricInterpretation;
 
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Grayscale images are a generalization of bi-level images. Bi-level images can store only black and white image data,
@@ -29,32 +30,75 @@ public sealed interface GrayscaleImage extends BaselineImage {
     /**
      * A grayscale image with 4-bit grayscale tones.
      */
-    record Grayscale4Image(Interpretation type, ImageDimensions dimensions, Resolution resolution,
-                           byte[][] data) implements GrayscaleImage {
+    record FourBit(Interpretation type, ImageDimensions dimensions, Resolution resolution,
+                   byte[][] data) implements GrayscaleImage {
 
-        public Grayscale4Image {
+        public FourBit {
             dimensions.checkBounds(data, 1);
         }
 
         @Override
-        public Pixel.Grayscale4 valueAt(int row, int col) {
-            return new Pixel.Grayscale4(data[row][col], type.whiteIsZero());
+        public Pixel valueAt(int row, int col) {
+            return new Pixel(data[row][col], type.whiteIsZero());
+        }
+
+        /**
+         * Grayscale images can represent a finite number of "shades of gray" between white and black based on the number of
+         * bits used in their encoding, in this case 4 (also see {@link EightBit.Pixel}).
+         *
+         * <p>Grayscale images like Bi-level ones, can be encoded in:
+         * <ol>
+         *     <li>{@link GrayscaleImage.Interpretation#BLACK_IS_ZERO}</li>
+         *     <li>{@link GrayscaleImage.Interpretation#WHITE_IS_ZERO}</li>
+         * </ol>
+         *
+         * <p>formats. This record encodes only the raw pixel value and whether white should be interpreted as zero, the max
+         * number of bits in the byte value used for tones is 15 (4 bits).
+         */
+        public record Pixel(byte value, boolean whiteIsZero) implements BaselineImage.Pixel {
+            public Pixel {
+                checkArgument(value >= 0 && value < 16, "4-bit grayscale range is [0, 16).");
+            }
+
+            public int unsignedValue() {
+                return java.lang.Byte.toUnsignedInt(value);
+            }
         }
     }
 
     /**
      * A grayscale image with 8-bit grayscale tones.
      */
-    record Grayscale8Image(Interpretation type, ImageDimensions dimensions, Resolution resolution,
-                           byte[][] data) implements GrayscaleImage {
+    record EightBit(Interpretation type, ImageDimensions dimensions, Resolution resolution,
+                    byte[][] data) implements GrayscaleImage {
 
-        public Grayscale8Image {
+        public EightBit {
             dimensions.checkBounds(data, 1);
         }
 
         @Override
-        public Pixel.Grayscale8 valueAt(int row, int col) {
-            return new Pixel.Grayscale8(data[row][col], type.whiteIsZero());
+        public Pixel valueAt(int row, int col) {
+            return new Pixel(data[row][col], type.whiteIsZero());
+        }
+
+        /**
+         * Grayscale images can represent a finite number of "shades of gray" between white and black based on the number of
+         * bits used in their encoding, in this case 8 (also see {@link FourBit.Pixel}).
+         *
+         * <p>Grayscale images like Bi-level ones, can be encoded in:
+         * <ol>
+         *     <li>{@link GrayscaleImage.Interpretation#BLACK_IS_ZERO}</li>
+         *     <li>{@link GrayscaleImage.Interpretation#WHITE_IS_ZERO}</li>
+         * </ol>
+         *
+         * <p>formats. This record encodes only the raw pixel value and whether white should be interpreted as zero. the max
+         * number of bits in the byte value used for tones is 255 (8 bits).
+         */
+        public record Pixel(byte value, boolean whiteIsZero) implements BaselineImage.Pixel {
+
+            public int unsignedValue() {
+                return java.lang.Byte.toUnsignedInt(value);
+            }
         }
     }
 
@@ -117,13 +161,13 @@ public sealed interface GrayscaleImage extends BaselineImage {
             );
 
             return switch (ShadesOfGray.from(ifd)) {
-                case N16 -> new Grayscale4Image(
+                case N16 -> new FourBit(
                         Interpretation.from(ifd),
                         ImageDimensions.get(ifd),
                         Resolution.from(ifd),
                         bytes.bytes()
                 );
-                case N256 -> new Grayscale8Image(
+                case N256 -> new EightBit(
                         Interpretation.from(ifd),
                         ImageDimensions.get(ifd),
                         Resolution.from(ifd),

@@ -1,7 +1,6 @@
 package io.github.stellarsunset.tiff.extension;
 
 import io.github.stellarsunset.tiff.Image;
-import io.github.stellarsunset.tiff.Pixel;
 import io.github.stellarsunset.tiff.baseline.BaselineImage;
 
 /**
@@ -20,5 +19,14 @@ import io.github.stellarsunset.tiff.baseline.BaselineImage;
 public non-sealed interface ExtensionImage extends Image {
 
     @Override
-    Pixel.Extension valueAt(int row, int col);
+    Pixel valueAt(int row, int col);
+
+    /**
+     * {@link Pixel} subtype for use in {@link ExtensionImage} images.
+     *
+     * <p>Provided to allow external libraries to add their own pixel types without losing the sealed baseline type
+     * hierarchy.
+     */
+    non-sealed interface Pixel extends Image.Pixel {
+    }
 }

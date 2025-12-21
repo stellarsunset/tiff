@@ -2,7 +2,6 @@ package io.github.stellarsunset.tiff.extension;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Image;
-import io.github.stellarsunset.tiff.Pixel;
 import io.github.stellarsunset.tiff.Raster;
 import io.github.stellarsunset.tiff.baseline.ImageDimensions;
 import io.github.stellarsunset.tiff.baseline.tag.SamplesPerPixel;
@@ -28,7 +27,11 @@ public sealed interface IntImage extends DataImage {
         return new Maker();
     }
 
-    Pixel.Int valueAt(int row, int col);
+    @Override
+    Pixel valueAt(int row, int col);
+
+    sealed interface Pixel extends DataImage.Pixel {
+    }
 
     record Int1Image(ImageDimensions dimensions, int[][] data) implements IntImage {
 
@@ -37,8 +40,20 @@ public sealed interface IntImage extends DataImage {
         }
 
         @Override
-        public Pixel.Int1 valueAt(int row, int col) {
-            return new Pixel.Int1(data[row][col]);
+        public Pixel valueAt(int row, int col) {
+            return new Pixel(data[row][col]);
+        }
+
+        /**
+         * Represents the value of a pixel as a single 32-bit integer.
+         *
+         * <p>These are typically used in extensions for storing measurements (e.g. elevations) taken on grids as images.
+         */
+        public record Pixel(int value) implements IntImage.Pixel {
+
+            public long unsignedValue() {
+                return Integer.toUnsignedLong(value);
+            }
         }
     }
 
@@ -49,12 +64,30 @@ public sealed interface IntImage extends DataImage {
         }
 
         @Override
-        public Pixel.Int3 valueAt(int row, int col) {
+        public Pixel valueAt(int row, int col) {
             int offset = col * 3;
             int i1 = data[row][offset];
             int i2 = data[row][offset + 1];
             int i3 = data[row][offset + 2];
-            return new Pixel.Int3(i1, i2, i3);
+            return new Pixel(i1, i2, i3);
+        }
+
+        /**
+         * Represents the value of a pixel as a trio of 32-bit integer values.
+         */
+        public record Pixel(int i1, int i2, int i3) implements IntImage.Pixel {
+
+            public long unsignedI1() {
+                return java.lang.Integer.toUnsignedLong(i1);
+            }
+
+            public long unsignedI2() {
+                return java.lang.Integer.toUnsignedLong(i2);
+            }
+
+            public long unsignedI3() {
+                return java.lang.Integer.toUnsignedLong(i3);
+            }
         }
     }
 
@@ -65,15 +98,21 @@ public sealed interface IntImage extends DataImage {
         }
 
         @Override
-        public Pixel.IntN valueAt(int row, int col) {
+        public Pixel valueAt(int row, int col) {
             int offset = col * componentsPerPixel;
-            return new Pixel.IntN(
+            return new Pixel(
                     Arrays.copyOfRange(
                             data[row],
                             offset,
                             offset + componentsPerPixel
                     )
             );
+        }
+
+        /**
+         * Represents the value of a pixel as an arbitrary number of 32-bit integer values.
+         */
+        public record Pixel(int[] values) implements IntImage.Pixel {
         }
     }
 

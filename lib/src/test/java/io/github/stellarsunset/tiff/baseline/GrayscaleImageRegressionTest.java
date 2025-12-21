@@ -49,7 +49,7 @@ class GrayscaleImageRegressionTest {
             Image image = file.image(0);
             Rasters rasters = readRasters();
 
-            if (unwrap(image) instanceof GrayscaleImage.Grayscale8Image g) {
+            if (unwrap(image) instanceof GrayscaleImage.EightBit g) {
                 assertAll(
                         "Check Image(0) contents.",
                         () -> assertEquals(rasters.getHeight(), g.dimensions().length(), "Image Length Matches"),
