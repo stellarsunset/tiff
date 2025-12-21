@@ -175,7 +175,7 @@ class LzwTest {
         Number[] rPixel = rasters.getPixel(column, row);
         assertEquals(1, rPixel.length, "Should return a single number for the Palette-Color image pixel value.");
 
-        Pixel.PaletteColor iPixel = image.valueAt(row, column);
+        PaletteColorImage.Pixel iPixel = image.valueAt(row, column);
         assertEquals(Short.toUnsignedInt((Short) rPixel[0]), iPixel.unsignedIndex(), String.format("Should contain identical ColorMap index at the respective pixel (%d, %d).", row, column));
     }
 

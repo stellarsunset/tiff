@@ -1,6 +1,5 @@
 package io.github.stellarsunset.tiff.extension;
 
-import io.github.stellarsunset.tiff.Pixel;
 import io.github.stellarsunset.tiff.baseline.ImageDimensions;
 import io.github.stellarsunset.tiff.extension.ShortImage.Short1Image;
 import io.github.stellarsunset.tiff.extension.ShortImage.Short3Image;
@@ -19,9 +18,9 @@ class ShortImageTest {
         );
 
         assertAll(
-                () -> assertEquals(new Pixel.Short1((short) 0), image.valueAt(0, 0), "0,0"),
-                () -> assertEquals(new Pixel.Short1((short) 5), image.valueAt(2, 3), "2,3"),
-                () -> assertEquals(new Pixel.Short1((short) 8), image.valueAt(4, 4), "4,4")
+                () -> assertEquals(new Short1Image.Pixel((short) 0), image.valueAt(0, 0), "0,0"),
+                () -> assertEquals(new Short1Image.Pixel((short) 5), image.valueAt(2, 3), "2,3"),
+                () -> assertEquals(new Short1Image.Pixel((short) 8), image.valueAt(4, 4), "4,4")
         );
     }
 
@@ -33,9 +32,9 @@ class ShortImageTest {
         );
 
         assertAll(
-                () -> assertEquals(new Pixel.Short3((short) 0, (short) 1, (short) 2), image.valueAt(0, 0), "0,0"),
-                () -> assertEquals(new Pixel.Short3((short) 11, (short) 12, (short) 13), image.valueAt(2, 3), "2,3"),
-                () -> assertEquals(new Pixel.Short3((short) 16, (short) 17, (short) 18), image.valueAt(4, 4), "4,4")
+                () -> assertEquals(new Short3Image.Pixel((short) 0, (short) 1, (short) 2), image.valueAt(0, 0), "0,0"),
+                () -> assertEquals(new Short3Image.Pixel((short) 11, (short) 12, (short) 13), image.valueAt(2, 3), "2,3"),
+                () -> assertEquals(new Short3Image.Pixel((short) 16, (short) 17, (short) 18), image.valueAt(4, 4), "4,4")
         );
     }
 
@@ -48,13 +47,13 @@ class ShortImageTest {
         );
 
         assertAll(
-                () -> pixelEquals(new Pixel.ShortN(new short[]{0, 1, 2, 3, 4}), image.valueAt(0, 0), "0,0"),
-                () -> pixelEquals(new Pixel.ShortN(new short[]{17, 18, 19, 20, 21}), image.valueAt(2, 3), "2,3"),
-                () -> pixelEquals(new Pixel.ShortN(new short[]{24, 25, 26, 27, 28}), image.valueAt(4, 4), "4,4")
+                () -> pixelEquals(new ShortNImage.Pixel(new short[]{0, 1, 2, 3, 4}), image.valueAt(0, 0), "0,0"),
+                () -> pixelEquals(new ShortNImage.Pixel(new short[]{17, 18, 19, 20, 21}), image.valueAt(2, 3), "2,3"),
+                () -> pixelEquals(new ShortNImage.Pixel(new short[]{24, 25, 26, 27, 28}), image.valueAt(4, 4), "4,4")
         );
     }
 
-    private void pixelEquals(Pixel.ShortN expected, Pixel.ShortN actual, String message) {
+    private void pixelEquals(ShortNImage.Pixel expected, ShortNImage.Pixel actual, String message) {
         assertArrayEquals(expected.values(), actual.values(), message);
     }
 

@@ -50,25 +50,25 @@ class SanityCheckTest {
 
     @Test
     void testPixelHierarchy() {
-        Pixel pixel = Pixel.empty();
+        Image.Pixel pixel = Image.Pixel.empty();
         switch (pixel) {
-            case Pixel.Baseline baseline -> {
+            case BaselineImage.Pixel baseline -> {
                 switch (baseline) {
-                    case Pixel.BlackOrWhite blackOrWhite -> {
+                    case BiLevelImage.Pixel blackOrWhite -> {
                     }
-                    case Pixel.Grayscale4 grayscale4 -> {
+                    case GrayscaleImage.FourBit.Pixel grayscale4 -> {
                     }
-                    case Pixel.Grayscale8 grayscale8 -> {
+                    case GrayscaleImage.EightBit.Pixel grayscale8 -> {
                     }
-                    case Pixel.PaletteColor paletteColor -> {
+                    case PaletteColorImage.Pixel paletteColor -> {
                     }
-                    case Pixel.Rgb rgb -> {
+                    case RgbImage.Pixel rgb -> {
                     }
                 }
             }
-            case Pixel.Empty empty -> {
+            case Image.Pixel.Empty empty -> {
             }
-            case Pixel.Extension extension -> {
+            case ExtensionImage.Pixel extension -> {
             }
         }
     }

@@ -1,6 +1,5 @@
 package io.github.stellarsunset.tiff.extension;
 
-import io.github.stellarsunset.tiff.Pixel;
 import io.github.stellarsunset.tiff.baseline.ImageDimensions;
 import io.github.stellarsunset.tiff.extension.IntImage.Int1Image;
 import io.github.stellarsunset.tiff.extension.IntImage.Int3Image;
@@ -19,9 +18,9 @@ class IntImageTest {
         );
 
         assertAll(
-                () -> assertEquals(new Pixel.Int1(0), image.valueAt(0, 0), "0,0"),
-                () -> assertEquals(new Pixel.Int1(5), image.valueAt(2, 3), "2,3"),
-                () -> assertEquals(new Pixel.Int1(8), image.valueAt(4, 4), "4,4")
+                () -> assertEquals(new Int1Image.Pixel(0), image.valueAt(0, 0), "0,0"),
+                () -> assertEquals(new Int1Image.Pixel(5), image.valueAt(2, 3), "2,3"),
+                () -> assertEquals(new Int1Image.Pixel(8), image.valueAt(4, 4), "4,4")
         );
     }
 
@@ -33,9 +32,9 @@ class IntImageTest {
         );
 
         assertAll(
-                () -> assertEquals(new Pixel.Int3(0, 1, 2), image.valueAt(0, 0), "0,0"),
-                () -> assertEquals(new Pixel.Int3(11, 12, 13), image.valueAt(2, 3), "2,3"),
-                () -> assertEquals(new Pixel.Int3(16, 17, 18), image.valueAt(4, 4), "4,4")
+                () -> assertEquals(new Int3Image.Pixel(0, 1, 2), image.valueAt(0, 0), "0,0"),
+                () -> assertEquals(new Int3Image.Pixel(11, 12, 13), image.valueAt(2, 3), "2,3"),
+                () -> assertEquals(new Int3Image.Pixel(16, 17, 18), image.valueAt(4, 4), "4,4")
         );
     }
 
@@ -48,13 +47,13 @@ class IntImageTest {
         );
 
         assertAll(
-                () -> pixelEquals(new Pixel.IntN(new int[]{0, 1, 2, 3, 4}), image.valueAt(0, 0), "0,0"),
-                () -> pixelEquals(new Pixel.IntN(new int[]{17, 18, 19, 20, 21}), image.valueAt(2, 3), "2,3"),
-                () -> pixelEquals(new Pixel.IntN(new int[]{24, 25, 26, 27, 28}), image.valueAt(4, 4), "4,4")
+                () -> pixelEquals(new IntNImage.Pixel(new int[]{0, 1, 2, 3, 4}), image.valueAt(0, 0), "0,0"),
+                () -> pixelEquals(new IntNImage.Pixel(new int[]{17, 18, 19, 20, 21}), image.valueAt(2, 3), "2,3"),
+                () -> pixelEquals(new IntNImage.Pixel(new int[]{24, 25, 26, 27, 28}), image.valueAt(4, 4), "4,4")
         );
     }
 
-    private void pixelEquals(Pixel.IntN expected, Pixel.IntN actual, String message) {
+    private void pixelEquals(IntNImage.Pixel expected, IntNImage.Pixel actual, String message) {
         assertArrayEquals(expected.values(), actual.values(), message);
     }
 

@@ -2,7 +2,6 @@ package io.github.stellarsunset.tiff.extension;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Image;
-import io.github.stellarsunset.tiff.Pixel;
 import io.github.stellarsunset.tiff.Raster;
 import io.github.stellarsunset.tiff.baseline.ImageDimensions;
 import io.github.stellarsunset.tiff.baseline.tag.SamplesPerPixel;
@@ -28,7 +27,11 @@ public sealed interface ShortImage extends DataImage {
         return new Maker();
     }
 
-    Pixel.Short valueAt(int row, int col);
+    @Override
+    Pixel valueAt(int row, int col);
+
+    sealed interface Pixel extends DataImage.Pixel {
+    }
 
     record Short1Image(ImageDimensions dimensions, short[][] data) implements ShortImage {
 
@@ -37,8 +40,20 @@ public sealed interface ShortImage extends DataImage {
         }
 
         @Override
-        public Pixel.Short1 valueAt(int row, int col) {
-            return new Pixel.Short1(data[row][col]);
+        public Pixel valueAt(int row, int col) {
+            return new Pixel(data[row][col]);
+        }
+
+        /**
+         * Represents the value of a pixel as a single 16-bit integer.
+         *
+         * <p>These are typically used in extensions for storing measurements (e.g. elevations) taken on grids as images.
+         */
+        public record Pixel(short value) implements ShortImage.Pixel {
+
+            public int unsignedValue() {
+                return java.lang.Short.toUnsignedInt(value);
+            }
         }
     }
 
@@ -49,12 +64,30 @@ public sealed interface ShortImage extends DataImage {
         }
 
         @Override
-        public Pixel.Short3 valueAt(int row, int col) {
+        public Pixel valueAt(int row, int col) {
             int offset = col * 3;
             short s1 = data[row][offset];
             short s2 = data[row][offset + 1];
             short s3 = data[row][offset + 2];
-            return new Pixel.Short3(s1, s2, s3);
+            return new Pixel(s1, s2, s3);
+        }
+
+        /**
+         * Represents the value of a pixel as a trio of 16-bit integer values.
+         */
+        public record Pixel(short s1, short s2, short s3) implements ShortImage.Pixel {
+
+            public int unsignedS1() {
+                return java.lang.Short.toUnsignedInt(s1);
+            }
+
+            public int unsignedS2() {
+                return java.lang.Short.toUnsignedInt(s2);
+            }
+
+            public int unsignedS3() {
+                return java.lang.Short.toUnsignedInt(s3);
+            }
         }
     }
 
@@ -65,15 +98,21 @@ public sealed interface ShortImage extends DataImage {
         }
 
         @Override
-        public Pixel.ShortN valueAt(int row, int col) {
+        public Pixel valueAt(int row, int col) {
             int offset = col * componentsPerPixel;
-            return new Pixel.ShortN(
+            return new Pixel(
                     Arrays.copyOfRange(
                             data[row],
                             offset,
                             offset + componentsPerPixel
                     )
             );
+        }
+
+        /**
+         * Represents the value of a pixel as an arbitrary number of 16-bit integer values.
+         */
+        public record Pixel(short[] values) implements ShortImage.Pixel {
         }
     }
 

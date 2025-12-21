@@ -2,7 +2,6 @@ package io.github.stellarsunset.tiff.extension;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Image;
-import io.github.stellarsunset.tiff.Pixel;
 import io.github.stellarsunset.tiff.Raster;
 import io.github.stellarsunset.tiff.baseline.ImageDimensions;
 import io.github.stellarsunset.tiff.baseline.tag.SamplesPerPixel;
@@ -28,7 +27,11 @@ public sealed interface FloatImage extends DataImage {
         return new Maker();
     }
 
-    Pixel.Float valueAt(int row, int col);
+    @Override
+    Pixel valueAt(int row, int col);
+
+    sealed interface Pixel extends DataImage.Pixel {
+    }
 
     record Float1Image(ImageDimensions dimensions, float[][] data) implements FloatImage {
 
@@ -37,8 +40,16 @@ public sealed interface FloatImage extends DataImage {
         }
 
         @Override
-        public Pixel.Float1 valueAt(int row, int col) {
-            return new Pixel.Float1(data[row][col]);
+        public Pixel valueAt(int row, int col) {
+            return new Pixel(data[row][col]);
+        }
+
+        /**
+         * Represents the value of a pixel as a single 32-bit float.
+         *
+         * <p>These are typically used in extensions for storing measurements (e.g. elevations) taken on grids as images.
+         */
+        public record Pixel(float value) implements FloatImage.Pixel {
         }
     }
 
@@ -49,12 +60,18 @@ public sealed interface FloatImage extends DataImage {
         }
 
         @Override
-        public Pixel.Float3 valueAt(int row, int col) {
+        public Pixel valueAt(int row, int col) {
             int offset = col * 3;
             float f1 = data[row][offset];
             float f2 = data[row][offset + 1];
             float f3 = data[row][offset + 2];
-            return new Pixel.Float3(f1, f2, f3);
+            return new Pixel(f1, f2, f3);
+        }
+
+        /**
+         * Represents the value of a pixel as a trio of 32-bit float values.
+         */
+        public record Pixel(float f1, float f2, float f3) implements FloatImage.Pixel {
         }
     }
 
@@ -65,15 +82,21 @@ public sealed interface FloatImage extends DataImage {
         }
 
         @Override
-        public Pixel.FloatN valueAt(int row, int col) {
+        public Pixel valueAt(int row, int col) {
             int offset = col * componentsPerPixel;
-            return new Pixel.FloatN(
+            return new Pixel(
                     Arrays.copyOfRange(
                             data[row],
                             offset,
                             offset + componentsPerPixel
                     )
             );
+        }
+
+        /**
+         * Represents the value of a pixel as an arbitrary number of 32-bit float values.
+         */
+        public record Pixel(float[] values) implements FloatImage.Pixel {
         }
     }
 

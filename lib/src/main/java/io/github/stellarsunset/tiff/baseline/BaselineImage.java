@@ -2,7 +2,6 @@ package io.github.stellarsunset.tiff.baseline;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Image;
-import io.github.stellarsunset.tiff.Pixel;
 import io.github.stellarsunset.tiff.baseline.tag.BitsPerSample;
 import io.github.stellarsunset.tiff.baseline.tag.PhotometricInterpretation;
 import io.github.stellarsunset.tiff.extension.DataImage;
@@ -26,7 +25,16 @@ public sealed interface BaselineImage extends Image permits BiLevelImage, Graysc
     }
 
     @Override
-    Pixel.Baseline valueAt(int row, int col);
+    Pixel valueAt(int row, int col);
+
+    /**
+     * {@link Pixel} subtype for use in {@link BaselineImage} images.
+     *
+     * <p>Provided as a base for inheritance to allow easy switching over returned pixel values.
+     */
+    sealed interface Pixel extends Image.Pixel permits BiLevelImage.Pixel, GrayscaleImage.EightBit.Pixel,
+            GrayscaleImage.FourBit.Pixel, PaletteColorImage.Pixel, RgbImage.Pixel {
+    }
 
     record Maker(Image.Maker biLevel, Image.Maker grayscale, Image.Maker fullColor,
                  Image.Maker palette) implements Image.Maker {

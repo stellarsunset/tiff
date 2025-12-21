@@ -2,7 +2,6 @@ package io.github.stellarsunset.tiff.extension;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Image;
-import io.github.stellarsunset.tiff.Pixel;
 import io.github.stellarsunset.tiff.Raster;
 import io.github.stellarsunset.tiff.baseline.BaselineImage;
 import io.github.stellarsunset.tiff.baseline.ImageDimensions;
@@ -29,7 +28,11 @@ public sealed interface ByteImage extends DataImage {
         return new Maker();
     }
 
-    Pixel.Byte valueAt(int row, int col);
+    @Override
+    Pixel valueAt(int row, int col);
+
+    sealed interface Pixel extends DataImage.Pixel {
+    }
 
     record Byte1Image(ImageDimensions dimensions, byte[][] data) implements ByteImage {
 
@@ -38,8 +41,21 @@ public sealed interface ByteImage extends DataImage {
         }
 
         @Override
-        public Pixel.Byte1 valueAt(int row, int col) {
-            return new Pixel.Byte1(data[row][col]);
+        public Pixel valueAt(int row, int col) {
+            return new Pixel(data[row][col]);
+        }
+
+        /**
+         * Represents the value of a pixel as a single 8-bit integer (byte).
+         *
+         * <p>Most {@link BaselineImage.Pixel} types can be represented a {@link Byte1Image.Pixel} or {@link Byte3Image.Pixel}
+         * types.
+         */
+        public record Pixel(byte value) implements ByteImage.Pixel {
+
+            public int unsignedValue() {
+                return java.lang.Byte.toUnsignedInt(value);
+            }
         }
     }
 
@@ -50,12 +66,30 @@ public sealed interface ByteImage extends DataImage {
         }
 
         @Override
-        public Pixel.Byte3 valueAt(int row, int col) {
+        public Pixel valueAt(int row, int col) {
             int offset = col * 3;
             byte b1 = data[row][offset];
             byte b2 = data[row][offset + 1];
             byte b3 = data[row][offset + 2];
-            return new Pixel.Byte3(b1, b2, b3);
+            return new Pixel(b1, b2, b3);
+        }
+
+        /**
+         * Represents the value of a pixel as a trio of 8-bit integer (byte) values.
+         */
+        public record Pixel(byte b1, byte b2, byte b3) implements ByteImage.Pixel {
+
+            public int unsignedB1() {
+                return java.lang.Byte.toUnsignedInt(b1);
+            }
+
+            public int unsignedB2() {
+                return java.lang.Byte.toUnsignedInt(b2);
+            }
+
+            public int unsignedB3() {
+                return java.lang.Byte.toUnsignedInt(b3);
+            }
         }
     }
 
@@ -66,15 +100,21 @@ public sealed interface ByteImage extends DataImage {
         }
 
         @Override
-        public Pixel.ByteN valueAt(int row, int col) {
+        public Pixel valueAt(int row, int col) {
             int offset = col * componentsPerPixel;
-            return new Pixel.ByteN(
+            return new Pixel(
                     Arrays.copyOfRange(
                             data[row],
                             offset,
                             offset + componentsPerPixel
                     )
             );
+        }
+
+        /**
+         * Represents the value of a pixel as an arbitrary number of 8-bit integer (byte) values.
+         */
+        public record Pixel(byte[] values) implements ByteImage.Pixel {
         }
     }
 

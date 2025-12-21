@@ -2,12 +2,13 @@ package io.github.stellarsunset.tiff.baseline;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Image;
-import io.github.stellarsunset.tiff.Pixel;
 import io.github.stellarsunset.tiff.Raster;
 import io.github.stellarsunset.tiff.baseline.tag.PhotometricInterpretation;
 
 import java.nio.ByteOrder;
 import java.nio.channels.SeekableByteChannel;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Standard bi-level black and white image.
@@ -29,8 +30,40 @@ public record BiLevelImage(Interpretation type, ImageDimensions dimensions, Reso
     }
 
     @Override
-    public Pixel.BlackOrWhite valueAt(int row, int col) {
-        return new Pixel.BlackOrWhite(data[row][col], type.whiteIsZero());
+    public Pixel valueAt(int row, int col) {
+        return new Pixel(data[row][col], type.whiteIsZero());
+    }
+
+    /**
+     * Bi-level image pixels are either black or white and can be stored as:
+     * <ol>
+     *     <li>{@link BiLevelImage.Interpretation#BLACK_IS_ZERO}</li>
+     *     <li>{@link BiLevelImage.Interpretation#WHITE_IS_ZERO}</li>
+     * </ol>
+     *
+     * <p>formats. This record encodes the raw pixel value and a boolean indicator for whether white is zero, it then
+     * provides simple methods to determine whether the pixel should be colored white or black.
+     *
+     * <p>This could be broken into {@code WhiteIsZero} and {@code BlackIsZero} types, but that seems excessive.
+     */
+    public record Pixel(byte value, boolean whiteIsZero) implements BaselineImage.Pixel {
+
+        public Pixel {
+            checkArgument(value == 0 || value == 1,
+                    "Pixel value should be either 0 or 1, found %s.", value);
+        }
+
+        public boolean isWhite() {
+            return whiteIsZero && value == 0 || !whiteIsZero && value == 1;
+        }
+
+        public boolean isBlack() {
+            return whiteIsZero && value == 1 || !whiteIsZero && value == 0;
+        }
+
+        public int unsignedValue() {
+            return java.lang.Byte.toUnsignedInt(value);
+        }
     }
 
     public enum Interpretation {

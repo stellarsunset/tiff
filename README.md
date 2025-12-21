@@ -42,7 +42,7 @@ public Optional<RgbImage> asRgb(Image image) {
 // BaselineImage subclasses provide richer Pixel types with more semantic information
 RgbImage rgb0 = asRgb(image0).orElseThrow();
 
-Pixel.Rgb rgb0_0 = rgb0.valueAt(0, 0);
+RgbImage.Pixel rgb0_0 = rgb0.valueAt(0, 0);
 int r = rgb0_0.unsignedR();
 int g = rgb0_0.unsignedG();
 int b = rgb0_0.unsignedB();
@@ -87,7 +87,7 @@ public Optional<Float3Image> asFloat(Image image) {
 // objects like Number[])
 Float3Image float0 = asFloat(image0);
 
-Pixel.Float3 float0_0 = float0.valueAt(0, 0);
+Float3Image.Pixel float0_0 = float0.valueAt(0, 0);
 float f1 = float0_0.f1();
 float f2 = float0_0.f2();
 float f3 = float0_0.f3();

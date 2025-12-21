@@ -37,6 +37,35 @@ public sealed interface Image permits Image.Lazy, Image.Unknown, BaselineImage, 
 
     Pixel valueAt(int row, int col);
 
+    /**
+     * Represents the value of a row/col (y/x) pixel in an image.
+     *
+     * <p>Different {@link Image} implementations are expected to return different {@link Pixel} subtypes specific to
+     * their implementation.
+     *
+     * <p>These implementations are provided to:
+     * <ol>
+     *     <li>Provide distinct types to help communicate differences in how pixels are encoded</li>
+     *     <li>Provide places for further documentation on their interpretation for rendering</li>
+     * </ol>
+     *
+     * <p>Expect to find implementations of these directly in their associated concrete image subtypes.
+     */
+    sealed interface Pixel permits Pixel.Empty, BaselineImage.Pixel, ExtensionImage.Pixel {
+
+        static Pixel empty() {
+            return new Empty();
+        }
+
+        /**
+         * Represents an empty pixel value.
+         *
+         * <p>Expected as a potential response type for out-of-range queries, testing, etc.
+         */
+        record Empty() implements Pixel {
+        }
+    }
+
     record Unknown(SeekableByteChannel channel, Ifd ifd) implements Image {
         @Override
         public Pixel valueAt(int row, int col) {
