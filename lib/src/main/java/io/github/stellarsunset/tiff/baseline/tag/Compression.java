@@ -10,7 +10,7 @@ import io.github.stellarsunset.tiff.compress.Compressors;
  *
  * <p>N = 1. Type = {@link Entry.Short}.
  */
-public final class Compression implements Tag.Value {
+public final class Compression implements Tag.Accessor {
 
     public static final Tag TAG = new Tag((short) 0x103, "COMPRESSION");
 
@@ -18,6 +18,6 @@ public final class Compression implements Tag.Value {
      * Used with the {@link Compressors} registry of compression algorithms to pack/unpack the bytes of an image.
      */
     public static int get(Ifd ifd) {
-        return Tag.Value.optionalUShort(TAG, ifd).orElse(1);
+        return Tag.Accessor.optionalUShort(TAG, ifd).orElse(1);
     }
 }

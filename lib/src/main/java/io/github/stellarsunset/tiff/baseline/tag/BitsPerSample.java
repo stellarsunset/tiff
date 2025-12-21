@@ -19,16 +19,16 @@ import java.util.OptionalInt;
  * <p>Most RGB files will have the same number of BitsPerSample for each component. Even in this case, the writer
  * must write all three values.
  */
-public final class BitsPerSample implements Tag.Value {
+public final class BitsPerSample implements Tag.Accessor {
 
     public static final Tag TAG = new Tag((short) 0x102, "BITS_PER_SAMPLE");
 
     public static int[] get(Ifd ifd) {
-        return Tag.Value.optionalUShortArray(TAG, ifd).orElseThrow(() -> new MissingRequiredTagException(TAG));
+        return getIfPresent(ifd).orElseThrow(() -> new MissingRequiredTagException(TAG));
     }
 
     public static Optional<int[]> getIfPresent(Ifd ifd) {
-        return Tag.Value.optionalUShortArray(TAG, ifd).or(() -> {
+        return Tag.Accessor.optionalUShortArray(TAG, ifd).or(() -> {
             OptionalInt samplesPerPixel = SamplesPerPixel.getIfPresent(ifd);
             return samplesPerPixel.isPresent()
                     ? Optional.of(createDefault(samplesPerPixel.getAsInt()))

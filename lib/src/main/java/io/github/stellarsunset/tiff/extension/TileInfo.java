@@ -27,19 +27,19 @@ public record TileInfo(long length, long width, long[] offsets, long[] byteCount
 
     public static TileInfo getRequired(Ifd ifd) {
         return new TileInfo(
-                TileLength.getRequired(ifd),
-                TileWidth.getRequired(ifd),
-                TileOffsets.getRequired(ifd),
-                TileByteCounts.getRequired(ifd)
+                TileLength.get(ifd),
+                TileWidth.get(ifd),
+                TileOffsets.get(ifd),
+                TileByteCounts.get(ifd)
         );
     }
 
     public static Optional<TileInfo> getOptional(Ifd ifd) {
 
-        OptionalLong length = TileLength.getOptional(ifd);
-        OptionalLong width = TileWidth.getOptional(ifd);
-        Optional<long[]> offsets = TileOffsets.getOptional(ifd);
-        Optional<long[]> byteCounts = TileByteCounts.getOptional(ifd);
+        OptionalLong length = TileLength.getIfPresent(ifd);
+        OptionalLong width = TileWidth.getIfPresent(ifd);
+        Optional<long[]> offsets = TileOffsets.getIfPresent(ifd);
+        Optional<long[]> byteCounts = TileByteCounts.getIfPresent(ifd);
 
         if (length.isPresent() && width.isPresent() && offsets.isPresent() && byteCounts.isPresent()) {
             return Optional.of(

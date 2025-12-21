@@ -17,7 +17,7 @@ import java.util.OptionalInt;
  *     <li>3 = Centimeter.</li>
  * </ul>
  */
-public final class ResolutionUnit implements Tag.Value {
+public final class ResolutionUnit implements Tag.Accessor {
 
     public static final Tag TAG = new Tag((short) 0x128, "RESOLUTION_UNIT");
 
@@ -26,7 +26,7 @@ public final class ResolutionUnit implements Tag.Value {
      * value.
      */
     public static int get(Ifd ifd) {
-        OptionalInt maybeRes = Tag.Value.optionalUShort(TAG, ifd);
+        OptionalInt maybeRes = Tag.Accessor.optionalUShort(TAG, ifd);
         return maybeRes.isPresent() ? maybeRes.getAsInt() : 2;
     }
 }

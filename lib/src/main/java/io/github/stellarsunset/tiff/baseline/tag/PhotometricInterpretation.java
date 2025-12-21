@@ -11,7 +11,7 @@ import java.util.OptionalInt;
  *
  * <p>N = 1. Type = {@link Entry.Short}.
  */
-public final class PhotometricInterpretation implements Tag.Value {
+public final class PhotometricInterpretation implements Tag.Accessor {
 
     public static final Tag TAG = new Tag((short) 0x106, "PHOTOMETRIC_INTERPRETATION");
 
@@ -20,6 +20,6 @@ public final class PhotometricInterpretation implements Tag.Value {
     }
 
     public static OptionalInt getIfPresent(Ifd ifd) {
-        return Tag.Value.optionalUShort(TAG, ifd);
+        return Tag.Accessor.optionalUShort(TAG, ifd);
     }
 }

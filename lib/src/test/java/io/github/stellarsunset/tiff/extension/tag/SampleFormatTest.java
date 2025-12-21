@@ -13,7 +13,7 @@ class SampleFormatTest {
     @Test
     void testCreateDefault() {
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(SamplesPerPixel.ID, new short[]{4})
+                new Ifd.Entry.Short(SamplesPerPixel.TAG.id(), new short[]{4})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
@@ -24,7 +24,7 @@ class SampleFormatTest {
     void testWrongType() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Float(SampleFormat.ID, new float[]{1.0f})
+                new Ifd.Entry.Float(SampleFormat.TAG.id(), new float[]{1.0f})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
@@ -35,8 +35,8 @@ class SampleFormatTest {
     void testMissingId() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(SamplesPerPixel.ID, new short[]{1}),
-                new Ifd.Entry.Short(TileWidth.ID, new short[]{1})
+                new Ifd.Entry.Short(SamplesPerPixel.TAG.id(), new short[]{1}),
+                new Ifd.Entry.Short(TileWidth.TAG.id(), new short[]{1})
         };
 
         Ifd ifd = new Ifd((short) 2, entry, 0);
@@ -47,7 +47,7 @@ class SampleFormatTest {
     void testCorrect() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(SampleFormat.ID, new short[]{8})
+                new Ifd.Entry.Short(SampleFormat.TAG.id(), new short[]{8})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);

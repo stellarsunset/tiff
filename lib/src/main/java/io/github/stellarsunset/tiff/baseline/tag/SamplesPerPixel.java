@@ -10,7 +10,7 @@ import java.util.OptionalInt;
  *
  * <p>See the ExtraSamples field for further information.
  */
-public final class SamplesPerPixel implements Tag.Value {
+public final class SamplesPerPixel implements Tag.Accessor {
 
     public static final Tag TAG = new Tag((short) 0x115, "SAMPLES_PER_PIXEL");
 
@@ -19,6 +19,6 @@ public final class SamplesPerPixel implements Tag.Value {
     }
 
     public static OptionalInt getIfPresent(Ifd ifd) {
-        return Tag.Value.optionalUShort(TAG, ifd);
+        return Tag.Accessor.optionalUShort(TAG, ifd);
     }
 }

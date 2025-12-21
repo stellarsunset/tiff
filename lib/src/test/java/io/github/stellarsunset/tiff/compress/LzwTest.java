@@ -126,7 +126,7 @@ class LzwTest {
 
             Ifd ifd = file.ifd(0);
 
-            int[] bitsPerSample = BitsPerSample.getRequired(ifd);
+            int[] bitsPerSample = BitsPerSample.get(ifd);
 
             int compression = Compression.get(ifd);
             int photometricInterpretation = PhotometricInterpretation.get(ifd);

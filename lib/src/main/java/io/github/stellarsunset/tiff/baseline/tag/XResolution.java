@@ -12,7 +12,7 @@ import java.util.Optional;
  *
  * <p>N = 1. Type = {@link Entry.Rational}.
  */
-public final class XResolution implements Tag.Value {
+public final class XResolution implements Tag.Accessor {
 
     public static final Tag TAG = new Tag((short) 0x11A, "X_RESOLUTION");
 
@@ -21,6 +21,6 @@ public final class XResolution implements Tag.Value {
     }
 
     public static Optional<Rational> getIfPresent(Ifd ifd) {
-        return Tag.Value.optionalRational(TAG, ifd);
+        return Tag.Accessor.optionalRational(TAG, ifd);
     }
 }

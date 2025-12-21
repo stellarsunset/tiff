@@ -15,11 +15,11 @@ class TileByteCountsTest {
     void testWrongType() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Float(TileByteCounts.ID, new float[]{1.0f})
+                new Ifd.Entry.Float(TileByteCounts.TAG.id(), new float[]{1.0f})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertThrows(UnsupportedTypeForTagException.class, () -> TileByteCounts.getRequired(ifd));
+        assertThrows(UnsupportedTypeForTagException.class, () -> TileByteCounts.get(ifd));
     }
 
     @Test
@@ -30,28 +30,28 @@ class TileByteCountsTest {
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertThrows(MissingRequiredTagException.class, () -> TileByteCounts.getRequired(ifd));
+        assertThrows(MissingRequiredTagException.class, () -> TileByteCounts.get(ifd));
     }
 
     @Test
     void testCorrectShort() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(TileByteCounts.ID, new short[]{8})
+                new Ifd.Entry.Short(TileByteCounts.TAG.id(), new short[]{8})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertArrayEquals(new long[]{8}, TileByteCounts.getRequired(ifd));
+        assertArrayEquals(new long[]{8}, TileByteCounts.get(ifd));
     }
 
     @Test
     void testCorrectLong() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Long(TileByteCounts.ID, new int[]{8})
+                new Ifd.Entry.Long(TileByteCounts.TAG.id(), new int[]{8})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertArrayEquals(new long[]{8}, TileByteCounts.getRequired(ifd));
+        assertArrayEquals(new long[]{8}, TileByteCounts.get(ifd));
     }
 }

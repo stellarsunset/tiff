@@ -16,7 +16,7 @@ import java.util.OptionalLong;
  * <p>RowsPerStrip and ImageLength together tell us the number of strips in the entire image. The equation is:
  * {@code StripsPerImage = floor ((ImageLength + RowsPerStrip - 1) / RowsPerStrip)}
  */
-public final class RowsPerStrip implements Tag.Value {
+public final class RowsPerStrip implements Tag.Accessor {
 
     public static final Tag TAG = new Tag((short) 0x116, "ROWS_PER_STRIP");
 
@@ -25,6 +25,6 @@ public final class RowsPerStrip implements Tag.Value {
     }
 
     public static OptionalLong getIfPresent(Ifd ifd) {
-        return Tag.Value.optionalUInt(TAG, ifd);
+        return Tag.Accessor.optionalUInt(TAG, ifd);
     }
 }

@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * A top-level TIFF tag used to store ASCII values associated with {@link GeoKeyDirectory} entry values.
  */
-public final class GeoAsciiParams {
+public final class GeoAsciiParams implements Tag.Accessor {
 
     public static final Tag TAG = new Tag((short) 0x87B1, "GEO_ASCII_PARAMS");
 
@@ -18,6 +18,6 @@ public final class GeoAsciiParams {
     }
 
     public static Optional<byte[]> getIfPresent(Ifd ifd) {
-        return Tag.Value.optionalAsciiArray(TAG, ifd);
+        return Tag.Accessor.optionalAsciiArray(TAG, ifd);
     }
 }

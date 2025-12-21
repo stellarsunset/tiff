@@ -17,7 +17,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * <p>Currently this field is used only with LZW ({@link Compression}=5) encoding because LZW is probably the only TIFF
  * encoding scheme that benefits significantly from a predictor step.
  */
-public interface DifferencingPredictor extends Tag.Value {
+public interface DifferencingPredictor extends Tag.Accessor {
 
     Tag TAG = new Tag((short) 0x13D, "DIFFERENCING_PREDICTOR");
 
@@ -63,12 +63,12 @@ public interface DifferencingPredictor extends Tag.Value {
      */
     static DifferencingPredictor get(Ifd ifd) {
 
-        int planarConfiguration = PlanarConfiguration.getRequired(ifd);
+        int planarConfiguration = PlanarConfiguration.get(ifd);
 
         checkArgument(planarConfiguration == 1,
                 "Predictors only supported on PlanarConfiguration 1, was %s", planarConfiguration);
 
-        int type = Tag.Value.optionalUShort(TAG, ifd).orElse(1);
+        int type = Tag.Accessor.optionalUShort(TAG, ifd).orElse(1);
         int componentsPerPixel = SamplesPerPixel.get(ifd);
 
         return switch (type) {

@@ -12,7 +12,7 @@ import java.util.Optional;
  * <p>N = StripsPerImage for PlanarConfiguration equal to 1 | SamplesPerPixel * StripsPerImage for PlanarConfiguration
  * equal to 2. Type = {@link Entry.Short} | {@link Entry.Long}.
  */
-public final class StripByteCounts implements Tag.Value {
+public final class StripByteCounts implements Tag.Accessor {
 
     public static final Tag TAG = new Tag((short) 0x117, "STRIP_BYTE_COUNTS");
 
@@ -21,6 +21,6 @@ public final class StripByteCounts implements Tag.Value {
     }
 
     public static Optional<long[]> getIfPresent(Ifd ifd) {
-        return Tag.Value.optionalUIntArray(TAG, ifd);
+        return Tag.Accessor.optionalUIntArray(TAG, ifd);
     }
 }

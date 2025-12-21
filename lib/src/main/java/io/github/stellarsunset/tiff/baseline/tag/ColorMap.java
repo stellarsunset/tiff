@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
-public final class ColorMap implements Tag.Value {
+public final class ColorMap implements Tag.Accessor {
 
     public static final Tag TAG = new Tag((short) 0x140, "COLOR_MAP");
 

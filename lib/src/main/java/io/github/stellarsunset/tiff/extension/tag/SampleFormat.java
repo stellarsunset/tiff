@@ -1,9 +1,8 @@
 package io.github.stellarsunset.tiff.extension.tag;
 
 import io.github.stellarsunset.tiff.Ifd;
-import io.github.stellarsunset.tiff.Ifd.Entry;
+import io.github.stellarsunset.tiff.Tag;
 import io.github.stellarsunset.tiff.baseline.tag.SamplesPerPixel;
-import io.github.stellarsunset.tiff.baseline.tag.UnsupportedTypeForTagException;
 
 /**
  * This field specifies how to interpret each data sample in a pixel. Possible values are:
@@ -26,20 +25,12 @@ import io.github.stellarsunset.tiff.baseline.tag.UnsupportedTypeForTagException;
  * <p>This returning an array means that different components of the same pixel may be different types... which is a bit
  * wild, we don't support this.
  */
-public final class SampleFormat {
+public final class SampleFormat implements Tag.Accessor {
 
-    public static final String NAME = "SAMPLE_FORMAT";
-
-    public static final short ID = 0x153;
+    public static final Tag TAG = new Tag((short) 0x153, "SAMPLE_FORMAT");
 
     public static int[] get(Ifd ifd) {
-        return switch (ifd.findTag(ID)) {
-            case Entry.Short s -> Arrays.toUnsignedIntArray(s.values());
-            case Entry.NotFound _ -> createDefault(ifd);
-            case Entry.Byte _, Entry.Ascii _, Entry.Long _, Entry.Rational _, Entry.SByte _, Entry.Undefined _,
-                 Entry.SShort _, Entry.SLong _, Entry.SRational _, Entry.Float _, Entry.Double _ ->
-                    throw new UnsupportedTypeForTagException(NAME, ID);
-        };
+        return Tag.Accessor.optionalUShortArray(TAG, ifd).orElseGet(() -> createDefault(ifd));
     }
 
     static int[] createDefault(Ifd ifd) {

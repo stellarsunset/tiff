@@ -11,7 +11,7 @@ import java.util.OptionalLong;
  *
  * <p>N = 1. Type = {@link Entry.Short} | {@link Entry.Long}.
  */
-public final class ImageLength implements Tag.Value {
+public final class ImageLength implements Tag.Accessor {
 
     public static final Tag TAG = new Tag((short) 0x101, "IMAGE_LENGTH");
 
@@ -20,6 +20,6 @@ public final class ImageLength implements Tag.Value {
     }
 
     public static OptionalLong getIfPresent(Ifd ifd) {
-        return Tag.Value.optionalUInt(TAG, ifd);
+        return Tag.Accessor.optionalUInt(TAG, ifd);
     }
 }

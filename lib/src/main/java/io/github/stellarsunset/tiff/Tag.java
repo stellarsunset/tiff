@@ -14,8 +14,8 @@ import java.util.OptionalLong;
 /**
  * Metadata about TIFF images is encoded in "tags", the values of tags are stored as entries inside an {@link Ifd}.
  *
- * <p>Convention for brevity/clarity/etc. is to wrap tag instances in a static accessor class, see {@link ImageLength}
- * or {@link ColorMap}, these classes can be located via the marker interface {@link Tag.Value}.
+ * <p>Convention for brevity/clarity/etc. is to provide a static accessor class for tags, see {@link ImageLength} or
+ * {@link ColorMap}, these classes can be located via the marker interface {@link Accessor}.
  *
  * @param id   the identifier for the tag, this is used to locate {@link Entry}'s containing the value of the tag.
  * @param name the canonical name for the tag, this isn't used functionally for lookups, but is useful context to have
@@ -30,14 +30,14 @@ public record Tag(short id, String name) {
      * <p>Splitting this out makes more sense for things like, {@link ColorMap} and {@link GeoKeyDirectory} which are
      * complex and semantically meaningful values, but also provides a place to collect useful tag value extraction code.
      *
-     * <p>By conventions {@link Value} implementations should have two static methods:
+     * <p>By conventions {@link Accessor} implementations should have two static methods:
      * <ol>
      *     <li>{@code Class.get(Ifd ifd)} - returning the value of the tag or throwing a {@link MissingRequiredTagException}.</li>
      *     <li>{@code Class.getIfPresent(Ifd ifd)} - return the value of the tag if present or {@link Optional#empty()}
      *     if the value isn't present.</li>
      * </ol>
      */
-    public interface Value {
+    public interface Accessor {
 
         /**
          * Convenience, optionally returns an array of ASCII character bytes.
@@ -129,6 +129,23 @@ public record Tag(short id, String name) {
                 case Entry.Byte _, Entry.Ascii _, Entry.Short _, Entry.Long _, Entry.SByte _, Entry.Undefined _,
                      Entry.SShort _, Entry.SLong _, Entry.SRational _,
                      Entry.Float _, Entry.Double _ -> throw new UnsupportedTypeForTagException(tag, entry.getClass());
+            };
+        }
+
+        /**
+         * Convenience, optionally returns the value of the provided tag as an array of {@link double}s.
+         *
+         * @param tag the tag value to access
+         * @param ifd the {@link Ifd} to locate the tag in
+         */
+        static Optional<double[]> optionalDoubleArray(Tag tag, Ifd ifd) {
+            Ifd.Entry entry = ifd.findTag(tag.id);
+            return switch (entry) {
+                case Entry.Double d -> Optional.of(d.values());
+                case Entry.NotFound _ -> Optional.empty();
+                case Entry.Byte _, Entry.Ascii _, Entry.Short _, Entry.Long _, Entry.Rational _, Entry.SByte _,
+                     Entry.Undefined _, Entry.SShort _, Entry.SLong _, Entry.SRational _, Entry.Float _ ->
+                        throw new UnsupportedTypeForTagException(tag, entry.getClass());
             };
         }
     }
