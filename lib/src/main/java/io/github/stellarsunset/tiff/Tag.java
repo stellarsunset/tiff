@@ -86,7 +86,7 @@ public record Tag(short id, String name) {
         }
 
         /**
-         * Convenience, optionally returns the value of the provided tag as an unsigned integer, in a {@link long} as all
+         * Convenience, optionally returns the value of the provided tag as an unsigned integer, in a {@code long} as all
          * Java primitives are implicitly signed.
          *
          * @param tag the tag value to access
@@ -97,7 +97,7 @@ public record Tag(short id, String name) {
         }
 
         /**
-         * Convenience, optionally returns the value of the provided tag as an array of unsigned integers, in a {@link long[]}
+         * Convenience, optionally returns the value of the provided tag as an array of unsigned integers, in a {@code long[]}
          * as all Java primitives are implicitly signed.
          *
          * @param tag the tag value to access
@@ -133,7 +133,7 @@ public record Tag(short id, String name) {
         }
 
         /**
-         * Convenience, optionally returns the value of the provided tag as an array of {@link double}s.
+         * Convenience, optionally returns the value of the provided tag as an array of {@code double}s.
          *
          * @param tag the tag value to access
          * @param ifd the {@link Ifd} to locate the tag in
