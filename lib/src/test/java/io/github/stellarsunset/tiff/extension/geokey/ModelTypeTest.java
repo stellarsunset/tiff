@@ -13,32 +13,32 @@ class ModelTypeTest {
     void testWrongType() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Float(ModelType.ID, new float[]{1.0f})
+                new Ifd.Entry.Float(ModelType.KEY.id(), new float[]{1.0f})
         };
 
         GeoKeyDirectory gkd = GeoKeyDirectory.v1(entry);
-        assertThrows(UnsupportedTypeForGeoKeyException.class, () -> ModelType.getRequired(gkd));
+        assertThrows(UnsupportedTypeForGeoKeyException.class, () -> ModelType.get(gkd));
     }
 
     @Test
     void testMissingId() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(RasterType.ID, new short[]{1})
+                new Ifd.Entry.Short(RasterType.KEY.id(), new short[]{1})
         };
 
         GeoKeyDirectory gkd = GeoKeyDirectory.v1(entry);
-        assertThrows(MissingRequiredGeoKeyException.class, () -> ModelType.getRequired(gkd));
+        assertThrows(MissingRequiredGeoKeyException.class, () -> ModelType.get(gkd));
     }
 
     @Test
     void testCorrect() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(ModelType.ID, new short[]{1})
+                new Ifd.Entry.Short(ModelType.KEY.id(), new short[]{1})
         };
 
         GeoKeyDirectory gkd = GeoKeyDirectory.v1(entry);
-        assertEquals(1, ModelType.getRequired(gkd));
+        assertEquals(1, ModelType.get(gkd));
     }
 }

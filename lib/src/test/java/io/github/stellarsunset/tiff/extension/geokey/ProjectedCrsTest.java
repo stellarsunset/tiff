@@ -13,32 +13,32 @@ class ProjectedCrsTest {
     void testWrongType() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Float(ProjectedCrs.ID, new float[]{1.0f})
+                new Ifd.Entry.Float(ProjectedCrs.KEY.id(), new float[]{1.0f})
         };
 
         GeoKeyDirectory gkd = GeoKeyDirectory.v1(entry);
-        assertThrows(UnsupportedTypeForGeoKeyException.class, () -> ProjectedCrs.getRequired(gkd));
+        assertThrows(UnsupportedTypeForGeoKeyException.class, () -> ProjectedCrs.get(gkd));
     }
 
     @Test
     void testMissingId() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(GeodeticCrs.ID, new short[]{1})
+                new Ifd.Entry.Short(GeodeticCrs.KEY.id(), new short[]{1})
         };
 
         GeoKeyDirectory gkd = GeoKeyDirectory.v1(entry);
-        assertThrows(MissingRequiredGeoKeyException.class, () -> ProjectedCrs.getRequired(gkd));
+        assertThrows(MissingRequiredGeoKeyException.class, () -> ProjectedCrs.get(gkd));
     }
 
     @Test
     void testCorrect() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(ProjectedCrs.ID, new short[]{1})
+                new Ifd.Entry.Short(ProjectedCrs.KEY.id(), new short[]{1})
         };
 
         GeoKeyDirectory gkd = GeoKeyDirectory.v1(entry);
-        assertEquals(1, ProjectedCrs.getRequired(gkd));
+        assertEquals(1, ProjectedCrs.get(gkd));
     }
 }

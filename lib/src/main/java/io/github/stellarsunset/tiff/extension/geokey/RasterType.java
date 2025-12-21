@@ -1,6 +1,5 @@
 package io.github.stellarsunset.tiff.extension.geokey;
 
-import io.github.stellarsunset.tiff.Ifd.Entry;
 import io.github.stellarsunset.tiff.extension.tag.GeoKeyDirectory;
 
 import java.util.OptionalInt;
@@ -22,23 +21,15 @@ import java.util.OptionalInt;
  *
  * <p>The use of this geokey is highly recommended for accurate georeferencing of raster.
  */
-public final class RasterType {
+public final class RasterType implements GeoKey.Accessor {
 
-    public static final String NAME = "RASTER_TYPE";
+    public static final GeoKey KEY = new GeoKey((short) 0x401, "RASTER_TYPE");
 
-    public static final short ID = 0x401;
-
-    public static int getRequired(GeoKeyDirectory gkd) {
-        return getOptional(gkd).orElseThrow(() -> new MissingRequiredGeoKeyException(NAME, ID));
+    public static int get(GeoKeyDirectory gkd) {
+        return getIfPresent(gkd).orElseThrow(() -> new MissingRequiredGeoKeyException(KEY));
     }
 
-    public static OptionalInt getOptional(GeoKeyDirectory gkd) {
-        return switch (gkd.findKey(ID)) {
-            case Entry.Short s -> OptionalInt.of(Short.toUnsignedInt(s.values()[0]));
-            case Entry.NotFound _ -> OptionalInt.empty();
-            case Entry.Byte _, Entry.Ascii _, Entry.Long _, Entry.Rational _, Entry.SByte _, Entry.Undefined _,
-                 Entry.SShort _, Entry.SLong _, Entry.SRational _,
-                 Entry.Float _, Entry.Double _ -> throw new UnsupportedTypeForGeoKeyException(NAME, ID);
-        };
+    public static OptionalInt getIfPresent(GeoKeyDirectory gkd) {
+        return GeoKey.Accessor.optionalUShort(KEY, gkd);
     }
 }
