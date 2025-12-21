@@ -6,22 +6,17 @@ import io.github.stellarsunset.tiff.extension.tag.GeoKeyDirectory;
 import java.util.OptionalInt;
 
 /**
- * This key is used to specify the projected coordinate reference system from the GeoTIFF CRS register or to indicate
- * that the Model CRS is a user-defined projected coordinate reference system.
+ * Similar to {@link ProjectedCrs} and {@link GeodeticCrs}, this tag is used to describe the vertical datum within an
+ * image. Depending on the image content this may be supplied alongside either the projected or geodetic CRS.
  *
- * <p>Projected CRS's convert latitude/longitudes into flat Cartesian-like coordinate systems, usually with units of feet
- * or meters. Using a projected CRS makes it easier to compute distances and areas.
- *
- * <p>E.g. a TIFF image using a projected CRS may have a pixel spacing of 30 meters, 10 meters, etc. so the distances
- * between the pixels remain constant across the image.
- *
- * <p>This is exclusive with {@link GeodeticCrs}.
+ * <p>Take for example a TIFF image where the value of each pixel is an elevation in meters, this field describes the
+ * vertical CRS these elevations are with respect to, e.g. a spherical earth, an ellipsoidal model, or a specific geoid.
  */
-public final class ProjectedCrs {
+public final class VerticalCrs {
 
-    public static final String NAME = "PROJECTED_CRS";
+    public static final String NAME = "VERTICAL_CRS";
 
-    public static final short ID = 0xC00;
+    public static final short ID = 0x1000;
 
     public static int getRequired(GeoKeyDirectory gkd) {
         return getOptional(gkd).orElseThrow(() -> new MissingRequiredGeoKeyException(NAME, ID));

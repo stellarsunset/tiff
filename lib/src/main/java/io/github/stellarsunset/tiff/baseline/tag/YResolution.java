@@ -3,6 +3,7 @@ package io.github.stellarsunset.tiff.baseline.tag;
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Ifd.Entry;
 import io.github.stellarsunset.tiff.Rational;
+import io.github.stellarsunset.tiff.Tag;
 
 import java.util.Optional;
 
@@ -11,22 +12,15 @@ import java.util.Optional;
  *
  * <p>N = 1. Type = {@link Entry.Rational}.
  */
-public final class YResolution {
+public final class YResolution implements Tag.Accessor {
 
-    public static final String NAME = "Y_RESOLUTION";
+    public static final Tag TAG = new Tag((short) 0x11B, "Y_RESOLUTION");
 
-    public static final short ID = 0x11B;
-
-    public static Rational getRequired(Ifd ifd) {
-        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+    public static Rational get(Ifd ifd) {
+        return getIfPresent(ifd).orElseThrow(() -> new MissingRequiredTagException(TAG));
     }
 
-    public static Optional<Rational> getOptional(Ifd ifd) {
-        return switch (ifd.findTag(ID)) {
-            case Entry.Rational r -> Optional.of(r.rational(0));
-            case Entry.NotFound _ -> Optional.empty();
-            case Entry.Byte _, Entry.Ascii _, Entry.Short _, Entry.Long _, Entry.SByte _, Entry.Undefined _, Entry.SShort _, Entry.SLong _, Entry.SRational _,
-                    Entry.Float _, Entry.Double _ -> throw new UnsupportedTypeForTagException(NAME, ID);
-        };
+    public static Optional<Rational> getIfPresent(Ifd ifd) {
+        return Tag.Accessor.optionalRational(TAG, ifd);
     }
 }

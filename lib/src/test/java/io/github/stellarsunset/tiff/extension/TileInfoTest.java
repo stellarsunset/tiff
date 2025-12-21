@@ -18,10 +18,10 @@ class TileInfoTest {
         Ifd ifd = new Ifd(
                 (short) 4,
                 new Entry[]{
-                        new Entry.Long(TileLength.ID, new int[]{1}),
-                        new Entry.Long(TileWidth.ID, new int[]{1}),
-                        new Entry.Long(TileOffsets.ID, new int[]{20, 40, -1}),
-                        new Entry.Long(TileByteCounts.ID, new int[]{10, 10, -1})
+                        new Entry.Long(TileLength.TAG.id(), new int[]{1}),
+                        new Entry.Long(TileWidth.TAG.id(), new int[]{1}),
+                        new Entry.Long(TileOffsets.TAG.id(), new int[]{20, 40, -1}),
+                        new Entry.Long(TileByteCounts.TAG.id(), new int[]{10, 10, -1})
                 },
                 0
         );

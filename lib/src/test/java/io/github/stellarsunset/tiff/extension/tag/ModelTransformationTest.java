@@ -12,31 +12,31 @@ class ModelTransformationTest {
     @Test
     void testWrongType() {
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Float(ModelTransformation.ID, new float[]{1.0f})
+                new Ifd.Entry.Float(ModelTransformation.TAG.id(), new float[]{1.0f})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertThrows(UnsupportedTypeForTagException.class, () -> ModelTransformation.getRequired(ifd));
+        assertThrows(UnsupportedTypeForTagException.class, () -> ModelTransformation.get(ifd));
     }
 
     @Test
     void testMissingId() {
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Double(ModelTiepoint.ID, new double[]{1.0d})
+                new Ifd.Entry.Double(ModelTiepoint.TAG.id(), new double[]{1.0d})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertThrows(MissingRequiredTagException.class, () -> ModelTransformation.getRequired(ifd));
+        assertThrows(MissingRequiredTagException.class, () -> ModelTransformation.get(ifd));
     }
 
     @Test
     void testIncorrectNumberOfEntries() {
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Double(ModelTransformation.ID, new double[]{1.0d})
+                new Ifd.Entry.Double(ModelTransformation.TAG.id(), new double[]{1.0d})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertThrows(IllegalArgumentException.class, () -> ModelTransformation.getRequired(ifd));
+        assertThrows(IllegalArgumentException.class, () -> ModelTransformation.get(ifd));
     }
 
     @Test
@@ -44,11 +44,11 @@ class ModelTransformationTest {
         double[] matrix = new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Double(ModelTransformation.ID, matrix)
+                new Ifd.Entry.Double(ModelTransformation.TAG.id(), matrix)
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        double[][] actual = ModelTransformation.getRequired(ifd);
+        double[][] actual = ModelTransformation.get(ifd);
 
         assertAll(
                 () -> assertArrayEquals(new double[]{1, 2, 3, 4}, actual[0], "Row 0"),

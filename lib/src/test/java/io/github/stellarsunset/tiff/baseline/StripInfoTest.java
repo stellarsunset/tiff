@@ -17,9 +17,9 @@ class StripInfoTest {
         Ifd ifd = new Ifd(
                 (short) 3,
                 new Entry[]{
-                        new Entry.Long(RowsPerStrip.ID, new int[]{1}),
-                        new Entry.Long(StripOffsets.ID, new int[]{20, 40, -1}),
-                        new Entry.Long(StripByteCounts.ID, new int[]{10, 10, -1})
+                        new Entry.Long(RowsPerStrip.TAG.id(), new int[]{1}),
+                        new Entry.Long(StripOffsets.TAG.id(), new int[]{20, 40, -1}),
+                        new Entry.Long(StripByteCounts.TAG.id(), new int[]{10, 10, -1})
                 },
                 0
         );
@@ -38,9 +38,9 @@ class StripInfoTest {
         Ifd ifd = new Ifd(
                 (short) 3,
                 new Entry[]{
-                        new Entry.Long(RowsPerStrip.ID, new int[]{1}),
-                        new Entry.Long(StripOffsets.ID, new int[]{20, 40, 1}),
-                        new Entry.Long(StripByteCounts.ID, new int[]{10, 10, 1})
+                        new Entry.Long(RowsPerStrip.TAG.id(), new int[]{1}),
+                        new Entry.Long(StripOffsets.TAG.id(), new int[]{20, 40, 1}),
+                        new Entry.Long(StripByteCounts.TAG.id(), new int[]{10, 10, 1})
                 },
                 0
         );

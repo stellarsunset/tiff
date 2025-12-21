@@ -82,7 +82,7 @@ public sealed interface FloatImage extends DataImage {
         @Override
         public FloatImage makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
-            int componentsPerPixel = SamplesPerPixel.getRequired(ifd);
+            int componentsPerPixel = SamplesPerPixel.get(ifd);
 
             Raster.Floats floats = Raster.Reader.floats(componentsPerPixel).readRaster(
                     channel,

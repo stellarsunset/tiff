@@ -2,6 +2,7 @@ package io.github.stellarsunset.tiff.baseline.tag;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Ifd.Entry;
+import io.github.stellarsunset.tiff.Tag;
 
 import java.util.OptionalLong;
 
@@ -10,23 +11,15 @@ import java.util.OptionalLong;
  *
  * <p>N = 1. Type = {@link Entry.Short} | {@link Entry.Long}.
  */
-public final class ImageLength {
+public final class ImageLength implements Tag.Accessor {
 
-    public static final String NAME = "IMAGE_LENGTH";
+    public static final Tag TAG = new Tag((short) 0x101, "IMAGE_LENGTH");
 
-    public static final short ID = 0x101;
-
-    public static long getRequired(Ifd ifd) {
-        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+    public static long get(Ifd ifd) {
+        return getIfPresent(ifd).orElseThrow(() -> new MissingRequiredTagException(TAG));
     }
 
-    public static OptionalLong getOptional(Ifd ifd) {
-        return switch (ifd.findTag(ID)) {
-            case Entry.Short s -> OptionalLong.of(Short.toUnsignedLong(s.values()[0]));
-            case Entry.Long l -> OptionalLong.of(Integer.toUnsignedLong(l.values()[0]));
-            case Entry.NotFound _ -> OptionalLong.empty();
-            case Entry.Byte _, Entry.Ascii _, Entry.Rational _, Entry.SByte _, Entry.Undefined _, Entry.SShort _, Entry.SLong _, Entry.SRational _,
-                    Entry.Float _, Entry.Double _ -> throw new UnsupportedTypeForTagException(NAME, ID);
-        };
+    public static OptionalLong getIfPresent(Ifd ifd) {
+        return Tag.Accessor.optionalUInt(TAG, ifd);
     }
 }

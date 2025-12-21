@@ -33,10 +33,10 @@ class GrayscaleImageRegressionTest {
 
             Ifd ifd = file.ifd(0);
 
-            int[] bitsPerSample = BitsPerSample.getRequired(ifd);
+            int[] bitsPerSample = BitsPerSample.get(ifd);
 
             int compression = Compression.get(ifd);
-            int photometricInterpretation = PhotometricInterpretation.getRequired(ifd);
+            int photometricInterpretation = PhotometricInterpretation.get(ifd);
 
             assertAll(
                     "Check IFD(0) contents.",

@@ -2,8 +2,10 @@ package io.github.stellarsunset.tiff.baseline.tag;
 
 import io.github.stellarsunset.tiff.Ifd;
 import io.github.stellarsunset.tiff.Ifd.Entry;
+import io.github.stellarsunset.tiff.Tag;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 
 /**
  * Number of bits per component.
@@ -17,28 +19,24 @@ import java.util.Optional;
  * <p>Most RGB files will have the same number of BitsPerSample for each component. Even in this case, the writer
  * must write all three values.
  */
-public final class BitsPerSample {
+public final class BitsPerSample implements Tag.Accessor {
 
-    public static final String NAME = "BITS_PER_SAMPLE";
+    public static final Tag TAG = new Tag((short) 0x102, "BITS_PER_SAMPLE");
 
-    public static final short ID = 0x102;
-
-    public static int[] getRequired(Ifd ifd) {
-        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+    public static int[] get(Ifd ifd) {
+        return getIfPresent(ifd).orElseThrow(() -> new MissingRequiredTagException(TAG));
     }
 
-    public static Optional<int[]> getOptional(Ifd ifd) {
-        return switch (ifd.findTag(ID)) {
-            case Entry.Short s -> Optional.of(Arrays.toUnsignedIntArray(s.values()));
-            case Entry.NotFound _ -> Optional.of(createDefault(ifd));
-            case Entry.Byte _, Entry.Ascii _, Entry.Long _, Entry.Rational _, Entry.SByte _, Entry.Undefined _,
-                 Entry.SShort _, Entry.SLong _, Entry.SRational _,
-                 Entry.Float _, Entry.Double _ -> throw new UnsupportedTypeForTagException(NAME, ID);
-        };
+    public static Optional<int[]> getIfPresent(Ifd ifd) {
+        return Tag.Accessor.optionalUShortArray(TAG, ifd).or(() -> {
+            OptionalInt samplesPerPixel = SamplesPerPixel.getIfPresent(ifd);
+            return samplesPerPixel.isPresent()
+                    ? Optional.of(createDefault(samplesPerPixel.getAsInt()))
+                    : Optional.empty();
+        });
     }
 
-    static int[] createDefault(Ifd ifd) {
-        int samplesPerPixel = SamplesPerPixel.getRequired(ifd);
+    static int[] createDefault(int samplesPerPixel) {
         int[] array = new int[samplesPerPixel];
         java.util.Arrays.fill(array, 1);
         return array;

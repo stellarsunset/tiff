@@ -1,9 +1,8 @@
 package io.github.stellarsunset.tiff.extension.tag;
 
 import io.github.stellarsunset.tiff.Ifd;
-import io.github.stellarsunset.tiff.Ifd.Entry;
+import io.github.stellarsunset.tiff.Tag;
 import io.github.stellarsunset.tiff.baseline.tag.MissingRequiredTagException;
-import io.github.stellarsunset.tiff.baseline.tag.UnsupportedTypeForTagException;
 
 import java.util.Optional;
 
@@ -14,24 +13,16 @@ import java.util.Optional;
  * <p>In most cases the model space is only two-dimensional, in which case both K and Z should be set to zero; this third
  * dimension is provided in anticipation of future support for 3D digital elevation models and vertical coordinate systems.
  */
-public record ModelTiepoint(double i, double j, double k, double x, double y, double z) {
+public record ModelTiepoint(double i, double j, double k, double x, double y, double z) implements Tag.Accessor {
 
-    public static final String NAME = "MODEL_TIE_POINT";
+    public static final Tag TAG = new Tag((short) 0x8482, "MODEL_TIE_POINT");
 
-    public static final short ID = (short) 0x8482;
-
-    public static ModelTiepoint[] getRequired(Ifd ifd) {
-        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+    public static ModelTiepoint[] get(Ifd ifd) {
+        return getIfPresent(ifd).orElseThrow(() -> new MissingRequiredTagException(TAG));
     }
 
-    public static Optional<ModelTiepoint[]> getOptional(Ifd ifd) {
-        return switch (ifd.findTag(ID)) {
-            case Entry.Double d -> Optional.of(createTiepoints(d.values()));
-            case Entry.NotFound _ -> Optional.empty();
-            case Entry.Byte _, Entry.Ascii _, Entry.Short _, Entry.Long _, Entry.Rational _, Entry.SByte _,
-                 Entry.Undefined _, Entry.SShort _, Entry.SLong _, Entry.SRational _, Entry.Float _ ->
-                    throw new UnsupportedTypeForTagException(NAME, ID);
-        };
+    public static Optional<ModelTiepoint[]> getIfPresent(Ifd ifd) {
+        return Tag.Accessor.optionalDoubleArray(TAG, ifd).map(ModelTiepoint::createTiepoints);
     }
 
     static ModelTiepoint[] createTiepoints(double[] doubles) {

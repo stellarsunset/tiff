@@ -43,7 +43,7 @@ public sealed interface DataImage extends ExtensionImage permits ByteImage, Shor
         @Override
         public Image makeImage(SeekableByteChannel channel, ByteOrder order, Ifd ifd) {
 
-            int[] samples = BitsPerSample.getRequired(ifd);
+            int[] samples = BitsPerSample.get(ifd);
             checkAllEqual(samples, "Should be exactly one component pixel width in the array, instead got %s");
 
             int[] formats = SampleFormat.get(ifd);

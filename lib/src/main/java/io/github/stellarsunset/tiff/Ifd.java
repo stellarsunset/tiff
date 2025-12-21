@@ -1,5 +1,7 @@
 package io.github.stellarsunset.tiff;
 
+import io.github.stellarsunset.tiff.baseline.tag.XResolution;
+
 import java.util.Arrays;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -25,7 +27,7 @@ public record Ifd(short entryCount, Entry[] entries, int nextIfdOffset) {
     public Ifd {
         checkArgument(Short.toUnsignedInt(entryCount) == entries.length,
                 "Entry count (%s) should match entries array length (%s)", Short.toUnsignedInt(entryCount), entries.length);
-        
+
         Arrays.sort(entries); // Ensure entries are sorted
     }
 
@@ -36,11 +38,13 @@ public record Ifd(short entryCount, Entry[] entries, int nextIfdOffset) {
     /**
      * Find the entry associated with the provided tag in the IFD, if not found return {@link Entry.NotFound}.
      *
+     * <p>Prefer routing through builtin utility classes for common tags, e.g. {@link XResolution#get(Ifd)}.
+     *
      * @param tag the short tag id to find
      */
-    public Ifd.Entry findTag(short tag) {
+    public Entry findTag(short tag) {
 
-        Ifd.Entry searchEntry = Ifd.Entry.notFound(tag);
+        Entry searchEntry = Entry.notFound(tag);
         int index = Arrays.binarySearch(entries, searchEntry);
 
         return index < 0 ? searchEntry : entries[index];
@@ -52,6 +56,12 @@ public record Ifd(short entryCount, Entry[] entries, int nextIfdOffset) {
             return new NotFound(tag);
         }
 
+        /**
+         * The short ID of the tag as one would find in the TIFF specification.
+         *
+         * <p>Expect to be able to look this up and find a definition/documentation, internally we have utility classes
+         * for accessing some entries by this id, e.g. {@link XResolution#get(Ifd)}.
+         */
         short tag();
 
         @Override
@@ -102,7 +112,7 @@ public record Ifd(short entryCount, Entry[] entries, int nextIfdOffset) {
         /**
          * 32-bit (4-byte) unsigned integer
          *
-         * <p>To deal with as unsigned use {@link java.lang.Integer#toUnsignedLong(int)}.
+         * <p>To deal with as unsigned use {@link Integer#toUnsignedLong(int)}.
          */
         record Long(short tag, int[] values) implements Entry {
             public Long {
@@ -113,7 +123,7 @@ public record Ifd(short entryCount, Entry[] entries, int nextIfdOffset) {
         /**
          * Two {@link Long}s (i.e. unsigned): the first represents the numerator of a fraction; the second, the denominator.
          *
-         * <p>To deal with as unsigned use {@link java.lang.Integer#toUnsignedLong(int)}.
+         * <p>To deal with as unsigned use {@link Integer#toUnsignedLong(int)}.
          */
         record Rational(short tag, int[] numerators, int[] denominators) implements Entry {
             public Rational {

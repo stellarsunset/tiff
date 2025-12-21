@@ -12,7 +12,7 @@ class CompressionTest {
     void testWrongType() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Float(Compression.ID, new float[]{1.0f})
+                new Ifd.Entry.Float(Compression.TAG.id(), new float[]{1.0f})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
@@ -23,7 +23,7 @@ class CompressionTest {
     void testMissingId() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(YResolution.ID, new short[]{1})
+                new Ifd.Entry.Short(YResolution.TAG.id(), new short[]{1})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
@@ -34,7 +34,7 @@ class CompressionTest {
     void testCorrect() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Short(Compression.ID, new short[]{8})
+                new Ifd.Entry.Short(Compression.TAG.id(), new short[]{8})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);

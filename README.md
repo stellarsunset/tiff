@@ -25,7 +25,7 @@ Ifd ifd0 = file.ifd(0);
 
 // static utility classes are provided for tag-value access, values types are handled via 
 // enhanced switch, unsigned entry values are returned up-cast (e.g. ushort -> int)
-int xResolution = XResolution.getRequired(ifd0);
+int xResolution = XResolution.get(ifd0);
 
 // the first image in the file, images can either be Baseline or Extension types
 Image image0 = file.image(0);
@@ -102,11 +102,11 @@ Functionally this GKD is identical to encoding another Image File Directory (IFD
 meta). Access the GKD through normal tag syntax:
 
 ```java
-GeoKeyDirectory gkd = GeoKeyDirectory.getRequired(ifd);
+GeoKeyDirectory gkd = GeoKeyDirectory.get(ifd);
 
 // interact with the GKD like an IFD
-int rasterType = RasterType.getRequired(gkd);
-int modelType = ModelType.getRequired(gkd);
+int rasterType = RasterType.get(gkd);
+int modelType = ModelType.get(gkd);
 ```
 
 GeoKeys allow clients to geo-reference TIFF raster data, i.e. put pixels on a map and images are used to indicate land cover 
@@ -128,5 +128,8 @@ without dependency conflicts.
 
 ## TODO
 
-1. Modified Huffman compression for BiLevel images
-2. Write files? 
+1. Fixup tags
+   1. Add some way to find all current implementations
+   2. Add some way to go from code -> human-readable names
+2. Modified Huffman compression for BiLevel images
+2. Write files?

@@ -1,11 +1,10 @@
 package io.github.stellarsunset.tiff.extension.tag;
 
 import io.github.stellarsunset.tiff.Ifd;
-import io.github.stellarsunset.tiff.Ifd.Entry;
+import io.github.stellarsunset.tiff.Tag;
 import io.github.stellarsunset.tiff.baseline.tag.ImageLength;
 import io.github.stellarsunset.tiff.baseline.tag.ImageWidth;
 import io.github.stellarsunset.tiff.baseline.tag.MissingRequiredTagException;
-import io.github.stellarsunset.tiff.baseline.tag.UnsupportedTypeForTagException;
 
 import java.util.OptionalLong;
 
@@ -42,24 +41,15 @@ import java.util.OptionalLong;
  *
  * <p>No default. See also {@link TileLength}, {@link TileOffsets}, {@link TileByteCounts}.
  */
-public final class TileWidth {
+public final class TileWidth implements Tag.Accessor {
 
-    public static final String NAME = "TILE_WIDTH";
+    public static final Tag TAG = new Tag((short) 0x142, "TILE_WIDTH");
 
-    public static final short ID = 0x142;
-
-    public static long getRequired(Ifd ifd) {
-        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(NAME, ID));
+    public static long get(Ifd ifd) {
+        return getIfPresent(ifd).orElseThrow(() -> new MissingRequiredTagException(TAG));
     }
 
-    public static OptionalLong getOptional(Ifd ifd) {
-        return switch (ifd.findTag(ID)) {
-            case Entry.Short s -> OptionalLong.of(Short.toUnsignedLong(s.values()[0]));
-            case Entry.Long l -> OptionalLong.of(Integer.toUnsignedLong(l.values()[0]));
-            case Entry.NotFound _ -> OptionalLong.empty();
-            case Entry.Byte _, Entry.Ascii _, Entry.Rational _, Entry.SByte _, Entry.Undefined _, Entry.SShort _,
-                 Entry.SLong _, Entry.SRational _,
-                 Entry.Float _, Entry.Double _ -> throw new UnsupportedTypeForTagException(NAME, ID);
-        };
+    public static OptionalLong getIfPresent(Ifd ifd) {
+        return Tag.Accessor.optionalUInt(TAG, ifd);
     }
 }

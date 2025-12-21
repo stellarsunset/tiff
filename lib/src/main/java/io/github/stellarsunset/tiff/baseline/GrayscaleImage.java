@@ -66,7 +66,7 @@ public sealed interface GrayscaleImage extends BaselineImage {
         N256;
 
         private static ShadesOfGray from(Ifd ifd) {
-            int bitsPerSample = BitsPerSample.getRequired(ifd)[0];
+            int bitsPerSample = BitsPerSample.get(ifd)[0];
             return switch (bitsPerSample) {
                 case 4 -> ShadesOfGray.N16;
                 case 8 -> ShadesOfGray.N256;
@@ -95,7 +95,7 @@ public sealed interface GrayscaleImage extends BaselineImage {
         }
 
         private static Interpretation from(Ifd ifd) {
-            int photometricCode = PhotometricInterpretation.getRequired(ifd);
+            int photometricCode = PhotometricInterpretation.get(ifd);
             return switch (photometricCode) {
                 case 0 -> Interpretation.WHITE_IS_ZERO;
                 case 1 -> Interpretation.BLACK_IS_ZERO;

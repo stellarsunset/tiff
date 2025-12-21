@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 public record ImageDimensions(long length, long width) {
 
     public static ImageDimensions get(Ifd ifd) {
-        return new ImageDimensions(ImageLength.getRequired(ifd), ImageWidth.getRequired(ifd));
+        return new ImageDimensions(ImageLength.get(ifd), ImageWidth.get(ifd));
     }
 
     public Int asIntInfo() {

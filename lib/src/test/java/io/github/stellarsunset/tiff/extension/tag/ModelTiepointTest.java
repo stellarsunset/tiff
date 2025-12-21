@@ -13,22 +13,22 @@ class ModelTiepointTest {
     @Test
     void testWrongType() {
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Float(ModelTiepoint.ID, new float[]{1.0f})
+                new Ifd.Entry.Float(ModelTiepoint.TAG.id(), new float[]{1.0f})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertThrows(UnsupportedTypeForTagException.class, () -> ModelTiepoint.getRequired(ifd));
+        assertThrows(UnsupportedTypeForTagException.class, () -> ModelTiepoint.get(ifd));
     }
 
     @Test
     void testMissingId() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Double(YResolution.ID, new double[]{1.0})
+                new Ifd.Entry.Double(YResolution.TAG.id(), new double[]{1.0})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertThrows(MissingRequiredTagException.class, () -> ModelTiepoint.getRequired(ifd));
+        assertThrows(MissingRequiredTagException.class, () -> ModelTiepoint.get(ifd));
     }
 
     @Test
@@ -36,7 +36,7 @@ class ModelTiepointTest {
 
         Ifd.Entry[] entries = new Ifd.Entry[]{
                 new Ifd.Entry.Double(
-                        ModelTiepoint.ID,
+                        ModelTiepoint.TAG.id(),
                         new double[]{
                                 0.0, 1.0, 2.0, // i,j,k
                                 3.0, 4.0, 5.0  // x,y,z
@@ -46,7 +46,7 @@ class ModelTiepointTest {
 
         Ifd ifd = new Ifd((short) 1, entries, 0);
 
-        ModelTiepoint[] tiepoints = ModelTiepoint.getRequired(ifd);
+        ModelTiepoint[] tiepoints = ModelTiepoint.get(ifd);
         assertEquals(1, tiepoints.length, "Should have one tiepoint");
 
         ModelTiepoint tiepoint = tiepoints[0];

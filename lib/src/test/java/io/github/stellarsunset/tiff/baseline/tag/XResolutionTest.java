@@ -13,32 +13,32 @@ class XResolutionTest {
     void testWrongType() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Float(XResolution.ID, new float[]{1.f})
+                new Ifd.Entry.Float(XResolution.TAG.id(), new float[]{1.f})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertThrows(UnsupportedTypeForTagException.class, () -> XResolution.getRequired(ifd));
+        assertThrows(UnsupportedTypeForTagException.class, () -> XResolution.get(ifd));
     }
 
     @Test
     void testMissingId() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Rational(YResolution.ID, new int[]{0}, new int[]{1})
+                new Ifd.Entry.Rational(YResolution.TAG.id(), new int[]{0}, new int[]{1})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertThrows(MissingRequiredTagException.class, () -> XResolution.getRequired(ifd));
+        assertThrows(MissingRequiredTagException.class, () -> XResolution.get(ifd));
     }
 
     @Test
     void testCorrect() {
 
         Ifd.Entry[] entry = new Ifd.Entry[]{
-                new Ifd.Entry.Rational(XResolution.ID, new int[]{0}, new int[]{1})
+                new Ifd.Entry.Rational(XResolution.TAG.id(), new int[]{0}, new int[]{1})
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertEquals(new Rational(0, 1), XResolution.getRequired(ifd));
+        assertEquals(new Rational(0, 1), XResolution.get(ifd));
     }
 }

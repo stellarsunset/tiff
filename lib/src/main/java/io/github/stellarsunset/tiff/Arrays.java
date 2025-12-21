@@ -1,4 +1,4 @@
-package io.github.stellarsunset.tiff.baseline.tag;
+package io.github.stellarsunset.tiff;
 
 /**
  * Keep package private to keep off client classpath.
