@@ -25,11 +25,11 @@ public record ModelPixelScale(double x, double y, double z) implements Tag.Acces
 
     public static final Tag TAG = new Tag((short) 0x830E, "MODEL_PIXEL_SCALE");
 
-    public static ModelPixelScale getRequired(Ifd ifd) {
-        return getOptional(ifd).orElseThrow(() -> new MissingRequiredTagException(TAG));
+    public static ModelPixelScale get(Ifd ifd) {
+        return getIfPresent(ifd).orElseThrow(() -> new MissingRequiredTagException(TAG));
     }
 
-    public static Optional<ModelPixelScale> getOptional(Ifd ifd) {
+    public static Optional<ModelPixelScale> getIfPresent(Ifd ifd) {
         return Tag.Accessor.optionalDoubleArray(TAG, ifd).map(d -> new ModelPixelScale(d[0], d[1], d[2]));
     }
 }

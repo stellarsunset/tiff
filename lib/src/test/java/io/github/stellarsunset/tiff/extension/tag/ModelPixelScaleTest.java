@@ -17,7 +17,7 @@ class ModelPixelScaleTest {
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertThrows(UnsupportedTypeForTagException.class, () -> ModelPixelScale.getRequired(ifd));
+        assertThrows(UnsupportedTypeForTagException.class, () -> ModelPixelScale.get(ifd));
     }
 
     @Test
@@ -28,7 +28,7 @@ class ModelPixelScaleTest {
         };
 
         Ifd ifd = new Ifd((short) 1, entry, 0);
-        assertThrows(MissingRequiredTagException.class, () -> ModelPixelScale.getRequired(ifd));
+        assertThrows(MissingRequiredTagException.class, () -> ModelPixelScale.get(ifd));
     }
 
     @Test
@@ -45,7 +45,7 @@ class ModelPixelScaleTest {
 
         Ifd ifd = new Ifd((short) 1, entries, 0);
 
-        ModelPixelScale scale = ModelPixelScale.getRequired(ifd);
+        ModelPixelScale scale = ModelPixelScale.get(ifd);
         assertAll(
                 () -> assertEquals(0.0, scale.x(), "x"),
                 () -> assertEquals(1.0, scale.y(), "y"),
