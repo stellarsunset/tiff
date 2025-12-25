@@ -67,7 +67,7 @@ public sealed interface DataImage extends ExtensionImage permits ByteImage, Shor
                 );
             };
 
-            return maker.makeImage(channel, order, ifd);
+            return Image.lazy(() -> maker.makeImage(channel, order, ifd));
         }
 
         static void checkAllEqual(int[] samples, String messageFormat) {
