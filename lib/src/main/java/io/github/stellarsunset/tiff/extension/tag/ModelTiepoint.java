@@ -13,7 +13,7 @@ import java.util.Optional;
  * <p>In most cases the model space is only two-dimensional, in which case both K and Z should be set to zero; this third
  * dimension is provided in anticipation of future support for 3D digital elevation models and vertical coordinate systems.
  *
- * <p>Note: by convention, <i>i</i> the column in the raster and <i>j</i> is the column.
+ * <p>Note: by convention, <i>i</i> is the column in the raster and <i>j</i> is the row.
  */
 public record ModelTiepoint(double i, double j, double k, double x, double y, double z) implements Tag.Accessor {
 

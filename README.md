@@ -109,7 +109,8 @@ int rasterType = RasterType.get(gkd);
 int modelType = ModelType.get(gkd);
 ```
 
-GeoKeys allow clients to geo-reference TIFF raster data, i.e. put pixels on a map and images are used to indicate land cover 
+GeoKeys allow clients to geo-reference TIFF raster data, i.e. put pixels on a map and images are used to indicate land
+cover
 (e.g. Ice vs Open Water vs etc. in a Palette-Color image) or may encode data such as elevation in the raster.
 
 This library purposefully doesn't include a coordinate transform system so clients can pick one that suits their needs
@@ -125,11 +126,12 @@ without dependency conflicts.
 4. Implementations are regression tested against the [NGA TIFF](https://github.com/ngageoint/tiff-java) library
 5. Example [GeoTIFF files](https://prd-tnm.s3.amazonaws.com/index.html?prefix=StagedProducts/Elevation/) published by
    USGS
+6. To explore TIFF files the `tiffinfo` cli tool is a great resource
 
 ## TODO
 
 1. Fixup tags
-   1. Add some way to find all current implementations
-   2. Add some way to go from code -> human-readable names
+    1. Add some way to find all current implementations
+    2. Add some way to go from code -> human-readable names
 2. Modified Huffman compression for BiLevel images
 2. Write files?
