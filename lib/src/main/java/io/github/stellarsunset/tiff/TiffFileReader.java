@@ -60,7 +60,7 @@ public final class TiffFileReader {
     /**
      * Read the contents of the provided {@link SeekableByteChannel} as a TIFF file.
      *
-     * <p>Its typical to provision the {@link SeekableByteChannel} via {@link FileChannel#open(Path, OpenOption...)}.
+     * <p>It's typical to provision the {@link SeekableByteChannel} via {@link FileChannel#open(Path, OpenOption...)}.
      *
      * <p>This byte channel will be used to lazily load image data associated with the TIFF file, so clients should think
      * carefully about how they provision this channel before handing it off (e.g. memory mapped).

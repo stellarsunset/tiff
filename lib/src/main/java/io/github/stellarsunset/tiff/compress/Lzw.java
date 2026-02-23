@@ -4,8 +4,6 @@ import io.github.stellarsunset.tiff.BytesAdapter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
@@ -85,10 +83,16 @@ record Lzw() implements Compressor {
     }
 
     static final class CodeTable {
+
+        /**
+         * The base prefix table to start with in LZW decoding.
+         */
+        private static final byte[][] BASE = baseTable();
+
         /**
          * Mapping from a short, containing the 9-12 bit code
          */
-        private final Map<Short, byte[]> table;
+        private final byte[][] table;
         /**
          * The current highest code value in the table.
          */
@@ -104,12 +108,16 @@ record Lzw() implements Compressor {
             this.codeBits = 9;
         }
 
-        private static Map<Short, byte[]> initializeCodeTable() {
-            Map<Short, byte[]> table = new HashMap<>();
+        private static byte[][] initializeCodeTable() {
+            return new byte[4096][0];
+        }
+
+        private static byte[][] baseTable() {
+            byte[][] bytes = new byte[258][0];
             for (int i = 0; i <= 257; i++) {
-                table.put((short) i, new byte[]{(byte) i});
+                bytes[i] = new byte[]{(byte) i};
             }
-            return table;
+            return bytes;
         }
 
         public int codeBits() {
@@ -117,21 +125,15 @@ record Lzw() implements Compressor {
         }
 
         public boolean containsCode(short code) {
-            return table.containsKey(code);
+            return code <= currentMaxCode;
         }
 
-        /**
-         * Return the byte sequence associated with the current code in the code table.
-         */
         public byte[] bytesForCode(short code) {
-            return table.get(code);
+            return code <= 257 ? BASE[code] : table[code];
         }
 
-        /**
-         * Add the provided bytes
-         */
         public CodeTable addNextCode(byte[] bytes) {
-            table.put(incrementMaxCode(), bytes);
+            table[incrementMaxCode()] = bytes;
             return this;
         }
 
