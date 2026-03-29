@@ -130,8 +130,5 @@ without dependency conflicts.
 
 ## TODO
 
-1. Fixup tags
-    1. Add some way to find all current implementations
-    2. Add some way to go from code -> human-readable names
-2. Modified Huffman compression for BiLevel images
+1. Modified Huffman compression for BiLevel images
 2. Write files?
